@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mark, token } from "@red-cup-engineering/signcell/utterance";
 import { specializationMorphism } from "@red-cup-engineering/signcell/predication";
-import { theoryOfData, derive, derivationValidity } from "../src/typed-theory.mjs";
+import { theoryOfData, derive, derivationValidity, typing } from "../src/typed-theory.mjs";
 
 function fixture() {
   const premise = token(mark("general"));
@@ -60,4 +60,31 @@ test("an invalid earlier step retains its original obstruction evidence", () => 
   assert.equal(result.kind, "typedTheory.derivation-obstruction");
   assert.equal(result.at, premise);
   assert.equal(result.step, step);
+});
+
+test("unadmitted object cannot gain an identity proof merely by matching itself", () => {
+  const {theory,premise}=fixture();
+  const unknown=token(mark("not-an-object-of-this-theory"));
+  const reflexive=derive(theory,unknown,JSON.parse(JSON.stringify(unknown)));
+  assert.equal(reflexive.kind,"typedTheory.derivationSearch-obstruction");
+  assert.deepEqual(reflexive.explored,[]);
+  assert.equal(typing(theory,unknown,unknown).kind,"typedTheory.typing-obstruction");
+  assert.equal(derive(theory,premise,premise).kind,"typedTheory.derivationSearch:witness",
+    "identity remains lawful for an actually admitted base object");
+});
+
+test("fabricated empty-step proof of an unknown cell refuses at checker boundary", () => {
+  const {theory,premise}=fixture();
+  const known=derive(theory,premise,premise).derivation;
+  const intruder=token(mark("not-admitted"));
+  for(const forged of [
+    {...known,premise:intruder,conclusion:intruder},
+    {...known,premise:intruder},
+    {...known,conclusion:intruder},
+  ]){
+    const checked=derivationValidity(theory,forged);
+    assert.equal(checked.kind,"typedTheory.derivation-obstruction");
+    assert.equal(checked.reason,"unadmitted-object");
+  }
+  assert.equal(derivationValidity(theory,known).kind,"typedTheory.derivationCheck:witness");
 });
