@@ -128,8 +128,16 @@ export function derivationClosure(theory) {
 }
 const derivationSearchWitness = (theory, premise, conclusion, derivation) => Object.freeze({ kind: "typedTheory.derivationSearch:witness", theory, premise, conclusion, derivation });
 const derivationSearchObstruction = (theory, premise, conclusion, explored) => Object.freeze({ kind: "typedTheory.derivationSearch-obstruction", theory, premise, conclusion, explored: Object.freeze([...explored]), rank: count(explored) });
+/** Objects must be admitted to this exact theory before its identity
+ * morphisms or proofs can exist. An arbitrary matching pair of JSON values
+ * is not an object of an otherwise unrelated finite category. */
+const admittedObject = (theory, object) => Array.isArray(theory?.objects)
+    && theory.objects.some((known) => baseObjectCoincides(known, object));
+
 /** Breadth-first search for a derivation from premise to conclusion. */
 export function derive(theory, premise, conclusion) {
+    if (!admittedObject(theory, premise) || !admittedObject(theory, conclusion))
+        return derivationSearchObstruction(theory, premise, conclusion, []);
     if (baseObjectCoincides(premise, conclusion)) {
         const derivation = Object.freeze({ kind: "typedTheory.derivation", theory, premise, conclusion, steps: Object.freeze([]), length: natZero });
         return derivationSearchWitness(theory, premise, conclusion, derivation);
@@ -166,6 +174,10 @@ export function typing(theory, premise, conclusion) {
 }
 /** Check each theory rule and that the justified path reaches the declared conclusion. */
 export function derivationValidity(theory, derivation) {
+    if (!admittedObject(theory, derivation?.premise) ||
+        !admittedObject(theory, derivation?.conclusion))
+        return Object.freeze({kind:"typedTheory.derivation-obstruction",
+            theory, reason:"unadmitted-object", derivation});
     let current = derivation.premise;
     for (const step of derivation.steps) {
         const generated = theory.rules.some((rule) => inferenceRulesCoincide(rule, step.rule)
