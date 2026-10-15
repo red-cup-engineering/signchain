@@ -4,7 +4,8 @@
   "type": "module",
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
-    "src"
+    "src",
+    "data/records/requirements-records"
   ],
   "exports": {
     "./package.json": "./package.json",
