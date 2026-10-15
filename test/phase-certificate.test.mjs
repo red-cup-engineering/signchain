@@ -28,7 +28,7 @@ for (const residue of [
 
 test("the canonical phase evidence constructor already rejects either negative tally", () => {
   for (const residue of [{ pos: -1, neg: 0 }, { pos: 0, neg: -1 }]) {
-    assert.throws(() => phaseEvidence(rawEvidence(residue)), /a tally is a natural number/);
+    assert.throws(() => phaseEvidence(rawEvidence(residue)), /a tally must be an exactly representable natural number/u);
   }
 });
 
