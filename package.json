@@ -28,14 +28,14 @@
     "./log": "./src/log.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/signcell": "workspace:*",
-    "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*",
-    "@red-cup-engineering/computer-filepath-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/metrologic": "workspace:*",
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/exact-number-data-service": "workspace:*",
-    "@red-cup-engineering/semiotic-eavt-services-section": "workspace:*"
+    "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",
+    "@red-cup-engineering/metrologic": "0.3.0",
+    "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
+    "@red-cup-engineering/exact-number-data-service": "0.1.1",
+    "@red-cup-engineering/semiotic-eavt-services-section": "0.1.0",
+    "@red-cup-engineering/signcell": "0.1.0",
+    "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
+    "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
   "scripts": {
     "test": "node --test \"test/**/*.test.mjs\""
@@ -46,5 +46,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/red-cup-engineering/signchain.git"
-  }
+  },
+  "private": false
 }
