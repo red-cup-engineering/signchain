@@ -31,7 +31,12 @@ function readingsOf(frame, valuation) {
     if (!isReading(reading)) throw new TypeError(`signchain: a valuation reads FOUR, not ${JSON.stringify(reading)}`);
     const key = coincidenceKey(token);
     if (!known.has(key)) throw new TypeError(`signchain: ${JSON.stringify(token)} is not a token of this frame`);
-    readings.set(key, readingAs("knowledge", reading));
+    const next = readingAs("knowledge", reading);
+    // A valuation is a point of FOUR^T. Repeated tellings at the same token
+    // join evidence in the knowledge order; last-writer-wins would erase one
+    // side of contradiction and make the fiber depend on arrival order.
+    readings.set(key, readings.has(key)
+      ? knowledgeJoinAll([readings.get(key), next], "knowledge") : next);
   }
   return (token) => readings.get(coincidenceKey(token)) ?? "absurd";
 }
