@@ -29,6 +29,29 @@ test("a valuation reads what is told of each token, told nothing where nothing i
   assert.equal(readingAt(possible, "thing"), "absurd");
 });
 
+test("two actors' same-token evidence joins in FOUR rather than overwriting by order", () => {
+  const frame = tokenFrame([told("workshop", "enterprise"), told("enterprise", "territory")]);
+  const forWitness = { token: "workshop", reading: "potential" };
+  const againstWitness = { token: "workshop", reading: "active" };
+  const forward = [forWitness, againstWitness];
+  const reverse = [againstWitness, forWitness];
+  const truth = pointwise(frame, (v) => v, forward);
+  const opposite = pointwise(frame, (v) => v, reverse);
+  assert.deepEqual(truth, opposite, "federated testimony is order-independent");
+  assert.equal(readingAt(truth, "workshop"), "stable",
+    "both sides remain visible in the same token fiber");
+  assert.equal(readingAt(truth, "territory"), "absurd",
+    "contradiction does not give unrelated tokens an invented witness");
+  const joined = possibilize(frame, forward);
+  assert.equal(readingAt(joined, "workshop"), "stable",
+    "specialization preserves the joined contradiction");
+  const repeated = pointwise(frame, (v) => v, [forWitness, forWitness]);
+  assert.equal(readingAt(repeated, "workshop"), "potential",
+    "duplicate positive testimony does not fabricate negative evidence");
+  assert.throws(() => pointwise(frame, (v) => v, [forWitness,
+    { token: "not-a-frame-token", reading: "active" }]), /not a token/u);
+});
+
 test("necessitating reads at a type what its whole extent holds", () => {
   const releases = [told("signcell-release", "release"), told("signgraph-release", "release")];
   const published = (token) => cell(token, "is-on", "registry.561.group", { for: ["npm-view"] });
