@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/signchain",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
@@ -34,7 +34,7 @@
     "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
     "@red-cup-engineering/exact-number-data-service": "0.1.1",
     "@red-cup-engineering/semiotic-eavt-services-section": "0.1.0",
-    "@red-cup-engineering/signcell": "0.4.0",
+    "@red-cup-engineering/signcell": "0.4.2",
     "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
     "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
