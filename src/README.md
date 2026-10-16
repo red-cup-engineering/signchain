@@ -16,6 +16,11 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   projection), inference rules and their composition closure,
   breadth-first derivation search, typing judgments, derivation validity
   checking, and predicate words.
+- `token-fiber` — the fiber algebra over SignCell's token frame: a claim
+  read at every token in FOUR (FOUR^T, each order's meet residuated by its
+  implication), and possibilizing and necessitating along the order, ◇ ⊣ □.
+  It sits between the frame (SignCell's Heyting algebra of tokens) and the
+  token sheaf SignGraph glues from it.
 
 ## Depends on
 
