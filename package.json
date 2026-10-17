@@ -6,7 +6,8 @@
   "files": [
     "src",
     "data/records/requirements-records",
-    "data/schema"
+    "data/schema",
+    "data/examples"
   ],
   "exports": {
     "./package.json": "./package.json",
