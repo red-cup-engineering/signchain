@@ -22,7 +22,7 @@
  * has been told, the order evidence grows in.
  */
 import { cell, cellSet, evidence, evidenced, hasTriple, isCell, admitCell, sameCell, valueOf, measured, knowledgeReading, truthReading } from "@red-cup-engineering/signcell/cell";
-import { conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { knowledgeLeqReading, truthLeqReading, conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { bytesToHex, semanticBytes } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
 // — the bilattice on cells: values combined, evidence accumulated —
@@ -168,5 +168,42 @@ export function adjudicateCellEvidence(original) {
       requires:"an independently established source equivalence relation and relation proof, plus competent effects authority",
     }),
     regime:"finite-reading-only",
+  });
+}
+
+
+/**
+ * Two different orders on the SAME native finite SignCell evidence.
+ *
+ * A knowledge-inflationary source transition can move down in the truth
+ * order when genuine against-evidence is newly received. This is a
+ * concrete finite obstruction to identifying the knowledge closure with
+ * the truth closure and is an appropriate local input to the future
+ * transfinite proof, not itself an ordinal/cofinality witness.
+ */
+export function adjudicateEvidenceTransition(before,after) {
+  if(!isCell(before)||!isCell(after)||!sameCell(before,after))
+    throw new TypeError("SignChain transition requires two native evidence states of the same original cell");
+  const source=adjudicateCellEvidence(before);
+  const target=adjudicateCellEvidence(after);
+  const knowledgeEvidenceLeq=knowledgeLeq(before,after);
+  const truthEvidenceLeq=truthLeq(before,after);
+  const knowledgeValueLeq=knowledgeLeqReading(source.value.knowledge,target.value.knowledge);
+  const truthValueLeq=truthLeqReading(source.value.knowledge,target.value.knowledge);
+  return Object.freeze({
+    kind:"signchain.adjudicatedEvidenceTransition.v1",
+    source,target,
+    witnessOrders:Object.freeze({
+      knowledgeNondecreasing:knowledgeEvidenceLeq,
+      truthNondecreasing:truthEvidenceLeq,
+    }),
+    valueOrders:Object.freeze({
+      knowledgeNondecreasing:knowledgeValueLeq,
+      truthNondecreasing:truthValueLeq,
+    }),
+    distinction:knowledgeEvidenceLeq&&!truthEvidenceLeq
+      ?"knowledge-ascent-without-truth-ascent":"order-directions-are-separately-measured",
+    closureRegime:"not inferred from one finite evidence transition",
+    noQuotientAdmission:true,
   });
 }
