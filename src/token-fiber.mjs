@@ -18,7 +18,7 @@
  */
 import { address, cell, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
 import { extent, generalizations } from "@red-cup-engineering/signcell/token-frame";
-import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthLeqReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const frozen = (values) => Object.freeze([...values]);
 const claimKey = (predicate, object) => address(cell(null, predicate, object));
@@ -76,8 +76,29 @@ const modal = (frame, valuation, coverOf, fold) => {
   return over(frame, (token) => fold(coverOf(frame, token).map(read), "knowledge"));
 };
 
-/** ◇: each token reads the knowledge join of the valuation over its generalizations (itself included). */
-export const possibilize = (frame, valuation) => modal(frame, valuation, generalizations, knowledgeJoinAll);
+const modalFold = (order, knowledgeFold, truthFold) => {
+  if (order === "knowledge") return knowledgeFold;
+  if (order === "truth") return truthFold;
+  throw new TypeError(`signchain: unknown modal fiber order ${String(order)}`);
+};
 
-/** □: each token reads the knowledge meet of the valuation over its extent (itself included). */
-export const necessitate = (frame, valuation) => modal(frame, valuation, extent, knowledgeMeetAll);
+/**
+ * The two independently indexed existential operators over a token frame.
+ * Knowledge order preserves both tellings; truth order uses logical disjunction
+ * (for if any generalization is for; against only if every one is against).
+ * A FOUR value is not a closure ordinal; both are finite fiber projections.
+ */
+export const possibilizeIn = (frame, valuation, order) =>
+  modal(frame, valuation, generalizations, modalFold(order, knowledgeJoinAll, truthJoinAll));
+
+/**
+ * The two indexed universal operators, right-adjoint to their existential
+ * counterparts: knowledge consensus versus truth-order conjunction
+ * (for iff all specializations support; against iff any one denies).
+ */
+export const necessitateIn = (frame, valuation, order) =>
+  modal(frame, valuation, extent, modalFold(order, knowledgeMeetAll, truthMeetAll));
+
+/** Backward-compatible knowledge-order existential and universal. */
+export const possibilize = (frame, valuation) => possibilizeIn(frame, valuation, "knowledge");
+export const necessitate = (frame, valuation) => necessitateIn(frame, valuation, "knowledge");
