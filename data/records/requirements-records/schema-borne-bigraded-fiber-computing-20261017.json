@@ -1,0 +1,51 @@
+{
+  "id": "schema-borne-bigraded-fiber-computing-20261017",
+  "name": "Execute source-derived two-order and multiplicative linear schema programs over original SignCell fibers",
+  "kind": "requirement",
+  "raised-by": "lenticule-science/computer-science-services-section",
+  "asks": "A schema is a typed executable composition of the existing native FOUR fiber functions and a genuine source-generated token frame, not a declaration-only profile.",
+  "scientific-source": "https://github.com/lenticule-science/computer-science-services-section/blob/chatgpt-web/schema-borne-regime-lift-science-20261017/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md",
+  "implementation-owner": "red-cup-engineering/signchain",
+  "constraints": [
+    "Do not change the Obsmetrologia generative order: Marks/Articulating before predications, positing, and all fiber operations.",
+    "Preserve distinct truth and knowledge orders, both positive and negative witness incidences, and linear multiplicative operations.",
+    "Never equate an enumerated family with all admissible causal descents, an application program with a schema validator, or a finite FOUR result with transfinite settlement.",
+    "Never let a schema grant native office, legal, payment, tool or effect powers.",
+    "Only qualify received source-generated SignCell token frames; original evidence authority remains upstream."
+  ],
+  "met-when": [
+    {
+      "cell": "dual-order-modality",
+      "target": "held",
+      "says": "Both indexed modal adjunctions on generated SignCell tokens compute distinct results and pass source-native valid/invalid cases."
+    },
+    {
+      "cell": "schema-as-program",
+      "target": "held",
+      "says": "An actual typed recursive schema program executes using canonical Data FOUR primitives and SignChain fiber functions."
+    },
+    {
+      "cell": "linear-residuation",
+      "target": "held",
+      "says": "A truth-order fusion/residual adjunction holds on all four FOUR points in executable tests; contradictions do not explode into unrelated facts."
+    },
+    {
+      "cell": "source-refusal",
+      "target": "held",
+      "says": "The interpreter refuses forged frames, invalid operators, unenumerated families and unsupported transfinite regime declarations."
+    },
+    {
+      "cell": "consumer-receiving",
+      "target": "held",
+      "says": "The immutable selected SignChain package is installed in a real downstream consumer, which independently exercises positive, different valid, and adverse cases."
+    }
+  ],
+  "x-provenance": {
+    "recorded-on": "2026-10-17",
+    "source-status": "scientific-requirement-to-engineering-proposed; implementation-present-in-review-branch",
+    "readback-separation": "Source change and authored tests are not evidence of executed tests, published release, installed consumer or independent receiving.",
+    "existing-comparator": "SignChain knowledge-only indexed modal evaluator on main",
+    "external-market-comparator": "No qualified matched workload or after-cost measurement available; market beat unclaimed",
+    "new-code": "https://github.com/red-cup-engineering/signchain/blob/chatgpt-web/dual-order-schema-computing-20261017/src/fiber-program.mjs"
+  }
+}
