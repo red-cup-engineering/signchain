@@ -21,7 +21,7 @@
  * The witness sets are ordered too (knowledgeLeq, truthLeq): inclusion of what
  * has been told, the order evidence grows in.
  */
-import { cell, cellSet, evidence, evidenced, hasTriple, sameCell, valueOf } from "@red-cup-engineering/signcell/cell";
+import { cell, cellSet, evidence, evidenced, hasTriple, isCell, admitCell, sameCell, valueOf, measured, knowledgeReading, truthReading } from "@red-cup-engineering/signcell/cell";
 import { conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { bytesToHex, semanticBytes } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
@@ -121,3 +121,52 @@ export function settleJudgments(judgments) {
   });
 }
 
+
+
+/**
+ * An epistemic (knowledge/truth) adjudication of ORIGINAL SignCell evidence.
+ *
+ * Distinguishes the evidence actually told for or against a predication cell
+ * from any written value of that cell. Knowledge and truth are two ORDERS over
+ * the SAME generated FOUR, not two independent primitive epistemic substances
+ * and not two nuclei of one order. An identification needs a source-proved
+ * equivalence relation before Quot.sound may transport it; witness polarity,
+ * byte coincidence, majority, a positive settled value or a semantic-judgment
+ * label alone never grants that relation proof.
+ *
+ * No hidden logical exhaustion/ordinal is inferred from a four-valued state:
+ * this is a finite per-cell reading. Transfinite closure requires its own
+ * ordinal/cofinality and limit-stage transport, not a package label.
+ */
+export function adjudicateCellEvidence(original) {
+  if(!isCell(original))
+    throw new TypeError("SignChain adjudication requires one original SignCell cell with separately retained evidence sides");
+  const source=admitCell(original);
+  const positive=source.for.length>0,negative=source.against.length>0;
+  const posture=positive
+    ?negative?"contested":"supported-unopposed"
+    :negative?"opposed-unopposed":"unobserved";
+  return Object.freeze({
+    kind:"signchain.cellEvidenceAdjudication.v1",
+    source,
+    evidence:Object.freeze({
+      positiveWitnesses:source.for,
+      negativeWitnesses:source.against,
+      knowledge:readingOfSides("knowledge",positive,negative),
+      truth:readingOfSides("truth",positive,negative),
+      posture,
+    }),
+    value:Object.freeze({
+      knowledge:knowledgeReading(source),
+      truth:truthReading(source),
+      measured:measured(source),
+    }),
+    identification:Object.freeze({
+      proposition:"source testimony about a candidate identification, not a proved equivalence relation",
+      eligibleForRelationProof:posture==="supported-unopposed"&&measured(source),
+      quotientAdmitted:false,
+      requires:"an independently established source equivalence relation and relation proof, plus competent effects authority",
+    }),
+    regime:"finite-reading-only",
+  });
+}
