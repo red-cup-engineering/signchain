@@ -67,4 +67,4 @@ fibers. It does not import a second logic engine or derive source Marks.
 The program's finite result is not a transfinite closure certificate or a
 claim that every possible causal descent has been enumerated. Scientific
 requirements and higher-regime proof obligations live with
-[Lenticule Computer Science](https://github.com/lenticule-science/computer-science-services-section/blob/chatgpt-web/schema-borne-regime-lift-science-20261017/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md).
+[Lenticule Computer Science](https://github.com/lenticule-science/computer-science-services-section/blob/main/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md).
