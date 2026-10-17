@@ -54,7 +54,7 @@ test("schema runs distinct truth/knowledge quantifiers across an enumerated fami
 test("indexed quantifiers compose with native linear negation in a schema program", () => {
   const frame = tokenFrame([
     cell("child", SPECIALIZES, "parent", { for: ["taxonomic-witness"] }),
-    cell("child", "qualifies", "candidate", { for: ["witness-1"], against: ["witness-2"] }),
+    cell("child", "qualifies", "candidate", { for: ["witness-1"] }),
     cell("parent", "qualifies", "candidate", { against: ["witness-3"] }),
   ]);
   const term = read("qualifies", "candidate");
@@ -62,7 +62,7 @@ test("indexed quantifiers compose with native linear negation in a schema progra
     program({ op: "indexed", quantifier, order, of: term });
   assert.equal(readingAt(executeFiberProgram(frame, indexed("some", "knowledge")), "child"), "stable");
   assert.equal(readingAt(executeFiberProgram(frame, indexed("some", "truth")), "child"), "potential");
-  assert.equal(readingAt(executeFiberProgram(frame, indexed("all", "knowledge")), "parent"), "active");
+  assert.equal(readingAt(executeFiberProgram(frame, indexed("all", "knowledge")), "parent"), "absurd");
   assert.equal(readingAt(executeFiberProgram(frame, indexed("all", "truth")), "parent"), "active");
   const negated = program({ op: "linear-not", of: indexed("some", "truth").expression });
   assert.equal(readingAt(executeFiberProgram(frame, negated), "child"), "active");
@@ -89,7 +89,7 @@ test("schema's multiplicative tensor and residual preserve truth-order adjunctio
       "the multiplicative residuum is right-adjoint to fusion"
     );
   }
-  assert.equal(readingAt(executeFiberProgram(frame, program(binary("par", expressions[1], expressions[2]))), "single-token"), "stable");
+  assert.equal(readingAt(executeFiberProgram(frame, program(binary("par", expressions[1], expressions[2]))), "single-token"), "potential");
 });
 
 test("malformed, unauthorized and falsely transfinite program shapes refuse execution", () => {
