@@ -7,7 +7,7 @@
 | Stage | Current original |
 | --- | --- |
 | Mathematical conformance | Obsmetrologia: Calculus/Logic/LinearLogicChu.lean, Language/Positing/FiberAlgebra.lean and Calculus/Logic/TwistProductResiduation.lean |
-| Scientific requirement | [Lenticule Computer Science](https://github.com/lenticule-science/computer-science-services-section/blob/chatgpt-web/schema-borne-regime-lift-science-20261017/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md) |
+| Scientific requirement | [Lenticule Computer Science](https://github.com/lenticule-science/computer-science-services-section/blob/main/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md) |
 | Engineering requirement | [Bigraded fiber computing](../data/records/requirements-records/schema-borne-bigraded-fiber-computing-20261017.json) |
 | Specification | [Recursive JSON Schema, Draft 2020-12](../data/schema/fiber-program.schema.json) and the input/output contract below |
 | Architecture | Native SignCell frame → SignChain pointwise/indexed fiber algebra → existing Data FOUR twist product; interpreter composes, does not duplicate |
