@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { cell } from "@red-cup-engineering/signcell/cell";
-import { adjudicateCellEvidence, adjudicateEvidenceTransition } from "../src/bilattice.mjs";
+import { adjudicateCellEvidence, adjudicateEvidenceTransition, knowledgeLeq, truthLeq } from "../src/bilattice.mjs";
 
 const make=(a=[],b=[],value)=>cell("source","proposed-identification","target",
   {for:a,against:b,...(value===undefined?{}:{value})});
@@ -95,4 +95,18 @@ test("different original Mark cell identity refuses an untyped knowledge/truth m
   const other=cell("different","identifies","target",{for:["witness"]});
   assert.throws(()=>adjudicateEvidenceTransition(make(["affirm"]),other),/same original cell/);
   assert.throws(()=>adjudicateEvidenceTransition(make(["affirm"]),{}),/same original cell/);
+});
+
+test("witness comparison uses SignCell's original coincidence key, including independently presented JSON",()=>{
+  const first=make([{source:"Alice",observed:1}]);
+  const same=make([{observed:1,source:"Alice"}]);
+  const different=make([{source:"Alice",observed:2}]);
+  assert.equal(knowledgeLeq(first,same),true);
+  assert.equal(knowledgeLeq(same,first),true);
+  assert.equal(truthLeq(first,same),true);
+  assert.equal(knowledgeLeq(first,different),false);
+  assert.equal(knowledgeLeq(different,first),false);
+  const contested=make([{source:"Alice",observed:1}],[{source:"Bob",observed:1}]);
+  assert.equal(knowledgeLeq(first,contested),true);
+  assert.equal(truthLeq(first,contested),false);
 });
