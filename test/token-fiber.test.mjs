@@ -5,7 +5,7 @@ import { SPECIALIZES, tokenFrame } from "@red-cup-engineering/signcell/token-fra
 import {
   knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingFamilies, truthImplyReading, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { knowledgeWithin, necessitate, pointwise, possibilize, truthWithin, valuationOf } from "../src/token-fiber.mjs";
+import { knowledgeWithin, necessitate, necessitateIn, pointwise, possibilize, possibilizeIn, truthWithin, valuationOf } from "../src/token-fiber.mjs";
 
 const told = (special, general) => cell(special, SPECIALIZES, general, { for: ["leader"] });
 const readingAt = (valuation, token) => valuation.find((entry) => entry.token === token).reading;
@@ -100,4 +100,41 @@ test("possibilizing is a closure, necessitating an interior, and they are adjoin
   assert.ok(knowledgeWithin(diamond, pointwise(diamond, knowledgeMeetReading, necessitate(diamond, v), necessitate(diamond, w)), necessitate(diamond, pointwise(diamond, knowledgeMeetReading, v, w))), "□ preserves meets");
   assert.throws(() => possibilize(diamond, [{ token: "a", reading: "maybe" }]), /reads FOUR/u);
   assert.throws(() => necessitate(diamond, [{ token: "kalshi", reading: "potential" }]), /not a token of this frame/u);
+});
+
+test("truth-order modality retains a contradiction's different logical reading", () => {
+  const frame = tokenFrame([told("specific", "general")]);
+  const state = [{ token: "specific", reading: "potential" }, { token: "general", reading: "active" }];
+  assert.equal(readingAt(possibilizeIn(frame, state, "knowledge"), "specific"), "stable",
+    "knowledge join retains both independent positive and negative reports");
+  assert.equal(readingAt(possibilizeIn(frame, state, "truth"), "specific"), "potential",
+    "truth disjunction retains a supporting side without inventing a contrary side");
+  assert.equal(readingAt(necessitateIn(frame, state, "knowledge"), "general"), "absurd",
+    "knowledge consensus cannot infer a common telling from opposed observers");
+  assert.equal(readingAt(necessitateIn(frame, state, "truth"), "general"), "active",
+    "truth conjunction is refuted by one opposing specialization");
+  assert.deepEqual(possibilizeIn(frame, state, "knowledge"), possibilize(frame, state));
+  assert.deepEqual(necessitateIn(frame, state, "knowledge"), necessitate(frame, state));
+  assert.throws(() => possibilizeIn(frame, state, "mixed"), /unknown modal fiber order/u);
+  assert.throws(() => necessitateIn(frame, state, "both"), /unknown modal fiber order/u);
+});
+
+test("both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers", () => {
+  const frame = tokenFrame([told("specific", "general")]);
+  const samples = [];
+  for (const left of readingFamilies.knowledge) for (const right of readingFamilies.knowledge)
+    samples.push([{ token: "specific", reading: left }, { token: "general", reading: right }]);
+  for (const [order, within] of [["knowledge", knowledgeWithin], ["truth", truthWithin]]) {
+    for (const v of samples) {
+      const possible = possibilizeIn(frame, v, order);
+      const necessary = necessitateIn(frame, v, order);
+      assert.ok(within(frame, v, possible), `${order}: existential is inflationary`);
+      assert.ok(within(frame, necessary, v), `${order}: universal is deflationary`);
+      assert.deepEqual(possibilizeIn(frame, possible, order), possible, `${order}: existential is idempotent`);
+      assert.deepEqual(necessitateIn(frame, necessary, order), necessary, `${order}: universal is idempotent`);
+      for (const w of samples)
+        assert.equal(within(frame, possible, w), within(frame, v, necessitateIn(frame, w, order)),
+          `${order}: existential and universal are adjoint`);
+    }
+  }
 });
