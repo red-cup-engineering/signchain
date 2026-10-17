@@ -21,14 +21,13 @@
  * The witness sets are ordered too (knowledgeLeq, truthLeq): inclusion of what
  * has been told, the order evidence grows in.
  */
-import { cell, cellSet, evidence, evidenced, hasTriple, isCell, admitCell, sameCell, valueOf, measured, knowledgeReading, truthReading } from "@red-cup-engineering/signcell/cell";
+import { cell, cellSet, coincidenceKey, evidence, evidenced, hasTriple, isCell, admitCell, sameCell, valueOf, measured, knowledgeReading, truthReading } from "@red-cup-engineering/signcell/cell";
 import { knowledgeLeqReading, truthLeqReading, conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { bytesToHex, semanticBytes } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+
 
 // — the bilattice on cells: values combined, evidence accumulated —
 
-const key = (witness) => bytesToHex(semanticBytes(witness));
-const includes = (small, large) => { const has = new Set(large.map(key)); return small.every((w) => has.has(key(w))); };
+const includes = (small, large) => { const has = new Set(large.map(coincidenceKey)); return small.every((w) => has.has(coincidenceKey(w))); };
 
 const sameShape = (left, right) => {
   if (hasTriple(left) !== hasTriple(right)) throw new TypeError("signchain: a cell combines only with a cell, a bare evidence pair only with a pair");
