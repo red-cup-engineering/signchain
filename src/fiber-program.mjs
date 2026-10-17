@@ -16,6 +16,8 @@ import {
   residuumReading, truthImplyReading, truthJoinAll, truthJoinReading,
   truthMeetAll, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { tokenFrame } from "@red-cup-engineering/signcell/token-frame";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import {
   knowledgeWithin, necessitateIn, pointwise, possibilizeIn, truthWithin, valuationOf,
 } from "./token-fiber.mjs";
@@ -123,7 +125,11 @@ export function executeFiberProgram(frame, program) {
     throw new TypeError("signchain fiber program: unsupported program kind or version");
   if (frame?.kind !== "signcell.token-frame" || !Array.isArray(frame.cells) || !Array.isArray(frame.tokens))
     throw new TypeError("signchain fiber program: a native SignCell token frame is required");
-  const valuation = expression(frame, program.expression);
+  // Reconstruct the original generated frame. A caller-authored token list is not a source witness.
+  const generated = tokenFrame(frame.cells, { predicate: frame.predicate });
+  if (semanticId(generated) !== semanticId(frame))
+    throw new TypeError("signchain fiber program: declared frame differs from its source-generated token frame");
+  const valuation = expression(generated, program.expression);
   return freeze({
     kind: "signchain.fiber-program-result",
     version: 1,
