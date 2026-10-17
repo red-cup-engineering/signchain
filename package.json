@@ -5,7 +5,9 @@
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
     "src",
-    "data/records/requirements-records"
+    "data/records/requirements-records",
+    "data/schema",
+    "data/examples"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -26,7 +28,8 @@
     "./bilattice": "./src/bilattice.mjs",
     "./token-fiber": "./src/token-fiber.mjs",
     "./rules": "./src/rules.mjs",
-    "./log": "./src/log.mjs"
+    "./log": "./src/log.mjs",
+    "./fiber-program": "./src/fiber-program.mjs"
   },
   "dependencies": {
     "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",

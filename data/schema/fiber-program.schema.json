@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/signchain/fiber-program.schema.json",
+  "title": "SignChain finite schema-borne predication-fiber program",
+  "description": "Executable expressions over a source-qualified native SignCell token frame, with distinct knowledge/truth orders, multiplicative linear operations and explicitly enumerated finite-family quantification. Does not certify transfinite closure, exhaustive descents or effect authority.",
+  "type": "object",
+  "required": [
+    "kind",
+    "version",
+    "expression"
+  ],
+  "properties": {
+    "kind": {
+      "const": "signchain.fiber-program"
+    },
+    "version": {
+      "const": 1
+    },
+    "expression": {
+      "$ref": "#/$defs/expression"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/read"
+        },
+        {
+          "$ref": "#/$defs/linearNot"
+        },
+        {
+          "$ref": "#/$defs/latticeBinary"
+        },
+        {
+          "$ref": "#/$defs/multiplicativeBinary"
+        },
+        {
+          "$ref": "#/$defs/indexed"
+        },
+        {
+          "$ref": "#/$defs/family"
+        }
+      ]
+    },
+    "read": {
+      "type": "object",
+      "required": [
+        "op",
+        "predicate",
+        "object"
+      ],
+      "properties": {
+        "op": {
+          "const": "read"
+        },
+        "predicate": {},
+        "object": {}
+      },
+      "additionalProperties": false
+    },
+    "linearNot": {
+      "type": "object",
+      "required": [
+        "op",
+        "of"
+      ],
+      "properties": {
+        "op": {
+          "const": "linear-not"
+        },
+        "of": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "latticeBinary": {
+      "type": "object",
+      "required": [
+        "op",
+        "operation",
+        "order",
+        "left",
+        "right"
+      ],
+      "properties": {
+        "op": {
+          "const": "binary"
+        },
+        "operation": {
+          "enum": [
+            "join",
+            "meet",
+            "imply"
+          ]
+        },
+        "order": {
+          "enum": [
+            "knowledge",
+            "truth"
+          ]
+        },
+        "left": {
+          "$ref": "#/$defs/expression"
+        },
+        "right": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "multiplicativeBinary": {
+      "type": "object",
+      "required": [
+        "op",
+        "operation",
+        "left",
+        "right"
+      ],
+      "properties": {
+        "op": {
+          "const": "binary"
+        },
+        "operation": {
+          "enum": [
+            "tensor",
+            "lollipop",
+            "par"
+          ]
+        },
+        "left": {
+          "$ref": "#/$defs/expression"
+        },
+        "right": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "indexed": {
+      "type": "object",
+      "required": [
+        "op",
+        "quantifier",
+        "order",
+        "of"
+      ],
+      "properties": {
+        "op": {
+          "const": "indexed"
+        },
+        "quantifier": {
+          "enum": [
+            "some",
+            "all"
+          ]
+        },
+        "order": {
+          "enum": [
+            "knowledge",
+            "truth"
+          ]
+        },
+        "of": {
+          "$ref": "#/$defs/expression"
+        }
+      },
+      "additionalProperties": false
+    },
+    "family": {
+      "type": "object",
+      "required": [
+        "op",
+        "quantifier",
+        "order",
+        "terms"
+      ],
+      "properties": {
+        "op": {
+          "const": "family"
+        },
+        "quantifier": {
+          "enum": [
+            "some",
+            "all"
+          ]
+        },
+        "order": {
+          "enum": [
+            "knowledge",
+            "truth"
+          ]
+        },
+        "terms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/expression"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "x-mathematical-boundary": {
+    "generatedCarrier": "SignCell native tokenFrame",
+    "logicCarrier": "FOUR^T as finite pointwise shadow; FOUR alone is not an ordinal",
+    "orders": [
+      "knowledge",
+      "truth"
+    ],
+    "primitives": "Red Cup Data /four; SignChain /token-fiber; Obsmetrologia Chu(FOUR) dual incidence",
+    "familyDomain": "exactly the nonempty enumerated expression family; exhaustiveness is NOT claimed",
+    "indexDomain": "reflexive/transitive token specialization; not unqualified causal order",
+    "settlement": "none"
+  }
+}

@@ -53,3 +53,18 @@ inference itself use the original
 `@red-cup-engineering/signcraft/settle`.
 The source changes are not yet immutable published package or installed
 consumer receiving.
+
+
+## Executable schema-borne fiber programs
+
+The [fiber-program](docs/fiber-program.md) interface evaluates a typed recursive
+[JSON program schema](data/schema/fiber-program.schema.json) against the original
+generated SignCell token frame. It **computes** both truth- and knowledge-order
+indexed adjoints, multiplicative linear tensor/par/residuation, and finite
+enumerated-family quantification by reusing the original Data FOUR and SignChain
+fibers. It does not import a second logic engine or derive source Marks.
+
+The program's finite result is not a transfinite closure certificate or a
+claim that every possible causal descent has been enumerated. Scientific
+requirements and higher-regime proof obligations live with
+[Lenticule Computer Science](https://github.com/lenticule-science/computer-science-services-section/blob/main/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md).
