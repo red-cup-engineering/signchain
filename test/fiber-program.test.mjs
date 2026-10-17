@@ -102,6 +102,7 @@ test("malformed, unauthorized and falsely transfinite program shapes refuse exec
   assert.throws(() => executeFiberProgram(frame, { ...program(good), closureRegime: "aperiodic" }), /undeclared field/u);
   assert.throws(() => executeFiberProgram(frame, { ...program(good), version: 999 }), /unsupported/u);
   assert.throws(() => executeFiberProgram(null, program(good)), /native SignCell token frame/u);
+  assert.throws(() => executeFiberProgram({ ...frame, tokens: [] }, program(good)), /differs from its source-generated/u);
   assert.throws(() => compareFiberPrograms(frame, program(good), program(good), "mixed"), /unknown order/u);
   assert.deepEqual(executeFiberProgram(frame, program(good)).valuation,
     executeFiberProgram(frame, program(good)).valuation,
