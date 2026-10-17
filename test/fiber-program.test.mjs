@@ -108,3 +108,16 @@ test("malformed, unauthorized and falsely transfinite program shapes refuse exec
     executeFiberProgram(frame, program(good)).valuation,
     "replay on the same unchanged source is deterministic");
 });
+
+test("the packaged schema example evaluates rather than merely passing a declaration check", () => {
+  const example = JSON.parse(readFileSync(new URL("../data/examples/schema-borne-necessity.json", import.meta.url), "utf8"));
+  const frame = tokenFrame([
+    cell("detail", SPECIALIZES, "kind", { for: ["source-specialization"] }),
+    cell("detail", "scenario-a", "outcome", { for: ["witness-a"] }),
+    cell("detail", "scenario-b", "outcome", { against: ["witness-b"] }),
+  ]);
+  const result = executeFiberProgram(frame, example);
+  assert.equal(readingAt(result, "detail"), "potential");
+  assert.equal(readingAt(result, "kind"), "absurd");
+  assert.equal(result.transfiniteSettlement, "not-established");
+});
