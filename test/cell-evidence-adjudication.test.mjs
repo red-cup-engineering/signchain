@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { cell } from "@red-cup-engineering/signcell/cell";
-import { adjudicateCellEvidence } from "../src/bilattice.mjs";
+import { adjudicateCellEvidence, adjudicateEvidenceTransition } from "../src/bilattice.mjs";
 
 const make=(a=[],b=[],value)=>cell("source","proposed-identification","target",
   {for:a,against:b,...(value===undefined?{}:{value})});
@@ -60,4 +60,39 @@ test("non-SignCell carriers and unsupported authority fields refuse",()=>{
     /one original SignCell cell/);
   assert.throws(()=>adjudicateCellEvidence({...make(["a"]),issuerAuthenticated:true}),
     /one original SignCell cell/);
+});
+
+
+test("new opposing evidence ASCENDS knowledge and DESCENDS truth on the same Mark cell",()=>{
+  const before=make(["affirm"]);
+  const after=make(["affirm"],["oppose"]);
+  const step=adjudicateEvidenceTransition(before,after);
+  assert.equal(step.kind,"signchain.adjudicatedEvidenceTransition.v1");
+  assert.equal(step.source.evidence.knowledge,"potential");
+  assert.equal(step.target.evidence.knowledge,"stable");
+  assert.equal(step.witnessOrders.knowledgeNondecreasing,true);
+  assert.equal(step.witnessOrders.truthNondecreasing,false);
+  assert.equal(step.valueOrders.knowledgeNondecreasing,true);
+  assert.equal(step.valueOrders.truthNondecreasing,false);
+  assert.equal(step.distinction,"knowledge-ascent-without-truth-ascent");
+  assert.equal(step.noQuotientAdmission,true);
+  assert.equal(step.closureRegime,"not inferred from one finite evidence transition");
+});
+
+test("finite witness transitions retain their own directions without inventing an ordinal",()=>{
+  const increase=adjudicateEvidenceTransition(make(),make(["affirm"]));
+  assert.equal(increase.witnessOrders.knowledgeNondecreasing,true);
+  assert.equal(increase.witnessOrders.truthNondecreasing,true);
+  const denial=adjudicateEvidenceTransition(make(),make([],["against"]));
+  assert.equal(denial.witnessOrders.knowledgeNondecreasing,true);
+  assert.equal(denial.witnessOrders.truthNondecreasing,false);
+  const forgotten=adjudicateEvidenceTransition(make(["affirm"]),make());
+  assert.equal(forgotten.witnessOrders.knowledgeNondecreasing,false);
+  assert.equal(forgotten.distinction,"order-directions-are-separately-measured");
+});
+
+test("different original Mark cell identity refuses an untyped knowledge/truth morphism",()=>{
+  const other=cell("different","identifies","target",{for:["witness"]});
+  assert.throws(()=>adjudicateEvidenceTransition(make(["affirm"]),other),/same original cell/);
+  assert.throws(()=>adjudicateEvidenceTransition(make(["affirm"]),{}),/same original cell/);
 });
