@@ -16,11 +16,22 @@
  * witness again, which the evidence sets absorb, so iterating T on finitely many
  * rules reaches its least fixed point above the seed.
  */
-import { address, cell, cellSet, knowledgeReading, mergeCellSets, triple } from "@red-cup-engineering/signcell/cell";
+import { address, cell, cellSet, knowledgeReading, merge, mergeCellSets, triple } from "@red-cup-engineering/signcell/cell";
 import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
-const cellAtTriple = (valuation, at) => valuation.find((told) => address(told) === address(at)) ?? cell(at.subject, at.predicate, at.object);
+/** Index one functional valuation, joining repeated tellings of the SAME cell
+ * through SignCell rather than letting first/last insertion order choose which
+ * evidence can license a derivation. A supplied Map is already an indexed
+ * valuation, as used by SignCraft's incremental settlement engine. */
+function indexValuation(valuation) {
+  const indexed = new Map();
+  for (const at of valuation) {
+    const key = address(at), prior = indexed.get(key);
+    indexed.set(key, prior === undefined ? at : merge(prior, at));
+  }
+  return indexed;
+}
 const indexedCellAtTriple = (valuation, at) => valuation.get(address(at)) ?? cell(at.subject, at.predicate, at.object);
 const validateDerivationVersion = (version) => {
   if (version !== 1 && version !== 2) throw new TypeError("signchain derivation: unsupported version");
@@ -42,9 +53,11 @@ export function rule(name, antecedent, consequent) {
 /** A rule with no antecedent: it always tells its consequent. */
 export const always = (at, reading) => rule(`always:${address(at)}:${reading}`, [], { cell: at, reading });
 
-/** Whether every antecedent of a rule holds in a valuation. */
-export const antecedentHolds = (r, valuation) => r.antecedent.every((condition) => knowledgeLeqReading(condition.atLeast, knowledgeReading(cellAtTriple(valuation, condition.cell))));
-const antecedentHoldsIn = (r, valuation) => r.antecedent.every((condition) => knowledgeLeqReading(condition.atLeast, knowledgeReading(indexedCellAtTriple(valuation, condition.cell))));
+/** Shared addressed rule judgment for public arrays and SignCraft Maps. */
+const antecedentHoldsIn = (r, valuation) => r.antecedent.every((condition) =>
+  knowledgeLeqReading(condition.atLeast, knowledgeReading(indexedCellAtTriple(valuation, condition.cell))));
+/** Whether every antecedent holds after repeated source tellings are merged. */
+export const antecedentHolds = (r, valuation) => antecedentHoldsIn(r, indexValuation(valuation));
 
 /** A stable witness per rule, including thresholds, conclusion and evidence lane in its identity.
  * Version 1 is retained only to replay historical settlements; it identifies labels and premise
@@ -61,7 +74,7 @@ export function derivation(r, version = 2) {
 /** What one rule tells in a valuation: its consequent cell, on the sides its reading tells, witnessed by
  *  its derivation; nothing if its antecedent fails. */
 export function fireRule(r, valuation, derivationVersion = 2) {
-  return fireRuleIn(r, new Map(valuation.map((at) => [address(at), at])), derivationVersion);
+  return fireRuleIn(r, indexValuation(valuation), derivationVersion);
 }
 
 /** Fire against an addressed valuation. Settlement can reuse this index across stages. */
@@ -76,7 +89,7 @@ export function fireRuleIn(r, valuation, derivationVersion = 2) {
 
 /** Everything the rules tell in a valuation. */
 export function fire(rules, valuation) {
-  const indexed = new Map(valuation.map((at) => [address(at), at]));
+  const indexed = indexValuation(valuation);
   const tellings = [];
   for (const r of rules) {
     tellings.push(...fireRuleIn(r, indexed));
@@ -88,4 +101,7 @@ export function fire(rules, valuation) {
 export const step = (rules, valuation) => mergeCellSets(valuation, fire(rules, valuation));
 
 /** The names of the rules whose antecedents hold. */
-export const firedRuleNames = (rules, valuation) => Object.freeze(rules.filter((r) => antecedentHolds(r, valuation)).map((r) => r.name));
+export const firedRuleNames = (rules, valuation) => {
+  const indexed = indexValuation(valuation);
+  return Object.freeze(rules.filter((r) => antecedentHoldsIn(r, indexed)).map((r) => r.name));
+};
