@@ -22,11 +22,13 @@ import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 
 /** Index one functional valuation, joining repeated tellings of the SAME cell
  * through SignCell rather than letting first/last insertion order choose which
- * evidence can license a derivation. A supplied Map is already an indexed
- * valuation, as used by SignCraft's incremental settlement engine. */
+ * evidence can license a derivation. Public readers accept either cell arrays
+ * or Maps of addressed cells; Map keys are untrusted here, so derive addresses
+ * from their values. SignCraft's already-admitted index goes directly to
+ * fireRuleIn without rebuilding this index. */
 function indexValuation(valuation) {
   const indexed = new Map();
-  for (const at of valuation) {
+  for (const at of valuation instanceof Map ? valuation.values() : valuation) {
     const key = address(at), prior = indexed.get(key);
     indexed.set(key, prior === undefined ? at : merge(prior, at));
   }
