@@ -18,7 +18,7 @@
  */
 import { address, cell, cellSet, knowledgeReading, merge, mergeCellSets, triple } from "@red-cup-engineering/signcell/cell";
 import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 
 /** Index one functional valuation, joining repeated tellings of the SAME cell
  * through SignCell rather than letting first/last insertion order choose which

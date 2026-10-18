@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bytesToHex, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { bytesToHex, semanticBytes, semanticId } from "@red-cup-engineering/semiotic-content-address";
 import { address, cell, evidence, valueOf } from "@red-cup-engineering/signcell/cell";
 import { derivation, fireRule, rule } from "../src/rules.mjs";
 import { knowledgeJoin, knowledgeLeq, knowledgeMeet, truthJoin, truthLeq, truthMeet } from "../src/bilattice.mjs";
