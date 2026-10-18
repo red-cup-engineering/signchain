@@ -142,6 +142,10 @@ export function phaseEvidenceRegime(phase, evidence) {
     const certificate = certificateOf(evidence.certificate.declaration, { residue: evidence.certificate.residue, seed: zeroSeed });
     return certificate.kind.endsWith("-obstruction") ? null : closureRegimeName(certificate.regime);
   }
+  // An observed finite/countable orbit cannot evidence uncountable cofinality.
+  // The shared ordinal reader refuses that claim; this evidence projection
+  // reports its documented absence of a regime without attempting the claim.
+  if (phase.closure.countableCofinality === false) return null;
   const ordinal = evidence.settledAt === undefined ? omegaOrdinal() : ofNat(evidence.settledAt);
   const regime = closureRegimeName(regimeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality));
   return regimeRank(regime) < 2 ? regime : null;
