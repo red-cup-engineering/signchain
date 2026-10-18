@@ -1,13 +1,14 @@
 {
   "name": "@red-cup-engineering/signchain",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "type": "module",
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
     "src",
     "data/records/requirements-records",
     "data/schema",
-    "data/examples"
+    "data/examples",
+    "test"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -21,7 +22,6 @@
     "./contracts/instrument": "./src/contracts/instrument.mjs",
     "./contracts/observation-lens": "./src/contracts/observation-lens.mjs",
     "./contracts/phase": "./src/contracts/phase.mjs",
-    "./contracts/site-directory-grammar": "./src/contracts/site-directory-grammar.mjs",
     "./contracts/verification": "./src/contracts/verification.mjs",
     "./contracts/judgment": "./src/contracts/judgment.mjs",
     "./contracts/judgment-schema": "./src/contracts/judgment-schema.mjs",
@@ -32,7 +32,6 @@
     "./fiber-program": "./src/fiber-program.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",
     "@red-cup-engineering/metrologic": "0.4.0",
     "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
     "@red-cup-engineering/exact-number-data-service": "0.1.1",
