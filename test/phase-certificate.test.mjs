@@ -85,6 +85,15 @@ test("ordinary phase observations retain their lower-rung behavior", () => {
   assert.equal(phaseEvidenced(aperiodicOrderPhase, [phaseEvidence(observed(aperiodicOrderPhase))]), false);
 });
 
+test("finite and unsettled observations do not supply uncountable cofinality evidence", () => {
+  for (const settledAt of [undefined, 0, 1]) {
+    const evidence = phaseEvidence({ id: "fixture.countable-observation", phase: aperiodicOrderPhase.id,
+      stages: ["fixture.stage"], ...(settledAt === undefined ? {} : { settledAt }) });
+    assert.equal(phaseEvidenceRegime(aperiodicOrderPhase, evidence), null);
+    assert.equal(phaseEvidenced(aperiodicOrderPhase, [evidence]), false);
+  }
+});
+
 test("finite process agreement remains insufficient for universal certificate correspondence", () => {
   const certificate = aheadCertificate("Obsmetrologia.omega_ahead");
   const process = { lattice: { eq: certificate.eq }, endomorphism: point =>
