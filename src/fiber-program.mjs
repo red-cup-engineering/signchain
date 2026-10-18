@@ -17,7 +17,7 @@ import {
   truthMeetAll, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { tokenFrame } from "@red-cup-engineering/signcell/token-frame";
-import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 import {
   knowledgeWithin, necessitateIn, pointwise, possibilizeIn, truthWithin, valuationOf,
 } from "./token-fiber.mjs";

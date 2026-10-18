@@ -25,5 +25,7 @@ Curry-Howard-Lambek reading says is what code is. Pure.
 ## Depends on
 
 `@red-cup-engineering/metrologic` for its metrology and `@red-cup-engineering/signcell`
-for the predication cell it assembles orderings over. Nothing here imports
+for the predication cell it assembles orderings over. Canonical content and
+witness identities use `@red-cup-engineering/semiotic-content-address`.
+Nothing here imports
 SignGraph or SignCraft; SignCraft imports this.

@@ -11,8 +11,8 @@
  */
 import { address, cell, cellSet, coincides, coincidenceKey, knowledgeReading, measured } from "@red-cup-engineering/signcell/cell";
 import { signCellOfSeavt, isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
-import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
-import { retainedCarrier } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/semiotic-content-address";
+import { retainedCarrier } from "@red-cup-engineering/semiotic-content-address";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const ROLES = ["subject", "predicate", "object"];
