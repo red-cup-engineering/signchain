@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { cell } from "@red-cup-engineering/signcell/cell";
+import { cell, claimCoordinate } from "@red-cup-engineering/signcell/cell";
 import { SPECIALIZES, tokenFrame } from "@red-cup-engineering/signcell/token-frame";
 import {
   knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingFamilies, truthImplyReading, truthMeetReading,
@@ -137,4 +137,23 @@ test("both distinct modal adjoint pairs satisfy S4 laws over all finite two-toke
           `${order}: existential and universal are adjoint`);
     }
   }
+});
+
+test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", () => {
+  const original = { beta: [2, 1], alpha: { z: "last", a: "first" } };
+  const equivalent = { alpha: { a: "first", z: "last" }, beta: [2, 1] };
+  const source = tokenFrame([
+    cell("specific", "specializes", "general", { for: ["source-classification"] }),
+    cell("general", "holds", original, { for: ["maker"] }),
+    cell("general", "holds", original, { against: ["receiver"] }),
+    cell("specific", "holds", "other", { for: ["unrelated"] }),
+  ]);
+  assert.equal(claimCoordinate("holds", original), claimCoordinate("holds", equivalent));
+  const vals = valuationOf(source, "holds", equivalent);
+  assert.equal(readingAt(vals, "general"), "stable");
+  assert.equal(readingAt(vals, "specific"), "absurd");
+  assert.equal(readingAt(possibilize(source, vals), "specific"), "stable",
+    "inheritance preserves contradictory original testimony");
+  assert.equal(readingAt(valuationOf(source, "holds", "absent"), "general"), "absurd");
+  assert.notEqual(claimCoordinate(original, "holds"), claimCoordinate("holds", original));
 });
