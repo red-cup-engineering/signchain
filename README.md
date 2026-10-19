@@ -1,6 +1,23 @@
 # signchain
 Witnessed rules, evidence ordering and executable SignCell contracts; one canonical SignChain package owner.
 
+## Fixed telling histories
+
+`TellingLog` from `@red-cup-engineering/signchain/log` receives ordered
+positive and negative tellings during construction. It owns nested terms and
+witnesses and indexes them by the original SignCell coincidence relation.
+Call `new TellingLog(rows).seal()` before retaining or sharing a fixed source
+observation. `seal()` returns that same log, irreversibly refuses later
+`tell`/`deny` calls, and exposes the state as `sealed`. Rows, indexes and all
+existing queries keep their original meanings. A later source observation
+requires a new log; it cannot rewrite an earlier sealed history.
+
+Logs remain appendable by default for existing builders and SEAVT replay.
+`Object.freeze(log)` alone is not finalization: private storage needs the
+native `seal()` guard. Finalization fixes the supplied history, not the truth
+or authority of its testimony. It does not define L-Space; queries remain
+operations over admitted observations of its points.
+
 
 ## Mark-rooted evidence, two orders and the identification frontier
 

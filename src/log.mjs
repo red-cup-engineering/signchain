@@ -43,9 +43,10 @@ export const cellsOfRows = (rows) => cellSet(rows.map((row) => {
   return cell(admitted.subject, admitted.predicate, admitted.object, { [admitted.side]: [admitted.witness] });
 }));
 
-/** An append-only log of tellings. */
+/** An append-only log of tellings, optionally sealed as one fixed history. */
 export class TellingLog {
   #rows = [];
+  #sealed = false;
   // Row positions by each role's term key, so a pattern is read from its narrowest role.
   #byRole = Object.fromEntries(ROLES.map((role) => [role, new Map()]));
 
@@ -57,7 +58,12 @@ export class TellingLog {
     }
   }
 
+  #assertAppendable() {
+    if (this.#sealed) throw new TypeError("signchain log: a sealed history cannot receive tellings");
+  }
+
   #push(row) {
+    this.#assertAppendable();
     const position = this.#rows.length;
     this.#rows.push(row);
     for (const role of ROLES) {
@@ -78,10 +84,16 @@ export class TellingLog {
   }
 
   /** Tell a triple for (witness defaults to the row's position). */
-  tell(at, witness = this.#rows.length, observedAt = undefined) { this.#push(telling(at, witness, "for", observedAt)); return this; }
+  tell(at, witness = this.#rows.length, observedAt = undefined) { this.#assertAppendable(); this.#push(telling(at, witness, "for", observedAt)); return this; }
 
   /** Tell a triple against. */
-  deny(at, witness = this.#rows.length, observedAt = undefined) { this.#push(telling(at, witness, "against", observedAt)); return this; }
+  deny(at, witness = this.#rows.length, observedAt = undefined) { this.#assertAppendable(); this.#push(telling(at, witness, "against", observedAt)); return this; }
+
+  /** Irreversibly finish construction. This same indexed history remains readable. */
+  seal() { this.#sealed = true; return Object.freeze(this); }
+
+  /** Whether this log has finished receiving tellings. */
+  get sealed() { return this.#sealed; }
 
   /** The rows, in order. */
   get rows() { return Object.freeze([...this.#rows]); }
