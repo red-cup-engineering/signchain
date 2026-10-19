@@ -16,12 +16,12 @@
  *
  * Gluing fibers into sections over covers is the layer above this one: SignGraph's token sheaf.
  */
-import { address, cell, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
+import { claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
 import { extent, generalizations } from "@red-cup-engineering/signcell/token-frame";
 import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const frozen = (values) => Object.freeze([...values]);
-const claimKey = (predicate, object) => address(cell(null, predicate, object));
+// The canonical predicate/object coordinate is owned upstream by SignCell.
 
 // A valuation's readings by token key, every frame token present; absent tokens read absurd.
 function readingsOf(frame, valuation) {
@@ -46,9 +46,9 @@ const over = (frame, readingAt) => frozen(frame.tokens.map((token) => Object.fre
 /** The valuation of one claim (predicate, object): each frame token's FOUR reading of what is told
  *  directly of (token, predicate, object) in the frame's cells, in the frame's token order. */
 export function valuationOf(frame, predicate, object) {
-  const target = claimKey(predicate, object);
+  const target = claimCoordinate(predicate, object);
   const told = new Map();
-  for (const at of frame.cells) if (claimKey(at.predicate, at.object) === target) told.set(coincidenceKey(at.subject), at);
+  for (const at of frame.cells) if (claimCoordinate(at.predicate, at.object) === target) told.set(coincidenceKey(at.subject), at);
   return over(frame, (token) => {
     const at = told.get(coincidenceKey(token));
     return at === undefined ? "absurd" : readingOfSides("knowledge", ...sidesOf(at));
