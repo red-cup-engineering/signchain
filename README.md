@@ -1,6 +1,12 @@
 # signchain
 Witnessed rules, evidence ordering and executable SignCell contracts; one canonical SignChain package owner.
 
+## Original LangChain peer obligation
+
+The [original application-peer requirement](data/records/requirements-records/signchain-meets-then-beats-application-peers.json) keeps **LangChain** as the Leader-named target and **Temporal** as a distinct additional workflow-engine target. The existing [R11-SCH-M1/M2/B1 specification](https://github.com/red-cup-engineering/computer-engineering-services-section/blob/main/content/text/documents/specifications/2026-10-15-technology-peer-acceptance.md#56-signchain-langchain-with-opa-as-a-policy-facet) owns the common user-workload comparison and independent receiving, not this README. No paired peer run has established parity or a beat.
+
+The original `./contracts/contract-operation` operation now rejects equal-but-untyped schema coordinates (including `null`/`null`), distinguishing a missing schema boundary from malformed claimed identities. Native tests exercise the **pure** inspect → transform → validate cut used in R11-SCH-M1. This does not simulate model/tool calls, perform a graph checkpoint, grant an effect, or substitute for SignCraft/AOE/FeltOS/Computer Systems execution and receiving.
+
 ## Fixed telling histories
 
 `TellingLog` from `@red-cup-engineering/signchain/log` receives ordered
