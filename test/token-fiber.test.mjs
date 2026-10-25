@@ -157,3 +157,17 @@ test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", (
   assert.equal(readingAt(valuationOf(source, "holds", "absent"), "general"), "absurd");
   assert.notEqual(claimCoordinate(original, "holds"), claimCoordinate("holds", original));
 });
+
+test("transported claim tellings preserve both evidence sides in either wire order", () => {
+  const positive = cell("token", "reports", { value: "source" }, { for: ["observer"] });
+  const negative = cell("token", "reports", { value: "source" }, { against: ["challenger"] });
+  const canonical = tokenFrame([positive, negative]);
+  const expected = valuationOf(canonical, "reports", { value: "source" });
+  assert.equal(readingAt(expected, "token"), "stable");
+  for (const cells of [[positive, negative], [negative, positive]]) {
+    const wire = { ...canonical, cells };
+    const actual = valuationOf(wire, "reports", { value: "source" });
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(possibilize(wire, actual), possibilize(canonical, expected));
+  }
+});

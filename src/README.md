@@ -11,6 +11,16 @@ Curry-Howard-Lambek reading says is what code is. Pure.
 
 ## What lives here
 
+- `log` — ordered, witnessed tellings and their canonical SignCell indexes.
+  `new TellingLog(rows)` owns the supplied rows and remains appendable by
+  default. After construction, `log.seal()` irreversibly finalizes that same
+  log as a fixed history; `log.sealed` reports the state. No second storage,
+  index or query engine is created. Every private append checks the sealed
+  state before changing rows or indexes, including a second check after input
+  admission in case an input getter finalizes the log. Public `tell` and `deny`
+  also reject a sealed receiver before inspecting new input. Repeated sealing
+  returns the same history. Existing unsealed consumers retain their append
+  behavior. Sealing does not authenticate witnesses or imply source authority.
 - `typed-theory` — consequence over SignCell's predication base objects:
   inference morphisms (specialization, converse, subject/object
   projection), inference rules and their composition closure,

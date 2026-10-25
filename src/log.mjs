@@ -10,7 +10,8 @@
  * sides gathered from its rows. A cell set forgets order; the log keeps it.
  */
 import { address, cell, cellSet, coincides, coincidenceKey, knowledgeReading, measured } from "@red-cup-engineering/signcell/cell";
-import { signCellOfSeavt, isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
+import { signCellOfSeavt } from "@red-cup-engineering/signcell/seavt";
+import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
 import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 import { retainedCarrier } from "@red-cup-engineering/semiotic-content-address";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
@@ -43,9 +44,10 @@ export const cellsOfRows = (rows) => cellSet(rows.map((row) => {
   return cell(admitted.subject, admitted.predicate, admitted.object, { [admitted.side]: [admitted.witness] });
 }));
 
-/** An append-only log of tellings. */
+/** An append-only log of tellings, optionally sealed as one fixed history. */
 export class TellingLog {
   #rows = [];
+  #sealed = false;
   // Row positions by each role's term key, so a pattern is read from its narrowest role.
   #byRole = Object.fromEntries(ROLES.map((role) => [role, new Map()]));
 
@@ -57,7 +59,12 @@ export class TellingLog {
     }
   }
 
+  #assertAppendable() {
+    if (this.#sealed) throw new TypeError("signchain log: a sealed history cannot receive tellings");
+  }
+
   #push(row) {
+    this.#assertAppendable();
     const position = this.#rows.length;
     this.#rows.push(row);
     for (const role of ROLES) {
@@ -78,10 +85,16 @@ export class TellingLog {
   }
 
   /** Tell a triple for (witness defaults to the row's position). */
-  tell(at, witness = this.#rows.length, observedAt = undefined) { this.#push(telling(at, witness, "for", observedAt)); return this; }
+  tell(at, witness = this.#rows.length, observedAt = undefined) { this.#assertAppendable(); this.#push(telling(at, witness, "for", observedAt)); return this; }
 
   /** Tell a triple against. */
-  deny(at, witness = this.#rows.length, observedAt = undefined) { this.#push(telling(at, witness, "against", observedAt)); return this; }
+  deny(at, witness = this.#rows.length, observedAt = undefined) { this.#assertAppendable(); this.#push(telling(at, witness, "against", observedAt)); return this; }
+
+  /** Irreversibly finish construction. This same indexed history remains readable. */
+  seal() { this.#sealed = true; return Object.freeze(this); }
+
+  /** Whether this log has finished receiving tellings. */
+  get sealed() { return this.#sealed; }
 
   /** The rows, in order. */
   get rows() { return Object.freeze([...this.#rows]); }

@@ -16,7 +16,7 @@
  *
  * Gluing fibers into sections over covers is the layer above this one: SignGraph's token sheaf.
  */
-import { claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
+import { cellSet, claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
 import { extent, generalizations } from "@red-cup-engineering/signcell/token-frame";
 import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
@@ -48,7 +48,10 @@ const over = (frame, readingAt) => frozen(frame.tokens.map((token) => Object.fre
 export function valuationOf(frame, predicate, object) {
   const target = claimCoordinate(predicate, object);
   const told = new Map();
-  for (const at of frame.cells) if (claimCoordinate(at.predicate, at.object) === target) told.set(coincidenceKey(at.subject), at);
+  // Transported frames may carry separate source tellings of one cell. Read
+  // their upstream knowledge join, exactly as the native frame constructor
+  // does, instead of letting the last wire row erase contrary evidence.
+  for (const at of cellSet(frame.cells)) if (claimCoordinate(at.predicate, at.object) === target) told.set(coincidenceKey(at.subject), at);
   return over(frame, (token) => {
     const at = told.get(coincidenceKey(token));
     return at === undefined ? "absurd" : readingOfSides("knowledge", ...sidesOf(at));
