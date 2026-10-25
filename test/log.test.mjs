@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { TellingLog, telling, cellsOfRows, logOfSeavtRows } from "../src/log.mjs";
 import { cell, witnessFor, witnessAgainst } from "@red-cup-engineering/signcell/cell";
-import { seavtOfSignCell } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
+import { seavtOfSignCell } from "@red-cup-engineering/signcell/seavt";
 
 const decomposed = "ta\u0302che";
 const composed = "tâche";
