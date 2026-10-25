@@ -1,0 +1,5 @@
+# Exact internal artifacts independently received for the original hierarchy repair.
+# Keep the inherited minimumReleaseAge and strict policy for every other release.
+minimumReleaseAgeExclude:
+  - '@red-cup-engineering/signcell@0.13.1-dev.0'
+  - '@red-cup-engineering/metrologic@0.14.3-dev.3'

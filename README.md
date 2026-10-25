@@ -1,6 +1,24 @@
 # signchain
 Witnessed rules, evidence ordering and executable SignCell contracts; one canonical SignChain package owner.
 
+## Source-admitted token fibers
+
+The `0.4.2-dev.0` source edition consumes SignCell `0.13.1-dev.0` and its
+Metrologic-backed token frame. Every valuation, pointwise comparison and modal
+read obtains its token carrier through SignCell's existing `top(frame)`.
+Transported display tokens cannot manufacture a foreign fiber, omit original
+cells, or retain a stale token after mutable source cells change. The same
+source admission governs both knowledge and truth readings.
+
+Possibility joins over generalizations; necessity meets over specializations.
+Their adjunction uses these two converse directions of a finite relation.
+This differs from the symmetric, same-fiber S5 construction in Science's
+[Modal.lean](https://github.com/lenticule-science/obsmetrologia-science-services-section/blob/a8515044eb632f4fc3b639e3b3d8d106e64b90ff/Obsmetrologia/Closure/Modal.lean).
+The two evidence orders remain separate as in
+[FiberAlgebra.lean](https://github.com/lenticule-science/obsmetrologia-science-services-section/blob/a8515044eb632f4fc3b639e3b3d8d106e64b90ff/Obsmetrologia/Language/Positing/FiberAlgebra.lean).
+These executable finite-carrier laws do not prove equality of source Marks,
+grant authority, or advance the supplied history.
+
 ## Fixed telling histories
 
 `TellingLog` from `@red-cup-engineering/signchain/log` receives ordered
@@ -85,3 +103,4 @@ The program's finite result is not a transfinite closure certificate or a
 claim that every possible causal descent has been enumerated. Scientific
 requirements and higher-regime proof obligations live with
 [Lenticule Computer Science](https://github.com/lenticule-science/computer-science-services-section/blob/main/research/regime-lift-computing/2026-10-17-schema-borne-dual-order-linear-computing.md).
+
