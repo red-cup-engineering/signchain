@@ -27,8 +27,8 @@ importers:
         specifier: 0.3.2
         version: 0.3.2
       '@red-cup-engineering/signcell':
-        specifier: 0.12.3
-        version: 0.12.3
+        specifier: 0.13.0
+        version: 0.13.0
 
 packages:
 
@@ -75,6 +75,10 @@ packages:
     resolution: {integrity: sha512-P8SMvW65n+jvHnQpI3lbIKsuMm8V3ilXZxUDKdccRd26gnF7s7w8aXb/ogdLIS+/qiEB+Mjj1Lm266K3cveGAw==}
     hasBin: true
 
+  '@red-cup-engineering/computer-data-engineering-services-section@0.7.1':
+    resolution: {integrity: sha512-W2LGCDWybchB6N2JeDEvK+v9TT0fDMcJXaaioqi+uRz9g/NLZ5EgP6rE3o+RVDtuwKiRnIOshnOf3lVOVNR5VQ==}
+    hasBin: true
+
   '@red-cup-engineering/computer-file-engineering-services-section@0.4.0':
     resolution: {integrity: sha512-if1u0Rg+LYzi3Gq+ZPoqQTmwHoaX/5wHJB0egstMLQ/2V8PzEwvihQCXVx8TJIEoDpZcIGYeFwT1rGJDWOoGgQ==}
     engines: {node: '>=22'}
@@ -87,6 +91,9 @@ packages:
 
   '@red-cup-engineering/computer-filepath-engineering-services-section@0.1.0':
     resolution: {integrity: sha512-q5+4/ufvitEzoDzQbFblRjN1R3gAiRj2D13TllGmjr9r5XcEBrEXmnwcFy0q5L5bimAaqR5KYeFTUILUFJKQPg==}
+
+  '@red-cup-engineering/computer-serialized-content-engineering-services-section@0.1.0':
+    resolution: {integrity: sha512-8IdUOmrtF6wuc0l2ZnGN4QmiA+Xjx/FypjeZ4GIRBTbRb+rp4uQtBunmb1Bnqzz8c+/Ywm7+XvEOoT/akGol8g==}
 
   '@red-cup-engineering/computer-text-content-engineering-services-section@0.1.0':
     resolution: {integrity: sha512-1sR6cPKd754th7xbQWaM2FFZ9MrOF1Sxkt+RLlVN0/QpvNkMZigUFLOTaQyIL+jzn8SGbD5cNZwUwCzXtVjjzg==}
@@ -147,14 +154,17 @@ packages:
   '@red-cup-engineering/signcell@0.11.1':
     resolution: {integrity: sha512-s1XoNDluDGVtQvWIsIlHjNVHOv2xzVJwK2i+Pf8mGQ60m3Llxpo/RQZvDXb3pAUWk9fkxOTobWtG8bOyqDlZQQ==}
 
-  '@red-cup-engineering/signcell@0.12.3':
-    resolution: {integrity: sha512-d7WTp4SxE78VfTphZ2KInPuonplS/FBkkzAUI0X1z/2pyqD/Qd/2P3marGfYt0MsFta07nxPLtG1HXeMzoMRcA==}
+  '@red-cup-engineering/signcell@0.13.0':
+    resolution: {integrity: sha512-0/tyCvC+vPuYXv7SI+trm7XFKh1QgAH1aOWqY0HH7TokvjZK1p/JrdGzZm02eUNJBv3N1vMMG76z8Eu0HXsA5Q==}
 
   '@red-cup-engineering/signcell@0.4.0':
     resolution: {integrity: sha512-VfGyU46S1y0QDlcgYLSYnKZgVbL7Ocn8oWDf2Gw3iYTI8Qgvm2IF2X+oTLu7iOJyWrwlLXnfdXqMROO1Ll4h/Q==}
 
   '@red-cup-engineering/uri-services-section@0.1.1':
     resolution: {integrity: sha512-y5Ipia5hTOLT/0lzEX+DAC/qtfT7ey17jNT/2dh7r0fqromCUxUOQiJOYaapXXWqe79T1sCEmICjukFuLvizmw==}
+
+  '@scure/base@2.4.0':
+    resolution: {integrity: sha512-thZ1TuJwFwBblOhgsjDKvvGirBxNp+wSvY/DR6tJBJOTDhdAAcHJ8Vbr2eFnqaxeca4+t0i9KBf+uHYGWwZORg==}
 
   cbor2@2.4.0:
     resolution: {integrity: sha512-s6+CPoEI6tgwasK2cWMTXt5sy8Yxo4vgRmKgkJSCdKDL/0bHU3aYJoYeHRX7/oywKYA3bxcpqEYkXkrdHe0+0Q==}
@@ -163,6 +173,10 @@ packages:
   content-type@1.0.5:
     resolution: {integrity: sha512-nTjqfcBFEipKdXCv4YDQWCfmcLZKm81ldF0pAopTvyrFGVbcR6P/VAAd5G7N+0tTr8QqiU0tFadD6FK4NtJwOA==}
     engines: {node: '>= 0.6'}
+
+  http-structured-fields@1.0.0:
+    resolution: {integrity: sha512-8eylm5J+xU05FQwAwprann+EtjWdC6DUlMlb/PAPMy1GbSH1SKc/IlJVaD+aa13EbKUh8jqNDqocrZcdNTHB2Q==}
+    engines: {node: '>=20'}
 
   idn-hostname@15.1.19:
     resolution: {integrity: sha512-pRGRbFpQWCptOBWw9Gn5DXtPdern5/XtdkcXdoEavjd+sh72jNm2eVI1eeysp64UisXPfaqoQrnLUKpSN4hJWw==}
@@ -178,6 +192,10 @@ packages:
   uuid@14.0.3:
     resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
     hasBin: true
+
+  whatwg-mimetype@5.0.0:
+    resolution: {integrity: sha512-sXcNcHOC51uPGF0P/D4NVtrkjSU2fNsm9iog4ZvZJsL3rjoDAzXZhkm2MWt1y+PUdggKAYVoMAIYcs78wJ51Cw==}
+    engines: {node: '>=20'}
 
 snapshots:
 
@@ -251,6 +269,15 @@ snapshots:
       '@red-cup-engineering/semiotic-content-address': 0.1.0
       '@red-cup-engineering/uri-services-section': 0.1.1
 
+  '@red-cup-engineering/computer-data-engineering-services-section@0.7.1':
+    dependencies:
+      '@red-cup-engineering/cbor-services-section': 0.1.1
+      '@red-cup-engineering/cryptographic-computer-data-engineering-services-section': 0.3.1
+      '@red-cup-engineering/exact-number-data-service': 0.1.1
+      '@red-cup-engineering/json-services-section': 0.4.0
+      '@red-cup-engineering/semiotic-content-address': 0.1.0
+      '@red-cup-engineering/uri-services-section': 0.1.1
+
   '@red-cup-engineering/computer-file-engineering-services-section@0.4.0':
     dependencies:
       '@red-cup-engineering/computer-content-address-engineering-services-section': 0.2.0
@@ -273,6 +300,14 @@ snapshots:
     dependencies:
       '@red-cup-engineering/computer-text-content-engineering-services-section': 0.1.0
       '@red-cup-engineering/json-services-section': 0.4.0
+
+  '@red-cup-engineering/computer-serialized-content-engineering-services-section@0.1.0':
+    dependencies:
+      '@red-cup-engineering/json-services-section': 0.4.0
+      '@red-cup-engineering/uri-services-section': 0.1.1
+      '@scure/base': 2.4.0
+      http-structured-fields: 1.0.0
+      whatwg-mimetype: 5.0.0
 
   '@red-cup-engineering/computer-text-content-engineering-services-section@0.1.0':
     dependencies:
@@ -376,13 +411,15 @@ snapshots:
       '@red-cup-engineering/metrologic': 0.13.0
       '@red-cup-engineering/semiotic-content-address': 0.1.1
 
-  '@red-cup-engineering/signcell@0.12.3':
+  '@red-cup-engineering/signcell@0.13.0':
     dependencies:
       '@red-cup-engineering/cbor-services-section': 0.1.1
-      '@red-cup-engineering/computer-data-engineering-services-section': 0.3.1
+      '@red-cup-engineering/computer-data-engineering-services-section': 0.7.1
+      '@red-cup-engineering/computer-serialized-content-engineering-services-section': 0.1.0
       '@red-cup-engineering/json-schema-services-section': 0.5.0
       '@red-cup-engineering/metrologic': 0.13.0
       '@red-cup-engineering/semiotic-content-address': 0.1.1
+      '@red-cup-engineering/semiotic-eavt-services-section': 0.3.2
 
   '@red-cup-engineering/signcell@0.4.0':
     dependencies:
@@ -396,11 +433,15 @@ snapshots:
       '@red-cup-engineering/cryptographic-computer-data-engineering-services-section': 0.3.1
       '@red-cup-engineering/json-services-section': 0.4.0
 
+  '@scure/base@2.4.0': {}
+
   cbor2@2.4.0:
     dependencies:
       '@cto.af/wtf8': 0.0.6
 
   content-type@1.0.5: {}
+
+  http-structured-fields@1.0.0: {}
 
   idn-hostname@15.1.19:
     dependencies:
@@ -411,3 +452,5 @@ snapshots:
   punycode@2.3.1: {}
 
   uuid@14.0.3: {}
+
+  whatwg-mimetype@5.0.0: {}
