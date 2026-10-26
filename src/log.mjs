@@ -11,6 +11,9 @@
  */
 import { address, cell, cellSet, coincides, coincidenceKey, knowledgeReading, measured } from "@red-cup-engineering/signcell/cell";
 import { signCellOfSeavt } from "@red-cup-engineering/signcell/seavt";
+import { admitMessage } from "@red-cup-engineering/signcell/signal";
+import { cellEventOfMessage, cellFromCloudEvent } from "@red-cup-engineering/signcell/cloud-events";
+import { observedTimeUnixNano } from "@red-cup-engineering/signcell/observability";
 import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
 import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 import { retainedCarrier } from "@red-cup-engineering/semiotic-content-address";
@@ -137,6 +140,21 @@ export function tellSides(log, at, [forSide, againstSide]) {
 /** A cell's knowledge reading, re-exported for readers of the log's cells. */
 export { knowledgeReading };
 
+/** Both source readers retain exactly the same original witnessed tellings.
+ * Valuation overrides cannot be represented by a telling-only projection. */
+function appendWitnesses(log, seen, at, observedAt) {
+  if (!measured(at))
+    throw new TypeError("signchain log: non-measured SignCell requires a witnessed valuation, not a telling");
+  const cellAddress = address(at);
+  for (const side of SIDES) for (const witness of at[side]) {
+    const key = semanticId([cellAddress, side, witness]);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (side === "for") log.tell(at, witness, observedAt);
+    else log.deny(at, witness, observedAt);
+  }
+}
+
 /**
  * Reconstruct the append-only tellings of witnessed SignCells from existing
  * native SEN/SEAVT rows. The SEAVT store remains the authoritative custody;
@@ -165,15 +183,49 @@ export function logOfSeavtRows(rows, { asOf } = {}) {
     // merely because two distinct instants share a JavaScript millisecond.
     if (asOf !== undefined && compareAbsoluteSeavtClocks(row.t, asOf) > 0) break;
     const at = signCellOfSeavt(row); // SEN admission and SCA subject verification
-    if (!measured(at))
-      throw new TypeError("signchain log: non-measured SignCell requires a witnessed valuation, not a telling");
-    for (const side of ["for", "against"]) for (const witness of at[side]) {
-      const key = semanticId([address(at), side, witness]);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      if (side === "for") log.tell(at, witness, row.t);
-      else log.deny(at, witness, row.t);
-    }
+    appendWitnesses(log, seen, at, row.t);
   }
   return log;
+}
+
+/**
+ * Read retained native claim-event observations through the existing telling
+ * log. The receiver's observation clock selects the cut; the event's asserted
+ * occurrence time never makes a later-received witness available earlier.
+ *
+ * CloudEvents source/id and scalar envelope spelling have exact protocol
+ * equality, separate from the SCA coincidence relation of cells and witnesses.
+ * Receipt adds no evidence. Conflicting event identities refuse before any
+ * result is exposed; complete event history remains in the source messages.
+ */
+export function logOfCellEventMessages(messages, { asOf } = {}) {
+  if (messages == null || typeof messages[Symbol.iterator] !== "function")
+    throw new TypeError("signchain log: claim-event messages must be iterable");
+  const cut = asOf === undefined ? undefined : BigInt(observedTimeUnixNano(asOf));
+  const log = new TellingLog(), seen = new Set(), events = new Map();
+  let preceding;
+  for (const input of messages) {
+    const admitted = admitMessage(input);
+    if (!admitted.ok) throw new TypeError(`signchain log: ${admitted.refusal.message}`);
+    const message = admitted.value;
+    const instant = BigInt(observedTimeUnixNano(message.observedAt));
+    if (preceding !== undefined && instant < preceding)
+      throw new RangeError("signchain log: claim-event observations must be time-ordered");
+    preceding = instant;
+    if (cut !== undefined && instant > cut) break;
+    const event = cellEventOfMessage(message);
+    const eventKey = JSON.stringify([event.source, event.id]);
+    // The admitted claim profile has scalar fields only. Sorting their names
+    // removes object insertion order without changing Unicode or URI spelling.
+    const content = JSON.stringify(Object.entries(event).sort(([left], [right]) =>
+      left < right ? -1 : left > right ? 1 : 0));
+    if (events.has(eventKey) && events.get(eventKey) !== content) {
+      const conflict = new TypeError("signchain log: CloudEvents source/id identifies conflicting envelope content");
+      conflict.code = "event-identity-conflict";
+      throw conflict;
+    }
+    events.set(eventKey, content);
+    appendWitnesses(log, seen, cellFromCloudEvent(event), message.observedAt);
+  }
+  return log.seal();
 }

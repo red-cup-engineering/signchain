@@ -1,0 +1,112 @@
+{
+  "kind": "signchain-claim-event-journal-composition-source-qualification/v1",
+  "scope": "Actual native SignCell, SEAVT and SignChain modules composed with real temporary journal files; source qualification, not immutable published-package receiving or installed-host activation.",
+  "requirement": "signcell-shared-standard-observability",
+  "requirements": [
+    "CL1",
+    "CL2",
+    "CL3",
+    "CL4",
+    "CL5",
+    "CL6",
+    "SV13"
+  ],
+  "sourceBindings": {
+    "signcell": {
+      "files": {
+        "package.json": {
+          "sha256": "1be6b4aaee763a06d304740448b8db0d60d745750ba723da0cc86e78d38ed72d",
+          "gitBlob": "9fb3cbe30cee08c6f2d4b6a64c50f976becdb558"
+        },
+        "src/cell.mjs": {
+          "sha256": "dad6785a13de3a11f893e18c23853993a61805916c2fd400ad6962d6a364b156",
+          "gitBlob": "d2964fb4819ec7e557a47d64b1ba14d923224ee1"
+        },
+        "src/cloud-events.mjs": {
+          "sha256": "658084c34ebb98789770e6675ae706439b9368e8127b8c0460fbef3b8a0353de",
+          "gitBlob": "edfaf76f26347bae174c999378b7d227bf99ee85"
+        },
+        "src/signal.mjs": {
+          "sha256": "ac8bef9d69f2556b4596cec352d26b7cde22da368ccb9198283b46f2df75651a",
+          "gitBlob": "53706d72649c22621dbe4d863975502f75ae0441"
+        },
+        "src/observability.mjs": {
+          "sha256": "f82b5c93b677e0ebe2fde6ec04084e80424ee690e7355728e4a4ca88b4005f1c",
+          "gitBlob": "21e699063cf062997f68f201af8eac5b0337a5d0"
+        },
+        "src/trace-context.mjs": {
+          "sha256": "79dae439178b821b2d0684f5ab65966398ff852a8debc5c61a7d6a82ec086356",
+          "gitBlob": "76dd8b333112ee7211d3662b3050cec336058e23"
+        }
+      },
+      "declaredPackageVersion": "0.13.1-dev.0"
+    },
+    "seavt": {
+      "files": {
+        "package.json": {
+          "sha256": "5bd3a697b0b47767e06dfc8362d168d0cbf4a7ab74b82a9c088b9230ce3ed740",
+          "gitBlob": "cb4161518c7c0c16222d76484502b6f16b2c27ea"
+        },
+        "src/telemetry.mjs": {
+          "sha256": "eaa48a97c40a72b0d0534ec373a260ca02b1ca274d7fd46f1302e944ad6abd44",
+          "gitBlob": "8134a1ff3680b3903aaedf74732e956f3b7aa99f"
+        },
+        "src/telemetry-store.mjs": {
+          "sha256": "c977e86d1b8a99116bcf4de76ee65fa67d6ce83419798045b5568595d854cf39",
+          "gitBlob": "727c721b4afa7393f4cdc5fa7a67455a7ce75f79"
+        },
+        "src/store-core.mjs": {
+          "sha256": "4e774793291ca8ea8a7990a8fd9050a3cefbf9cef32e9a51bc2e816095414a64",
+          "gitBlob": "87976cd72b2cb0b1028f08ee29d6b284fabff392"
+        }
+      },
+      "declaredPackageVersion": "0.3.2"
+    },
+    "signchain": {
+      "files": {
+        "package.json": {
+          "sha256": "d85e5e556288e168475d164072c74dad4ea77f50e8bc963114eb150a21f45fff",
+          "gitBlob": "3b5c34315de63b523c6ed0e3b73d117dce463dc1"
+        },
+        "src/log.mjs": {
+          "sha256": "0eb571b69bf44606cef1546eae6c07ff2fffc44567c3ee9a0570d0e50d20aace",
+          "gitBlob": "1054fbb1f5748cc0453e4b86f6595f6badcce9ad"
+        }
+      },
+      "declaredPackageVersion": "0.4.2-dev.1"
+    }
+  },
+  "signcellLandedCommit": "ce026a96e3c1ad20a3fa1f358af7d1eda4c56899",
+  "nodeVersion": "24.22.1",
+  "command": "SIGNCELL_SOURCE=/absolute/path/to/signcell SEAVT_SOURCE=/absolute/path/to/seavt SIGNCHAIN_SOURCE=/absolute/path/to/signchain node --test --test-reporter=tap data/records/measurements/2026-10-26-shared-claim-journal-reading.test.mjs",
+  "report": {
+    "path": "data/records/measurements/2026-10-26-shared-claim-journal-reading.tap",
+    "sha256": "b8b2bbc38bac026cf76c5c63406cf4fde208bdb99b8e5232ff81aa6b5aef6fa8",
+    "gitBlob": "37daed09a6010ecdab998de0f7e4d456cef6509e"
+  },
+  "fixture": {
+    "path": "data/records/measurements/2026-10-26-shared-claim-journal-reading.test.mjs",
+    "sha256": "4db989f13b9f0733378f1248f97431c2c494bbc22f6d0c9b10390175e1952888",
+    "gitBlob": "895ac800e5abcc66f1d1647a793355251ca9069a"
+  },
+  "results": {
+    "tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "observations": [
+    "Four real journal observations across two channels retain the same original event and two original opposing witnesses; the resulting existing TellingLog has two rows, not four manufactured witnesses.",
+    "A nanosecond observation cut excludes a later observed opposing witness despite its asserted earlier event time.",
+    "The original journal exports four standards-admitted OTLP LogRecords in two channel batches.",
+    "Conflicting same-source/id events remain recoverable as two complete journal messages, while the SignChain reading refuses atomically.",
+    "Clock rollback preserves source causal order and complete custody; the explicitly time-ordered SignChain projection refuses instead of silently sorting history."
+  ],
+  "limitations": [
+    "Temporary journal filesystem effects are tested locally. No network OTLP receiver, physical-durability guarantee or production process is asserted.",
+    "SEAVT and SignChain use explicit current SignCell source links. Their declared released supplier versions remain unchanged pending verified publication.",
+    "The cross-owner cases are additional integration qualification; they are not part of the package default unit suite or its published receiving enrollment.",
+    "The runtime must select an explicitly appropriate clock reading before calling the ordered TellingLog projection on a source with backward observation clocks."
+  ]
+}
