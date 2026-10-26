@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { bytesToHex, semanticBytes, semanticId } from "@red-cup-engineering/semiotic-content-address";
-import { address, cell, evidence, valueOf } from "@red-cup-engineering/signcell/cell";
+import { address, cell, evidence, semanticId as cellSemanticId, valueOf } from "@red-cup-engineering/signcell/cell";
 import { derivation, fireRule, rule } from "../src/rules.mjs";
 import { knowledgeJoin, knowledgeLeq, knowledgeMeet, truthJoin, truthLeq, truthMeet } from "../src/bilattice.mjs";
 
@@ -22,6 +22,22 @@ test("same rule labels do not erase different version two licenses", () => {
   const denied = rule("fixture:same-name", [], { cell: conclusion, reading: "denied" });
   assert.deepEqual(derivation(held, 1), derivation(denied, 1));
   assert.notEqual(derivation(held).ruleId, derivation(denied).ruleId);
+});
+
+test("rule identity and firing use the owner of byte-valued source cells", () => {
+  const bytes = new Uint8Array([0, 128, 255]);
+  const premise = cell("source", "has", { bytes, amount: 9007199254740993n }, { for: [{ bytes }] });
+  const conclusion = cell("source", "retains", { bytes });
+  const license = rule("byte-carrier", [{ cell: premise, atLeast: "potential" }], { cell: conclusion, reading: "potential" });
+  bytes.fill(7);
+  const witness = derivation(license);
+  assert.equal(witness.ruleId, cellSemanticId(license));
+  assert.deepEqual(witness.from, [address(premise)]);
+  const [result] = fireRule(license, [premise]);
+  assert.equal(address(result), address(conclusion));
+  assert.deepEqual([...result.object.bytes], [0, 128, 255]);
+  assert.deepEqual(result.for, [witness]);
+  assert.deepEqual(derivation(license, 1), { rule: license.name, from: [address(premise)] });
 });
 
 test("firing preserves the selected derivation version in its evidence", () => {

@@ -51,6 +51,17 @@ test("schema runs distinct truth/knowledge quantifiers across an enumerated fami
   assert.equal(actual("some", "knowledge").effectAuthority, "not-established");
 });
 
+test("source-frame identity uses the owner of retained byte-valued claims", () => {
+  const bytes = new Uint8Array([0, 128, 255]);
+  const original = cell("source", "has", { bytes, amount: 9007199254740993n }, { for: [{ bytes }] });
+  const frame = tokenFrame([original]);
+  bytes.fill(7);
+  const input = program(read("has", { amount: 9007199254740993n, bytes: new Uint8Array([0, 128, 255]) }));
+  assert.equal(readingAt(executeFiberProgram(frame, input), "source"), "potential");
+  assert.throws(() => executeFiberProgram({ ...frame, tokens: [] }, input), /differs from its source-generated/u);
+  assert.equal(executeFiberProgram(frame, input).effectAuthority, "not-established");
+});
+
 test("indexed quantifiers compose with native linear negation in a schema program", () => {
   const frame = tokenFrame([
     cell("child", SPECIALIZES, "parent", { for: ["taxonomic-witness"] }),

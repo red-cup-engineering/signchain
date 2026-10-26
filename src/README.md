@@ -36,6 +36,12 @@ Curry-Howard-Lambek reading says is what code is. Pure.
 
 `@red-cup-engineering/metrologic` for its metrology and `@red-cup-engineering/signcell`
 for the predication cell it assembles orderings over. Canonical content and
-witness identities use `@red-cup-engineering/semiotic-content-address`.
+witness identities use SignCell's re-exported SCA operations, from the same
+owner that retained those cells. The telling log, rule identity and fiber
+program must not re-admit Cell-owned byte snapshots through an independently
+resolved SCA instance: its private retained-carrier custody is different even
+when the wire content is equivalent. Arbitrary source accessors still refuse;
+this binding does not grant them admission. The explicit SCA dependency remains
+for the packaged historical carrier-encoding comparisons.
 Nothing here imports
 SignGraph or SignCraft; SignCraft imports this.

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { cell, address } from '@red-cup-engineering/signcell/cell';
 import { channel, message } from '@red-cup-engineering/signcell/signal';
 import { cellToCloudEvent, cellEventMessage, cellEventOfMessage, cellFromCloudEvent } from '@red-cup-engineering/signcell/cloud-events';
-import { logOfCellEventMessages } from '../src/log.mjs';
+import { logOfCellEventMessages, TellingLog } from '../src/log.mjs';
 
 const first = '2026-10-26T18:00:00.000000001Z';
 const second = '2026-10-26T18:00:00.000000002Z';
@@ -99,4 +99,28 @@ test('CL2: byte-valued claims and exact integers retain the native evidence carr
   assert.equal(address(log.cells()[0]),address(original));
   assert.equal(log.rows[0].object.amount,9007199254740993n);
   assert.deepEqual([...log.rows[0].object.bytes],[0,128,255]);
+});
+
+test('CL2/CL3: retained byte witnesses deduplicate without losing either evidence side',()=>{
+  const bytes=new Uint8Array([0,128,255]);
+  const original=cell('s','has','bytes',{for:[{bytes}],against:[{bytes:new Uint8Array([0,127,255])}]});
+  bytes.fill(7);
+  const e=event(original),a=observed(e),b=observed(e,second,other,[a]);
+  const log=logOfCellEventMessages([a,b]);
+  assert.equal(log.size,2);
+  assert.equal(log.readingAt(original),'stable');
+  assert.equal(address(log.cells()[0]),address(original));
+  assert.deepEqual([...log.where()[0].witness.bytes],[0,128,255]);
+  assert.deepEqual([...log.against()[0].witness.bytes],[0,127,255]);
+  log.where()[0].witness.bytes.fill(9);
+  assert.deepEqual([...log.where()[0].witness.bytes],[0,128,255]);
+});
+
+test('claim retention still refuses unowned witness accessors without executing them',()=>{
+  let reads=0;
+  const foreign={get bytes(){reads++;return new Uint8Array([1]);}};
+  const log=new TellingLog();
+  assert.throws(()=>log.tell({subject:'s',predicate:'p',object:'o'},foreign),/accessors/u);
+  assert.equal(reads,0);
+  assert.equal(log.size,0);
 });
