@@ -1,0 +1,322 @@
+{
+  "kind": "signchain-issued-shared-claim-journal-receiving/v1",
+  "observedAt": "2026-10-26T20:37:09.066885+00:00",
+  "result": "passed",
+  "scope": "Actual issued SignCell 198, SEAVT 200, SignChain 68 and CAIRN 356 compose through their original public APIs and real temporary journal files. No source supplier, provider rewrite, new runtime or codec is introduced.",
+  "requirement": "signcell-shared-standard-observability",
+  "requirements": [
+    "CL1",
+    "CL2",
+    "CL3",
+    "CL4",
+    "CL5",
+    "CL6",
+    "SV13",
+    "JCE1",
+    "JCE3",
+    "JCE6"
+  ],
+  "artifacts": {
+    "signcell": {
+      "name": "@red-cup-engineering/signcell",
+      "version": "0.13.1-dev.198",
+      "gitHead": "1abcd4a218618408284014af35169459c8170a02",
+      "archiveUrl": "https://registry.561.group/@red-cup-engineering/signcell/-/signcell-0.13.1-dev.198.tgz",
+      "integrity": "sha512-0ZhJJxrGa/hSMBTx64D+M1Qeo68oJMYy/Jiq3gA7k0pInXqYQs0ISCFzlY0Dkimi2GoGuETl1ghfJKmSPO9T1w==",
+      "sha256": "3057fcc98f8283927ea09e1b8accc8c73c19e5f6a49bbe0b5e2bf2e8562f9212",
+      "bytes": 104141,
+      "packagePath": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+      "archivePath": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/signcell-0.13.1-dev.198.tgz",
+      "verifiedOriginalFiles": 44,
+      "manifest": {
+        "bytes": 3353,
+        "sha256": "77c8230fdb639048b8ebc6d30ca3f0f6911f3ec19b17677985010af8836520e5"
+      }
+    },
+    "seavt": {
+      "name": "@red-cup-engineering/semiotic-eavt-services-section",
+      "version": "0.3.3-dev.200",
+      "gitHead": "389951f15e0ffb57ee29f8d71ef1a16a4904ce3d",
+      "archiveUrl": "https://registry.561.group/@red-cup-engineering/semiotic-eavt-services-section/-/semiotic-eavt-services-section-0.3.3-dev.200.tgz",
+      "integrity": "sha512-7IgIQnXX0cblR3jw23TZE6vRmykr12e5SYGiRulXdV4bnPOKPwFqUhtU4YaWVlVBYsxs2FLIZB9+V3oQVKgjdg==",
+      "sha256": "dfc538a4229a61aeef1bfbbd592d9cdfd8d63c88f923c97fdc770d3f39966424",
+      "bytes": 61017,
+      "packagePath": "/workspace/scratch/455c183ed200/evidence/published-seavt-200/package",
+      "archivePath": "/workspace/scratch/455c183ed200/evidence/published-seavt-200/seavt-0.3.3-dev.200.tgz",
+      "verifiedOriginalFiles": 33,
+      "manifest": {
+        "bytes": 3063,
+        "sha256": "0926fdfb34689f6b2c8784cde06ecee5401bbfa52468c042965b168672780819"
+      }
+    },
+    "signchain": {
+      "name": "@red-cup-engineering/signchain",
+      "version": "0.4.2-dev.68",
+      "gitHead": "d7609603e35ebad3a265b3177c2b6314fcf2666d",
+      "archiveUrl": "https://registry.561.group/@red-cup-engineering/signchain/-/signchain-0.4.2-dev.68.tgz",
+      "integrity": "sha512-ef4+/xJjMW1/ez8uXlljmSq4wWsULHb7Ja2tmxpbVrRzwY/K+phoSkQFWjN+nv7i7WhwKxwQH02uhBDKYsj7bA==",
+      "sha256": "df6f50eca0f966b89f71f751c1e2ed159b4a5da5cf0839bf581c847dc717b809",
+      "bytes": 74415,
+      "packagePath": "/workspace/scratch/455c183ed200/evidence/published-signchain-68/package",
+      "archivePath": "/workspace/scratch/455c183ed200/evidence/published-signchain-68/signchain-0.4.2-dev.68.tgz",
+      "verifiedOriginalFiles": 40,
+      "manifest": {
+        "bytes": 2432,
+        "sha256": "c5d211ce7918ba5e702e113d8d905ddab7aebf5a0fad2ad64a4716b8b866ebda"
+      }
+    },
+    "cairn": {
+      "name": "@red-cup-engineering/knowledge-system-server",
+      "version": "0.2.5-dev.356",
+      "gitHead": "4504657f251ca5692348aee5066bad53137b803c",
+      "archiveUrl": "https://registry.561.group/@red-cup-engineering/knowledge-system-server/-/knowledge-system-server-0.2.5-dev.356.tgz",
+      "integrity": "sha512-oO9jXvoKWvHlyJSBLsHnzKsIKCJqHKxCDRlFwTbLSNI4Mvr4rbLvSrRRJPNf9S/QmExfXCwefusbL6tYeQhQgg==",
+      "sha256": "d7761cf8777f22622269f719e7afa589cf304e02efcc4b56ad645bddfdbeba06",
+      "bytes": 468908,
+      "packagePath": "/workspace/scratch/455c183ed200/evidence/published-cairn-356/package",
+      "archivePath": "/workspace/scratch/455c183ed200/evidence/published-cairn-356/cairn-0.2.5-dev.356.tgz",
+      "verifiedOriginalFiles": 136,
+      "manifest": {
+        "bytes": 10574,
+        "sha256": "9f0c94ea10b33a0064a0e04f6506c1ebc005eb8e31e886ddde89c71bf5c2fada"
+      }
+    }
+  },
+  "providerSelection": {
+    "method": "Each package is selected by an explicit extracted archive root. createRequire anchored at that owner resolves its own public exports and its exact declared SignCell package. Each native Cell factory or decoder uses that owner selection; only original CloudEvent/message data crosses owners.",
+    "owners": {
+      "seavt": {
+        "nodeModulesPath": "/workspace/scratch/455c183ed200/seavt/node_modules",
+        "exactDeclaredDirectProviderManifestsVerified": 8,
+        "allDirectVersionsMatchPublishedManifest": true,
+        "relevantDirectSelections": [
+          {
+            "name": "@red-cup-engineering/computer-data-engineering-services-section",
+            "version": "0.2.0",
+            "path": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+            "manifest": {
+              "bytes": 2641,
+              "sha256": "d054adc1d03cd518eff79b3e25e3cacaf2ec914e45dde17df80e9196c8063e3c"
+            }
+          },
+          {
+            "name": "@red-cup-engineering/signcell",
+            "version": "0.13.1-dev.198",
+            "path": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+            "manifest": {
+              "bytes": 3353,
+              "sha256": "77c8230fdb639048b8ebc6d30ca3f0f6911f3ec19b17677985010af8836520e5"
+            }
+          }
+        ],
+        "signcell": {
+          "path": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+          "version": "0.13.1-dev.198",
+          "allOriginalArchiveFilesCompared": 44,
+          "allOriginalArchiveFilesEqualBeforeAndAfter": true,
+          "allDeclaredDirectProviderManifestsVerified": 8,
+          "dataProvider": {
+            "version": "0.7.1",
+            "path": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.7.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+            "manifest": {
+              "bytes": 3380,
+              "sha256": "563eabcb8919db7123f1092dd47906ecdfcd86ea1ef5706fac708c91d8478bc7"
+            }
+          }
+        }
+      },
+      "signchain": {
+        "nodeModulesPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules",
+        "exactDeclaredDirectProviderManifestsVerified": 7,
+        "allDirectVersionsMatchPublishedManifest": true,
+        "relevantDirectSelections": [
+          {
+            "name": "@red-cup-engineering/computer-data-engineering-services-section",
+            "version": "0.3.1",
+            "path": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.3.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+            "manifest": {
+              "bytes": 3196,
+              "sha256": "5f2467568734022f482aa4db9fd875c74d507781088634452c3abbda1952bd90"
+            }
+          },
+          {
+            "name": "@red-cup-engineering/semiotic-eavt-services-section",
+            "version": "0.3.2",
+            "path": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+semiotic-eavt-services-section@0.3.2/node_modules/@red-cup-engineering/semiotic-eavt-services-section",
+            "manifest": {
+              "bytes": 2681,
+              "sha256": "b2a55e2ab735fa9d7c3b17a449e9726be994fa10b75913d45f6f55559e0a072d"
+            }
+          },
+          {
+            "name": "@red-cup-engineering/signcell",
+            "version": "0.13.1-dev.198",
+            "path": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+            "manifest": {
+              "bytes": 3353,
+              "sha256": "77c8230fdb639048b8ebc6d30ca3f0f6911f3ec19b17677985010af8836520e5"
+            }
+          }
+        ],
+        "signcell": {
+          "path": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+          "version": "0.13.1-dev.198",
+          "allOriginalArchiveFilesCompared": 44,
+          "allOriginalArchiveFilesEqualBeforeAndAfter": true,
+          "allDeclaredDirectProviderManifestsVerified": 8,
+          "dataProvider": {
+            "version": "0.7.1",
+            "path": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.7.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+            "manifest": {
+              "bytes": 3380,
+              "sha256": "563eabcb8919db7123f1092dd47906ecdfcd86ea1ef5706fac708c91d8478bc7"
+            }
+          }
+        }
+      },
+      "cairn": {
+        "nodeModulesPath": "/workspace/scratch/455c183ed200/cairn/node_modules",
+        "exactDeclaredDirectProviderManifestsVerified": 35,
+        "allDirectVersionsMatchPublishedManifest": true,
+        "relevantDirectSelections": [
+          {
+            "name": "@red-cup-engineering/semiotic-eavt-services-section",
+            "version": "0.3.3-dev.200",
+            "path": "/workspace/scratch/455c183ed200/evidence/published-seavt-200/package",
+            "manifest": {
+              "bytes": 3063,
+              "sha256": "0926fdfb34689f6b2c8784cde06ecee5401bbfa52468c042965b168672780819"
+            }
+          },
+          {
+            "name": "@red-cup-engineering/computer-data-engineering-services-section",
+            "version": "0.7.1",
+            "path": "/workspace/scratch/10adc8949912/cairn-file-effects/qualification/final-cohort/packed-cairn/package/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.7.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+            "manifest": {
+              "bytes": 3380,
+              "sha256": "563eabcb8919db7123f1092dd47906ecdfcd86ea1ef5706fac708c91d8478bc7"
+            }
+          },
+          {
+            "name": "@red-cup-engineering/signcraft",
+            "version": "0.6.1-dev.495",
+            "path": "/workspace/scratch/10adc8949912/cairn-file-effects/qualification/final-cohort/packed-cairn/package/node_modules/.pnpm/@red-cup-engineering+signcraft@0.6.1-dev.495/node_modules/@red-cup-engineering/signcraft",
+            "manifest": {
+              "bytes": 5816,
+              "sha256": "54b432fd50cf0ab5ba8d3e23752fc2efbf95eb04d46ea0eaca7bde46b9a8ad14"
+            }
+          },
+          {
+            "name": "@red-cup-engineering/signcell",
+            "version": "0.13.1-dev.198",
+            "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+            "manifest": {
+              "bytes": 3353,
+              "sha256": "77c8230fdb639048b8ebc6d30ca3f0f6911f3ec19b17677985010af8836520e5"
+            }
+          }
+        ],
+        "signcell": {
+          "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+          "version": "0.13.1-dev.198",
+          "allOriginalArchiveFilesCompared": 44,
+          "allOriginalArchiveFilesEqualBeforeAndAfter": true,
+          "allDeclaredDirectProviderManifestsVerified": 8,
+          "dataProvider": {
+            "version": "0.7.1",
+            "path": "/workspace/scratch/10adc8949912/signchain-cell-adoption/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.7.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+            "manifest": {
+              "bytes": 3380,
+              "sha256": "563eabcb8919db7123f1092dd47906ecdfcd86ea1ef5706fac708c91d8478bc7"
+            }
+          }
+        }
+      }
+    },
+    "allOwnerDirectProviderManifestsChecked": 50,
+    "allThreeSigncellDirectProviderManifestSelectionsChecked": 24,
+    "providerTreesNotModified": true,
+    "installationScope": "Reused the exact provider selections already qualified for each issued package. This composition performs no install and does not claim a new CAIRN frozen installation.",
+    "retainedCompatibility": "SignChain 68 retains its declared legacy SEAVT 0.3.2 supplier; the separate actual SEAVT 200 journal produces messages consumed by the public logOfCellEventMessages API. CAIRN 356 retains its declared Chain 64 and Craft 495 dependencies. No dependency was silently replaced."
+  },
+  "fixture": {
+    "path": "data/records/measurements/2026-10-26-issued-claim-journal-reading.test.mjs",
+    "bytes": 15338,
+    "sha256": "ea389fcf433e5c149e91f1ec5f405046c3295f00d86f51acad38fb71126f338e",
+    "gitBlob": "0d6c03bf9713961cb1a143fb14f113be428919e9",
+    "derivedFrom": {
+      "path": "data/records/measurements/2026-10-26-shared-claim-journal-reading.test.mjs",
+      "sha256": "4db989f13b9f0733378f1248f97431c2c494bbc22f6d0c9b10390175e1952888",
+      "gitBlob": "895ac800e5abcc66f1d1647a793355251ca9069a",
+      "historicalFixtureUnchanged": true
+    },
+    "change": "Reuse the original three cases. Select verified issued packages through their public exports; resolve SignCell per owner; add CAIRN authorized occurrence, revision and refusal assertions on those exact real cuts. The original fixtures remain deterministic controlled test data."
+  },
+  "receiving": {
+    "startedAt": "2026-10-26T20:35:43.727295+00:00",
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "/workspace/scratch/455c183ed200/signchain/data/records/measurements/2026-10-26-issued-claim-journal-reading.test.mjs"
+    ],
+    "environmentSelection": {
+      "SEAVT_PACKAGE": "/workspace/scratch/455c183ed200/evidence/published-seavt-200/package",
+      "SIGNCHAIN_PACKAGE": "/workspace/scratch/455c183ed200/evidence/published-signchain-68/package",
+      "CAIRN_PACKAGE": "/workspace/scratch/455c183ed200/evidence/published-cairn-356/package"
+    },
+    "cwd": "/workspace/scratch/455c183ed200/signchain",
+    "node": "v24.22.1",
+    "exitCode": 0,
+    "elapsedSeconds": 0.923,
+    "counts": {
+      "tests": 3,
+      "suites": 0,
+      "pass": 3,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "report": "data/records/measurements/2026-10-26-issued-claim-journal-reading.tap",
+    "reportSha256": "eeabcf91b710090b847aade05319e22006453f9fa2c6aa6ef1616e9b0528393e"
+  },
+  "observations": [
+    {
+      "case": 1,
+      "result": "Four unique observations across two channels retain one repeated/forwarded positive event and one opposing event. The original sealed TellingLog contains exactly the two original witnesses; no message, channel, reader or receipt becomes a new witness. Nanosecond asOf cuts retain the original exclusion behavior. The original journal exports four admitted OTLP log records in two channel batches."
+    },
+    {
+      "case": 1,
+      "result": "CAIRN reads that same complete cut through a host-bound source and principal grant. Two pages retain four distinct message IDs with exact causes, channel IDs, observedAt, trace IDs, span IDs, flags, event source/id/subject and data_base64. Its owner-native decoder recovers the original proposition payload and the original for/against witnesses. Both pages share the original revision; knowledgeTruthEstablished remains false."
+    },
+    {
+      "case": 1,
+      "result": "A real fifth append changes the CAIRN cut revision, refuses old-revision pagination and retains five distinct occurrences while the new sealed SignChain log still has only two witnesses. Revoked permission and another actor both refuse before the source callback runs again."
+    },
+    {
+      "case": 2,
+      "result": "Two different payloads under the same event source/id remain recoverable as two complete journal and CAIRN occurrences. SignChain refuses atomically with event-identity-conflict; CAIRN does not claim established world truth."
+    },
+    {
+      "case": 3,
+      "result": "With an intentionally backward controlled observation clock, journal custody and CAIRN retain original causal order, timestamps and causes. The explicitly time-ordered SignChain projection refuses instead of sorting or fabricating time."
+    }
+  ],
+  "postReceiving": {
+    "archiveDigestsAndSRIUnchanged": true,
+    "originalArchiveFilesVerifiedUnchanged": 253,
+    "everySelectedSigncellCopyMatchesAll44OriginalFiles": true,
+    "ownerDirectProviderManifestsAndLinksUnchanged": true,
+    "allThreeSigncellProviderManifestSelectionsUnchanged": true,
+    "historicalSourceFixtureUnchanged": true,
+    "issuedReceivingCaseUnchanged": true,
+    "temporaryJournalsRemovedBySynchronousAfterHook": true
+  },
+  "limits": [
+    "The three cases are additional cross-owner receiving, separate from the default native unit suites and each issued package receiving enrollment.",
+    "The principal and permission are explicit trusted-host test bindings. No deployed authentication system, production journal, live host activation or physical durability is claimed.",
+    "The fixture uses controlled clocks, entropy, actors and native claims. No production data, network Collector, package install or dependency lifecycle script is used.",
+    "A time-ordered knowledge projection still requires an appropriate clock reading; the exercised rollback refusal is preserved."
+  ]
+}
