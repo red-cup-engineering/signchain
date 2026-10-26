@@ -9,14 +9,13 @@
  * this" is well defined); read as cells it gives the cell set, each cell's
  * sides gathered from its rows. A cell set forgets order; the log keeps it.
  */
-import { address, cell, cellSet, coincides, coincidenceKey, knowledgeReading, measured } from "@red-cup-engineering/signcell/cell";
+import { address, cell, cellSet, coincides, coincidenceKey, knowledgeReading, measured,
+  retainedCarrier, semanticId } from "@red-cup-engineering/signcell/cell";
 import { signCellOfSeavt } from "@red-cup-engineering/signcell/seavt";
 import { admitMessage } from "@red-cup-engineering/signcell/signal";
 import { cellEventOfMessage, cellFromCloudEvent } from "@red-cup-engineering/signcell/cloud-events";
 import { observedTimeUnixNano } from "@red-cup-engineering/signcell/observability";
 import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
-import { semanticId } from "@red-cup-engineering/semiotic-content-address";
-import { retainedCarrier } from "@red-cup-engineering/semiotic-content-address";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const ROLES = ["subject", "predicate", "object"];
@@ -35,6 +34,7 @@ export function telling(at, witness, side = "for", observedAt = undefined) {
   if (witness === undefined) throw new TypeError("signchain log: a telling must carry a witness");
   // Own the entire event, including nested witnesses, before indexing it. A
   // later mutation of provider-owned input cannot rewrite a past telling.
+  // Retain through the Cell's own carrier owner, including its byte snapshots.
   return retainedCarrier({ subject: at.subject, predicate: at.predicate, object: at.object, side, witness, ...(observedAt === undefined ? {} : { observedAt }) });
 }
 
