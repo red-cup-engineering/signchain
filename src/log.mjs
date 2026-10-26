@@ -10,7 +10,8 @@
  * sides gathered from its rows. A cell set forgets order; the log keeps it.
  */
 import { address, cell, cellSet, coincides, coincidenceKey, knowledgeReading, measured } from "@red-cup-engineering/signcell/cell";
-import { signCellOfSeavt, isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
+import { signCellOfSeavt } from "@red-cup-engineering/signcell/seavt";
+import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
 import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 import { retainedCarrier } from "@red-cup-engineering/semiotic-content-address";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";

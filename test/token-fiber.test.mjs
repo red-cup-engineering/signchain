@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { cell } from "@red-cup-engineering/signcell/cell";
+import { cell, claimCoordinate } from "@red-cup-engineering/signcell/cell";
 import { SPECIALIZES, tokenFrame } from "@red-cup-engineering/signcell/token-frame";
 import {
   knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingFamilies, truthImplyReading, truthMeetReading,
@@ -137,4 +137,95 @@ test("both distinct modal adjoint pairs satisfy S4 laws over all finite two-toke
           `${order}: existential and universal are adjoint`);
     }
   }
+});
+
+test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", () => {
+  const original = { beta: [2, 1], alpha: { z: "last", a: "first" } };
+  const equivalent = { alpha: { a: "first", z: "last" }, beta: [2, 1] };
+  const source = tokenFrame([
+    cell("specific", "specializes", "general", { for: ["source-classification"] }),
+    cell("general", "holds", original, { for: ["maker"] }),
+    cell("general", "holds", original, { against: ["receiver"] }),
+    cell("specific", "holds", "other", { for: ["unrelated"] }),
+  ]);
+  assert.equal(claimCoordinate("holds", original), claimCoordinate("holds", equivalent));
+  const vals = valuationOf(source, "holds", equivalent);
+  assert.equal(readingAt(vals, "general"), "stable");
+  assert.equal(readingAt(vals, "specific"), "absurd");
+  assert.equal(readingAt(possibilize(source, vals), "specific"), "stable",
+    "inheritance preserves contradictory original testimony");
+  assert.equal(readingAt(valuationOf(source, "holds", "absent"), "general"), "absurd");
+  assert.notEqual(claimCoordinate(original, "holds"), claimCoordinate("holds", original));
+});
+
+test("transported claim tellings preserve both evidence sides in either wire order", () => {
+  const positive = cell("token", "reports", { value: "source" }, { for: ["observer"] });
+  const negative = cell("token", "reports", { value: "source" }, { against: ["challenger"] });
+  const canonical = tokenFrame([positive, negative]);
+  const expected = valuationOf(canonical, "reports", { value: "source" });
+  assert.equal(readingAt(expected, "token"), "stable");
+  for (const cells of [[positive, negative], [negative, positive]]) {
+    const wire = { ...canonical, cells };
+    const actual = valuationOf(wire, "reports", { value: "source" });
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(possibilize(wire, actual), possibilize(canonical, expected));
+  }
+});
+
+test("every fiber reader derives transported tokens from original SignCells", () => {
+  const source = tokenFrame([
+    told("specific", "general"),
+    cell("general", "reports", "claim", { for: ["observer"], against: ["challenger"] }),
+  ]);
+  const valuation = valuationOf(source, "reports", "claim");
+  const left = [{ token: "specific", reading: "potential" }];
+  const right = [];
+  for (const tokens of [[], ["foreign"], ["general", "general"], undefined]) {
+    const wire = { ...source, tokens };
+    assert.deepEqual(valuationOf(wire, "reports", "claim"), valuation);
+    assert.deepEqual(pointwise(wire, x => x, valuation), pointwise(source, x => x, valuation));
+    assert.deepEqual(pointwise(wire, () => "potential"), pointwise(source, () => "potential"));
+    assert.equal(knowledgeWithin(wire, left, right), false, "an omitted source token still participates");
+    assert.equal(truthWithin(wire, left, right), false);
+    for (const order of ["knowledge", "truth"]) {
+      assert.deepEqual(possibilizeIn(wire, valuation, order), possibilizeIn(source, valuation, order));
+      assert.deepEqual(necessitateIn(wire, valuation, order), necessitateIn(source, valuation, order));
+    }
+    const foreign = [{ token: "foreign", reading: "potential" }];
+    for (const read of [
+      () => pointwise(wire, x => x, foreign),
+      () => knowledgeWithin(wire, foreign, []),
+      () => truthWithin(wire, [], foreign),
+      () => possibilize(wire, foreign),
+      () => necessitate(wire, foreign),
+    ]) assert.throws(read, /not a token of this frame/u);
+  }
+});
+
+test("a transported frame's display token accessor is never an admission authority", () => {
+  const source = tokenFrame([told("specific", "general")]);
+  const wire = { kind: source.kind, predicate: source.predicate, cells: source.cells };
+  Object.defineProperty(wire, "tokens", { enumerable: true, get() {
+    throw new Error("display token projection was executed");
+  } });
+  Object.freeze(wire);
+  assert.deepEqual(valuationOf(wire, "absent", "claim"), valuationOf(source, "absent", "claim"));
+  assert.deepEqual(pointwise(wire, () => "potential"), pointwise(source, () => "potential"));
+  assert.deepEqual(possibilize(wire, []), possibilize(source, []));
+  assert.deepEqual(necessitate(wire, []), necessitate(source, []));
+  assert.throws(() => valuationOf({ ...source, kind: "foreign.frame" }, "reports", "claim"), /made by tokenFrame/u);
+});
+
+test("mutated transported source cells are read again instead of trusting stale display tokens", () => {
+  const wire = JSON.parse(JSON.stringify(tokenFrame([
+    cell({ id: "old" }, "reports", "claim", { for: ["observer"] }),
+  ])));
+  assert.deepEqual(valuationOf(wire, "reports", "claim"), [{ token: { id: "old" }, reading: "potential" }]);
+  wire.cells[0].subject.id = "new";
+  assert.deepEqual(valuationOf(wire, "reports", "claim"), [{ token: { id: "new" }, reading: "potential" }]);
+  const newValuation = [{ token: { id: "new" }, reading: "active" }];
+  assert.deepEqual(pointwise(wire, x => x, newValuation), newValuation);
+  assert.deepEqual(possibilize(wire, newValuation), newValuation);
+  assert.deepEqual(necessitate(wire, newValuation), newValuation);
+  assert.throws(() => pointwise(wire, x => x, [{ token: { id: "old" }, reading: "potential" }]), /not a token/u);
 });

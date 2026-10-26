@@ -105,3 +105,23 @@ test("finite process agreement remains insufficient for universal certificate co
   assert.notDeepEqual(process.endomorphism(certificate.limit), certificate.limit);
   // Neither the sampled pass nor SignChain's catalog regime proves this process.
 });
+
+for (const { name, declarationName, phase, residue } of [
+  { name: "ahead", declarationName: "Obsmetrologia.omega_ahead", phase: transfiniteClosurePhase },
+  { name: "germ", declarationName: "Obsmetrologia.residue_germ_ahead", phase: aperiodicOrderPhase, residue: { pos: 1, neg: 1 } },
+]) {
+  test(`raw ${name} phase evidence refuses a coercible declaration without invoking it`, () => {
+    let coercions = 0;
+    const declaration = { [Symbol.toPrimitive]() { coercions += 1; return declarationName; } };
+    const evidence = { kind: "metroplat.phase-evidence", id: "fixture.coercible-declaration",
+      phase: phase.id, stages: ["fixture.observed-stage"],
+      certificate: { declaration, ...(residue === undefined ? {} : { residue }) } };
+    // The public readers receive raw evidence independently of the constructor.
+    // A catalog name must remain a primitive string at the supplier boundary.
+    assert.throws(() => phaseEvidence(evidence), /a certificate names its declaration/u);
+    assert.equal(coercions, 0);
+    assert.equal(phaseEvidenceRegime(phase, evidence), null);
+    assert.equal(phaseEvidenced(phase, [evidence]), false);
+    assert.equal(coercions, 0);
+  });
+}
