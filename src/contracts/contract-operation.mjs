@@ -12,8 +12,8 @@ export const schemaOperationAuditSchema = {
     id: { type: "string" },
     relation: { enum: ["operation", "boundary"] },
     hasPortableBody: { type: "boolean" },
-    domain: { type: "string" },
-    codomain: { type: "string" },
+    domain: { type: "string", minLength: 1, pattern: "\\S" },
+    codomain: { type: "string", minLength: 1, pattern: "\\S" },
     reason: { enum: ["untyped boundary", "admission boundary", "transport boundary"] },
   },
   additionalProperties: false,
@@ -53,11 +53,22 @@ export function executableProgramPacket(
   });
 }
 
+/** A schema cut composes only two explicitly named, nonblank schema coordinates.
+ * A missing or malformed coordinate is not made valid by JS value equality. */
+const typedSchemaAddress = value => typeof value === "string" && value.trim().length > 0;
+
 export function schemaOperationsCompose(producer, consumer) {
-  return producer.codomain !== undefined && consumer.domain !== undefined && producer.codomain === consumer.domain;
+  const codomain = producer?.codomain, domain = consumer?.domain;
+  return typedSchemaAddress(codomain) && typedSchemaAddress(domain) && codomain === domain;
 }
 
 export function auditSchemaOperation(presentation) {
+  if (presentation === null || typeof presentation !== "object" || Array.isArray(presentation))
+    throw new TypeError("schema operation audit: an operation presentation is required");
+  for (const coordinate of ["domain", "codomain"]) {
+    if (presentation[coordinate] !== undefined && !typedSchemaAddress(presentation[coordinate]))
+      throw new TypeError(`schema operation audit: ${coordinate} must be a nonblank schema address when present`);
+  }
   const relation = presentation.domain !== undefined && presentation.codomain !== undefined ? "operation" : "boundary";
   const reason = relation === "operation"
     ? undefined

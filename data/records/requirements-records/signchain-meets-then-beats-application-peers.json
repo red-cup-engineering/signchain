@@ -14,11 +14,11 @@
     "against": [
       {
         "name": "LangChain",
-        "domain": "composable executable workflows, durable continuation and effect custody"
+        "domain": "Composed agent/model/tool operations: typed inputs and outputs, tool choice and middleware behavior, structured outputs, bounded retries, and observable execution through LangGraph-backed agents"
       },
       {
         "name": "Temporal",
-        "domain": "composable executable workflows, durable continuation and effect custody"
+        "domain": "Durable workflow execution: persisted event-history replay, task retries and external-activity idempotency, signals, timeouts, and recovery across worker failure"
       }
     ]
   },
@@ -48,9 +48,36 @@
     "intended-capability": "Composable programs with typed contracts, durable continuation and witnessed effects; fewer opaque agent steps and safer resumption.",
     "derivation": "The subject is grounded in the observed owner or explicitly desired application. Target selections extend the Leader's named comparisons under the quoted delegation. Existing requirements remain additive. Manifest descriptions describe current source and do not determine the intended design.",
     "qualification-gaps": [
-      "Target identities and capability domains are selected; exact baseline versions, workloads, measures and receiving operations remain to be specified.",
+      "Peer identities and existing R11-SCH cases are selected; exact benchmark revisions, complete paired workloads, measures, installed packages and independent receiver decisions remain unqualified.",
       "No comparative receiving command or evidence is attached; satisfaction remains unsettled. Native schema admission remains unreceived after the previously recorded semantic-content-identity export failure."
     ],
-    "admission": "Authored requirement data; not an assertion of signed live-enterprise admission or achieved parity."
+    "admission": "Authored requirement data; not an assertion of signed live-enterprise admission or achieved parity.",
+    "peer-workload-qualification": {
+      "status": "Existing R11 workloads selected; pinned versions, complete paired runtime tests, and independently received installed effects are unqualified",
+      "originalSpecification": "red-cup-engineering/computer-engineering-services-section/content/text/documents/specifications/2026-10-15-technology-peer-acceptance.md#56-signchain-langchain-with-opa-as-a-policy-facet",
+      "LangChain": {
+        "primarySources": [
+          "https://docs.langchain.com/oss/python/langchain/overview",
+          "https://docs.langchain.com/oss/python/learn"
+        ],
+        "selectedCases": [
+          "R11-SCH-M1 typed inspect -> transform -> validate, two tool choices, invalid tool output, tool exception, bounded retry and trace",
+          "R11-SCH-B1 rule identity, premise witnesses, failed and contested paths"
+        ],
+        "ownerBoundary": "SignChain owns pure schema/rule/evidence composition. Model/tool calls, organizational authority, effect custody and durable runtime belong to the original composed consumers."
+      },
+      "Temporal": {
+        "primarySources": [
+          "https://docs.temporal.io/workflows",
+          "https://docs.temporal.io/encyclopedia/event-history"
+        ],
+        "selectedCases": [
+          "Resume after acknowledged versus in-flight activities; observe event-history replay and external-effect idempotency",
+          "Measure recovered user outcomes and interventions through existing FeltOS/System owners"
+        ],
+        "ownerBoundary": "Temporal is an additional, different workflow engine competitor; do not misclassify its worker/history requirements as LangChain's model/tool middleware."
+      },
+      "actualStatus": "Unmeasured; original meet/beat cells are unchanged and this source repair alone has no external runtime receiving"
+    }
   }
 }
