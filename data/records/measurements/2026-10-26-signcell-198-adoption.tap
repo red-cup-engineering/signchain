@@ -1,0 +1,586 @@
+TAP version 13
+# Subtest: Boolean SEN binding preserves all four points and all 16 joins, order and witness cases
+ok 1 - Boolean SEN binding preserves all four points and all 16 joins, order and witness cases
+  ---
+  duration_ms: 6.435685
+  type: 'test'
+  ...
+# Subtest: Boolean SEN admission retains exact keys, explicit booleans and immutable output
+ok 2 - Boolean SEN admission retains exact keys, explicit booleans and immutable output
+  ---
+  duration_ms: 0.378038
+  type: 'test'
+  ...
+# Subtest: rule derivations retain full carrier identity and explicit historical version one
+ok 3 - rule derivations retain full carrier identity and explicit historical version one
+  ---
+  duration_ms: 2.424425
+  type: 'test'
+  ...
+# Subtest: same rule labels do not erase different version two licenses
+ok 4 - same rule labels do not erase different version two licenses
+  ---
+  duration_ms: 0.736577
+  type: 'test'
+  ...
+# Subtest: firing preserves the selected derivation version in its evidence
+ok 5 - firing preserves the selected derivation version in its evidence
+  ---
+  duration_ms: 2.044474
+  type: 'test'
+  ...
+# Subtest: witness inclusion follows complete canonical carrier bytes on each evidence side
+ok 6 - witness inclusion follows complete canonical carrier bytes on each evidence side
+  ---
+  duration_ms: 3.386651
+  type: 'test'
+  ...
+# Subtest: lattice value operations retain evidence on both sides
+ok 7 - lattice value operations retain evidence on both sides
+  ---
+  duration_ms: 1.222027
+  type: 'test'
+  ...
+# Subtest: SignChain distinguishes two independent witness sides under BOTH derived FOUR orders
+ok 8 - SignChain distinguishes two independent witness sides under BOTH derived FOUR orders
+  ---
+  duration_ms: 0.786202
+  type: 'test'
+  ...
+# Subtest: a written conflated/presumed FOUR value cannot forge a positive original witness
+ok 9 - a written conflated/presumed FOUR value cannot forge a positive original witness
+  ---
+  duration_ms: 0.47223
+  type: 'test'
+  ...
+# Subtest: positive original evidence is a candidate for a relation proof, NOT Quot.sound
+ok 10 - positive original evidence is a candidate for a relation proof, NOT Quot.sound
+  ---
+  duration_ms: 0.624819
+  type: 'test'
+  ...
+# Subtest: non-SignCell carriers and unsupported authority fields refuse
+ok 11 - non-SignCell carriers and unsupported authority fields refuse
+  ---
+  duration_ms: 0.333812
+  type: 'test'
+  ...
+# Subtest: new opposing evidence ASCENDS knowledge and DESCENDS truth on the same Mark cell
+ok 12 - new opposing evidence ASCENDS knowledge and DESCENDS truth on the same Mark cell
+  ---
+  duration_ms: 0.706041
+  type: 'test'
+  ...
+# Subtest: finite witness transitions retain their own directions without inventing an ordinal
+ok 13 - finite witness transitions retain their own directions without inventing an ordinal
+  ---
+  duration_ms: 1.013134
+  type: 'test'
+  ...
+# Subtest: different original Mark cell identity refuses an untyped knowledge/truth morphism
+ok 14 - different original Mark cell identity refuses an untyped knowledge/truth morphism
+  ---
+  duration_ms: 0.56544
+  type: 'test'
+  ...
+# Subtest: witness comparison uses SignCell's original coincidence key, including independently presented JSON
+ok 15 - witness comparison uses SignCell's original coincidence key, including independently presented JSON
+  ---
+  duration_ms: 1.881559
+  type: 'test'
+  ...
+# Subtest: CL1/CL2: original opposing witnesses enter the existing sealed telling log
+ok 16 - CL1/CL2: original opposing witnesses enter the existing sealed telling log
+  ---
+  duration_ms: 26.959708
+  type: 'test'
+  ...
+# Subtest: CL3: retry and cross-channel forwarding do not manufacture witnesses
+ok 17 - CL3: retry and cross-channel forwarding do not manufacture witnesses
+  ---
+  duration_ms: 32.448134
+  type: 'test'
+  ...
+# Subtest: CL3: cumulative claim snapshots add only new original witnesses
+ok 18 - CL3: cumulative claim snapshots add only new original witnesses
+  ---
+  duration_ms: 37.596518
+  type: 'test'
+  ...
+# Subtest: CL4: equal ids under distinct sources are distinct occurrences
+ok 19 - CL4: equal ids under distinct sources are distinct occurrences
+  ---
+  duration_ms: 12.176534
+  type: 'test'
+  ...
+# Subtest: CL4: reused event identity with changed content refuses instead of replacing evidence
+ok 20 - CL4: reused event identity with changed content refuses instead of replacing evidence
+  ---
+  duration_ms: 13.457069
+  type: 'test'
+  ...
+# Subtest: CL4: extension order is immaterial but exact extension spelling remains content
+ok 21 - CL4: extension order is immaterial but exact extension spelling remains content
+  ---
+  duration_ms: 23.623513
+  type: 'test'
+  ...
+# Subtest: CL5: exact observation cut excludes a later witness despite an earlier claimed event time
+ok 22 - CL5: exact observation cut excludes a later witness despite an earlier claimed event time
+  ---
+  duration_ms: 19.390369
+  type: 'test'
+  ...
+# Subtest: CL5: instant ordering is numeric, not lexical fractional-second spelling
+ok 23 - CL5: instant ordering is numeric, not lexical fractional-second spelling
+  ---
+  duration_ms: 21.392388
+  type: 'test'
+  ...
+# Subtest: CL1: forged observations and unrelated log bodies cannot become claims
+ok 24 - CL1: forged observations and unrelated log bodies cannot become claims
+  ---
+  duration_ms: 3.81182
+  type: 'test'
+  ...
+# Subtest: CL2/CL6: unasserted claims stay unasserted and explicit valuation loss refuses
+ok 25 - CL2/CL6: unasserted claims stay unasserted and explicit valuation loss refuses
+  ---
+  duration_ms: 11.884867
+  type: 'test'
+  ...
+# Subtest: CL2: byte-valued claims and exact integers retain the native evidence carrier
+ok 26 - CL2: byte-valued claims and exact integers retain the native evidence carrier
+  ---
+  duration_ms: 8.883934
+  type: 'test'
+  ...
+# Subtest: an empty identity derivation uses semantic coincidence, including transported carriers
+ok 27 - an empty identity derivation uses semantic coincidence, including transported carriers
+  ---
+  duration_ms: 2.890085
+  type: 'test'
+  ...
+# Subtest: empty steps cannot witness a distinct declared conclusion
+ok 28 - empty steps cannot witness a distinct declared conclusion
+  ---
+  duration_ms: 0.711289
+  type: 'test'
+  ...
+# Subtest: a valid prefix cannot claim the endpoint of a longer derivation
+ok 29 - a valid prefix cannot claim the endpoint of a longer derivation
+  ---
+  duration_ms: 0.921025
+  type: 'test'
+  ...
+# Subtest: an invalid earlier step retains its original obstruction evidence
+ok 30 - an invalid earlier step retains its original obstruction evidence
+  ---
+  duration_ms: 0.552381
+  type: 'test'
+  ...
+# Subtest: unadmitted object cannot gain an identity proof merely by matching itself
+ok 31 - unadmitted object cannot gain an identity proof merely by matching itself
+  ---
+  duration_ms: 1.826737
+  type: 'test'
+  ...
+# Subtest: fabricated empty-step proof of an unknown cell refuses at checker boundary
+ok 32 - fabricated empty-step proof of an unknown cell refuses at checker boundary
+  ---
+  duration_ms: 0.696597
+  type: 'test'
+  ...
+# Subtest: the checked-in JSON Schema is a recursive executable expression grammar
+ok 33 - the checked-in JSON Schema is a recursive executable expression grammar
+  ---
+  duration_ms: 0.750028
+  type: 'test'
+  ...
+# Subtest: schema runs distinct truth/knowledge quantifiers across an enumerated family
+ok 34 - schema runs distinct truth/knowledge quantifiers across an enumerated family
+  ---
+  duration_ms: 17.371733
+  type: 'test'
+  ...
+# Subtest: indexed quantifiers compose with native linear negation in a schema program
+ok 35 - indexed quantifiers compose with native linear negation in a schema program
+  ---
+  duration_ms: 6.803407
+  type: 'test'
+  ...
+# Subtest: schema's multiplicative tensor and residual preserve truth-order adjunction
+ok 36 - schema's multiplicative tensor and residual preserve truth-order adjunction
+  ---
+  duration_ms: 285.972834
+  type: 'test'
+  ...
+# Subtest: malformed, unauthorized and falsely transfinite program shapes refuse execution
+ok 37 - malformed, unauthorized and falsely transfinite program shapes refuse execution
+  ---
+  duration_ms: 3.816247
+  type: 'test'
+  ...
+# Subtest: the packaged schema example evaluates rather than merely passing a declaration check
+ok 38 - the packaged schema example evaluates rather than merely passing a declaration check
+  ---
+  duration_ms: 2.224484
+  type: 'test'
+  ...
+# Subtest: finalization preserves default append behavior and irreversibly retains the same log
+ok 39 - finalization preserves default append behavior and irreversibly retains the same log
+  ---
+  duration_ms: 4.299864
+  type: 'test'
+  ...
+# Subtest: sealed logs refuse before input inspection and recheck after reentrant admission
+ok 40 - sealed logs refuse before input inspection and recheck after reentrant admission
+  ---
+  duration_ms: 0.937569
+  type: 'test'
+  ...
+# Subtest: finalized construction owns nested terms and witnesses and never exposes mutable rows
+ok 41 - finalized construction owns nested terms and witnesses and never exposes mutable rows
+  ---
+  duration_ms: 0.622215
+  type: 'test'
+  ...
+# Subtest: finalized indexes preserve canonical coincidence, row order, repeated and opposed testimony
+ok 42 - finalized indexes preserve canonical coincidence, row order, repeated and opposed testimony
+  ---
+  duration_ms: 7.528698
+  type: 'test'
+  ...
+# Subtest: an empty finalized history stays empty while a separate new log can receive evidence
+ok 43 - an empty finalized history stays empty while a separate new log can receive evidence
+  ---
+  duration_ms: 0.252519
+  type: 'test'
+  ...
+# Subtest: SignChain indexed queries are complete under SCA coincidence
+ok 44 - SignChain indexed queries are complete under SCA coincidence
+  ---
+  duration_ms: 1.05147
+  type: 'test'
+  ...
+# Subtest: SignChain tellings keep original representatives and own provider input
+ok 45 - SignChain tellings keep original representatives and own provider input
+  ---
+  duration_ms: 0.479381
+  type: 'test'
+  ...
+# Subtest: native SEAVT rows form an SCA-witnessed SignChain with proper as-of filtration
+ok 46 - native SEAVT rows form an SCA-witnessed SignChain with proper as-of filtration
+  ---
+  duration_ms: 10.121576
+  type: 'test'
+  ...
+# Subtest: as-of SignChain replay never interprets future SEAVT contents
+ok 47 - as-of SignChain replay never interprets future SEAVT contents
+  ---
+  duration_ms: 1.747387
+  type: 'test'
+  ...
+# Subtest: FOUR cannot conflate positive and negative evidence about different market propositions
+ok 48 - FOUR cannot conflate positive and negative evidence about different market propositions
+  ---
+  duration_ms: 0.954495
+  type: 'test'
+  ...
+# Subtest: persisted telling rows refuse unknown or missing evidence side
+ok 49 - persisted telling rows refuse unknown or missing evidence side
+  ---
+  duration_ms: 0.382425
+  type: 'test'
+  ...
+# Subtest: raw phase evidence with negative residue (-1, 0) witnesses no regime
+ok 50 - raw phase evidence with negative residue (-1, 0) witnesses no regime
+  ---
+  duration_ms: 0.368544
+  type: 'test'
+  ...
+# Subtest: raw phase evidence with negative residue (0, -1) witnesses no regime
+ok 51 - raw phase evidence with negative residue (0, -1) witnesses no regime
+  ---
+  duration_ms: 0.067262
+  type: 'test'
+  ...
+# Subtest: raw phase evidence with negative residue (-1, 1) witnesses no regime
+ok 52 - raw phase evidence with negative residue (-1, 1) witnesses no regime
+  ---
+  duration_ms: 1.925565
+  type: 'test'
+  ...
+# Subtest: raw phase evidence with negative residue (1, -1) witnesses no regime
+ok 53 - raw phase evidence with negative residue (1, -1) witnesses no regime
+  ---
+  duration_ms: 0.11957
+  type: 'test'
+  ...
+# Subtest: raw phase evidence with negative residue (-1, -1) witnesses no regime
+ok 54 - raw phase evidence with negative residue (-1, -1) witnesses no regime
+  ---
+  duration_ms: 0.105749
+  type: 'test'
+  ...
+# Subtest: the canonical phase evidence constructor already rejects either negative tally
+ok 55 - the canonical phase evidence constructor already rejects either negative tally
+  ---
+  duration_ms: 0.407543
+  type: 'test'
+  ...
+# Subtest: nonnegative residue (0, 1) retains its catalog regime
+ok 56 - nonnegative residue (0, 1) retains its catalog regime
+  ---
+  duration_ms: 0.344177
+  type: 'test'
+  ...
+# Subtest: nonnegative residue (1, 0) retains its catalog regime
+ok 57 - nonnegative residue (1, 0) retains its catalog regime
+  ---
+  duration_ms: 0.123035
+  type: 'test'
+  ...
+# Subtest: nonnegative residue (1, 1) retains its catalog regime
+ok 58 - nonnegative residue (1, 1) retains its catalog regime
+  ---
+  duration_ms: 0.142364
+  type: 'test'
+  ...
+# Subtest: nonnegative residue (2, 1) retains its catalog regime
+ok 59 - nonnegative residue (2, 1) retains its catalog regime
+  ---
+  duration_ms: 0.101903
+  type: 'test'
+  ...
+# Subtest: nonnegative residue (1, 2) retains its catalog regime
+ok 60 - nonnegative residue (1, 2) retains its catalog regime
+  ---
+  duration_ms: 0.098428
+  type: 'test'
+  ...
+# Subtest: the canonical constructor snapshots the caller's mutable residue
+ok 61 - the canonical constructor snapshots the caller's mutable residue
+  ---
+  duration_ms: 0.154302
+  type: 'test'
+  ...
+# Subtest: zero, missing, malformed and unsafe residue evidence stays obstructed
+ok 62 - zero, missing, malformed and unsafe residue evidence stays obstructed
+  ---
+  duration_ms: 0.2129
+  type: 'test'
+  ...
+# Subtest: phase evidence still requires matching phase, nonempty stages and matching catalog regime
+ok 63 - phase evidence still requires matching phase, nonempty stages and matching catalog regime
+  ---
+  duration_ms: 0.132029
+  type: 'test'
+  ...
+# Subtest: the ahead declaration retains its transfinite catalog regime
+ok 64 - the ahead declaration retains its transfinite catalog regime
+  ---
+  duration_ms: 0.241002
+  type: 'test'
+  ...
+# Subtest: ordinary phase observations retain their lower-rung behavior
+ok 65 - ordinary phase observations retain their lower-rung behavior
+  ---
+  duration_ms: 0.701174
+  type: 'test'
+  ...
+# Subtest: finite and unsettled observations do not supply uncountable cofinality evidence
+ok 66 - finite and unsettled observations do not supply uncountable cofinality evidence
+  ---
+  duration_ms: 0.186991
+  type: 'test'
+  ...
+# Subtest: finite process agreement remains insufficient for universal certificate correspondence
+ok 67 - finite process agreement remains insufficient for universal certificate correspondence
+  ---
+  duration_ms: 0.662817
+  type: 'test'
+  ...
+# Subtest: raw ahead phase evidence refuses a coercible declaration without invoking it
+ok 68 - raw ahead phase evidence refuses a coercible declaration without invoking it
+  ---
+  duration_ms: 0.247572
+  type: 'test'
+  ...
+# Subtest: raw germ phase evidence refuses a coercible declaration without invoking it
+ok 69 - raw germ phase evidence refuses a coercible declaration without invoking it
+  ---
+  duration_ms: 0.217517
+  type: 'test'
+  ...
+# Subtest: the Sign-family source is a pure functional substrate, not an effects provider
+ok 70 - the Sign-family source is a pure functional substrate, not an effects provider
+  ---
+  duration_ms: 4.342978
+  type: 'test'
+  ...
+# Subtest: first/last occurrence order cannot change an admitted rule judgment
+ok 71 - first/last occurrence order cannot change an admitted rule judgment
+  ---
+  duration_ms: 8.007087
+  type: 'test'
+  ...
+# Subtest: public rule firing and SignCraft's indexed rule firing share the same source evidence
+ok 72 - public rule firing and SignCraft's indexed rule firing share the same source evidence
+  ---
+  duration_ms: 2.206877
+  type: 'test'
+  ...
+# Subtest: missing or one-sided testimony cannot be promoted into both-sided proof
+ok 73 - missing or one-sided testimony cannot be promoted into both-sided proof
+  ---
+  duration_ms: 1.025131
+  type: 'test'
+  ...
+# Subtest: public rule readers preserve Map evidence and refuse forged Map-key attribution
+ok 74 - public rule readers preserve Map evidence and refuse forged Map-key attribution
+  ---
+  duration_ms: 9.790719
+  type: 'test'
+  ...
+# Subtest: three-stage named operation cuts preserve their typed intended sequence
+ok 75 - three-stage named operation cuts preserve their typed intended sequence
+  ---
+  duration_ms: 0.253681
+  type: 'test'
+  ...
+# Subtest: non-string, empty and missing coordinates never compose by JS equality
+ok 76 - non-string, empty and missing coordinates never compose by JS equality
+  ---
+  duration_ms: 0.190196
+  type: 'test'
+  ...
+# Subtest: missing boundaries are preserved, malformed claimed coordinates are refused
+ok 77 - missing boundaries are preserved, malformed claimed coordinates are refused
+  ---
+  duration_ms: 0.448384
+  type: 'test'
+  ...
+# Subtest: unwitnessed classification cannot transmit a requirement
+ok 78 - unwitnessed classification cannot transmit a requirement
+  ---
+  duration_ms: 0.522495
+  type: 'test'
+  ...
+# Subtest: lowered classification cannot erase a witnessed path
+ok 79 - lowered classification cannot erase a witnessed path
+  ---
+  duration_ms: 0.360703
+  type: 'test'
+  ...
+# Subtest: positive written value cannot overturn negative classification
+ok 80 - positive written value cannot overturn negative classification
+  ---
+  duration_ms: 0.373922
+  type: 'test'
+  ...
+# Subtest: a valuation reads what is told of each token, told nothing where nothing is
+ok 81 - a valuation reads what is told of each token, told nothing where nothing is
+  ---
+  duration_ms: 0.980484
+  type: 'test'
+  ...
+# Subtest: two actors' same-token evidence joins in FOUR rather than overwriting by order
+ok 82 - two actors' same-token evidence joins in FOUR rather than overwriting by order
+  ---
+  duration_ms: 0.683358
+  type: 'test'
+  ...
+# Subtest: necessitating reads at a type what its whole extent holds
+ok 83 - necessitating reads at a type what its whole extent holds
+  ---
+  duration_ms: 1.517481
+  type: 'test'
+  ...
+# Subtest: the fiber is FOUR taken pointwise: each order's meet is residuated by its implication
+ok 84 - the fiber is FOUR taken pointwise: each order's meet is residuated by its implication
+  ---
+  duration_ms: 76601.760511
+  type: 'test'
+  ...
+# Subtest: possibilizing is a closure, necessitating an interior, and they are adjoint
+ok 85 - possibilizing is a closure, necessitating an interior, and they are adjoint
+  ---
+  duration_ms: 23176.072521
+  type: 'test'
+  ...
+# Subtest: truth-order modality retains a contradiction's different logical reading
+ok 86 - truth-order modality retains a contradiction's different logical reading
+  ---
+  duration_ms: 4.437568
+  type: 'test'
+  ...
+# Subtest: both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers
+ok 87 - both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers
+  ---
+  duration_ms: 237.370223
+  type: 'test'
+  ...
+# Subtest: FOUR claim fiber uses SignCell's canonical predicate/object coordinate
+ok 88 - FOUR claim fiber uses SignCell's canonical predicate/object coordinate
+  ---
+  duration_ms: 2.737243
+  type: 'test'
+  ...
+# Subtest: transported claim tellings preserve both evidence sides in either wire order
+ok 89 - transported claim tellings preserve both evidence sides in either wire order
+  ---
+  duration_ms: 2.266496
+  type: 'test'
+  ...
+# Subtest: every fiber reader derives transported tokens from original SignCells
+ok 90 - every fiber reader derives transported tokens from original SignCells
+  ---
+  duration_ms: 18.077716
+  type: 'test'
+  ...
+# Subtest: a transported frame's display token accessor is never an admission authority
+ok 91 - a transported frame's display token accessor is never an admission authority
+  ---
+  duration_ms: 2.760488
+  type: 'test'
+  ...
+# Subtest: mutated transported source cells are read again instead of trusting stale display tokens
+ok 92 - mutated transported source cells are read again instead of trusting stale display tokens
+  ---
+  duration_ms: 2.844113
+  type: 'test'
+  ...
+# Subtest: cellOf builds a (subject, predicate, object) cell
+ok 93 - cellOf builds a (subject, predicate, object) cell
+  ---
+  duration_ms: 0.151798
+  type: 'test'
+  ...
+# Subtest: inferenceMorphismIdentity: a morphism is identical to itself
+ok 94 - inferenceMorphismIdentity: a morphism is identical to itself
+  ---
+  duration_ms: 0.145819
+  type: 'test'
+  ...
+# Subtest: inferenceMorphismIdentity: distinct morphism kinds are not identical
+ok 95 - inferenceMorphismIdentity: distinct morphism kinds are not identical
+  ---
+  duration_ms: 0.129625
+  type: 'test'
+  ...
+# Subtest: inferenceRules: a cell witness yields three rules (converse, subject- and object-projection)
+ok 96 - inferenceRules: a cell witness yields three rules (converse, subject- and object-projection)
+  ---
+  duration_ms: 0.342365
+  type: 'test'
+  ...
+1..96
+# tests 96
+# suites 0
+# pass 96
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 100867.641586

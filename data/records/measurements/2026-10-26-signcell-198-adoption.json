@@ -1,0 +1,162 @@
+{
+  "kind": "published-signcell-supplier-receiving/v1",
+  "qualifiedAt": "2026-10-26T19:53:44.078535+00:00",
+  "consumer": "@red-cup-engineering/signchain",
+  "originalMain": "0fdecb6d7068f691a9cf19ece2c56a710db0bf3c",
+  "supplier": {
+    "package": "@red-cup-engineering/signcell",
+    "version": "0.13.1-dev.198",
+    "gitHead": "1abcd4a218618408284014af35169459c8170a02",
+    "qualifiedSourceParent": "ce026a96e3c1ad20a3fa1f358af7d1eda4c56899",
+    "archiveSha256": "3057fcc98f8283927ea09e1b8accc8c73c19e5f6a49bbe0b5e2bf2e8562f9212",
+    "integrity": "sha512-0ZhJJxrGa/hSMBTx64D+M1Qeo68oJMYy/Jiq3gA7k0pInXqYQs0ISCFzlY0Dkimi2GoGuETl1ghfJKmSPO9T1w==",
+    "archiveBytes": 104141,
+    "archiveMembers": 44,
+    "supplierReceiving": "116/116 passed independently against the issued archive; no member changed after receiving."
+  },
+  "manifestChange": {
+    "dependency": "@red-cup-engineering/signcell",
+    "from": "0.13.1-dev.185",
+    "to": "0.13.1-dev.198",
+    "allOtherManifestFieldsUnchanged": true
+  },
+  "identities": {
+    "package.json": {
+      "bytes": 2374,
+      "sha256": "51a38c99003de105755d0ed551b62e5dbc548c3fdbdd1fd91d4d51c0c4e4db82",
+      "gitBlob": "529dd7fab898acbc80318b0363a514f52680d392"
+    },
+    "pnpm-lock.yaml": {
+      "bytes": 21671,
+      "sha256": "7537488cec9653d0656c56a0b4bfdc75bbb5dc351bd3fbaccac00a7105b27792",
+      "gitBlob": "88dc5da097706d067dd6db1bd10b00ef5e6f0085"
+    },
+    "src/log.mjs": {
+      "bytes": 12187,
+      "sha256": "0eb571b69bf44606cef1546eae6c07ff2fffc44567c3ee9a0570d0e50d20aace",
+      "gitBlob": "1054fbb1f5748cc0453e4b86f6595f6badcce9ad"
+    },
+    "test/claim-event-log.test.mjs": {
+      "bytes": 5733,
+      "sha256": "a389bcb2cb1fa2196cd91fdc0f6b7e2bfccf217dee4670e5b9465c44c85db4fd",
+      "gitBlob": "e76acc5a3916fa4691af526e2cec887cbc6b3dcb"
+    }
+  },
+  "lockGeneration": {
+    "packageManager": "pnpm11.25.0",
+    "command": "pnpm install --lockfile-only --ignore-scripts --reporter=append-only --store-dir /workspace/scratch/455c183ed200/evidence/pnpm-store-signcell198",
+    "result": "passed",
+    "registry": "https://registry.561.group/",
+    "lockedPackages": 46,
+    "directManifestPinsMatch": true,
+    "localLinkResolutions": false,
+    "workspacePolicy": "Original house release-age exclusions unchanged."
+  },
+  "nativeReceiving": {
+    "command": "node --test-isolation=none --test --test-reporter=tap 'test/**/*.test.mjs'",
+    "node": "v24.22.1",
+    "passed": 96,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "rawTap": "data/records/measurements/2026-10-26-signcell-198-adoption.tap",
+    "bytes": 20995,
+    "sha256": "9e644526b2c56f83caccb2e2b6a1d6c94209e3d241ff9ea4703ce0d7e318e773",
+    "gitBlob": "9b5dfd33bce7c582f68db8dec14e0b90eb04c370",
+    "issuedSupplierMembersMatched": 44,
+    "actualSignCellPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell"
+  },
+  "providers": [
+    {
+      "package": "@red-cup-engineering/metrologic",
+      "selected": "0.14.3-dev.3",
+      "installed": "0.14.3-dev.3",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+metrologic@0.14.3-dev.3/node_modules/@red-cup-engineering/metrologic",
+      "manifest": {
+        "bytes": 23002,
+        "sha256": "9ed80a693a78dae74b8a86efcc0d107a9daf6de00ca67eaaf19f14e48aaebfb5",
+        "gitBlob": "eed664670e97454808db502537b2b8f44bd16dec"
+      }
+    },
+    {
+      "package": "@red-cup-engineering/computer-data-engineering-services-section",
+      "selected": "0.3.1",
+      "installed": "0.3.1",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.3.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+      "manifest": {
+        "bytes": 3196,
+        "sha256": "5f2467568734022f482aa4db9fd875c74d507781088634452c3abbda1952bd90",
+        "gitBlob": "96c6d81bbb508855fcfd8c6224ea977eb610ddbd"
+      }
+    },
+    {
+      "package": "@red-cup-engineering/exact-number-data-service",
+      "selected": "0.1.1",
+      "installed": "0.1.1",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+exact-number-data-service@0.1.1/node_modules/@red-cup-engineering/exact-number-data-service",
+      "manifest": {
+        "bytes": 1068,
+        "sha256": "649d29f830c72470d7dccd1465b6b4c5f200db1f65d4e1841fdcf9399bbb8b33",
+        "gitBlob": "8f294745dc23556686fda125eac5065989c55c5a"
+      }
+    },
+    {
+      "package": "@red-cup-engineering/semiotic-eavt-services-section",
+      "selected": "0.3.2",
+      "installed": "0.3.2",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+semiotic-eavt-services-section@0.3.2/node_modules/@red-cup-engineering/semiotic-eavt-services-section",
+      "manifest": {
+        "bytes": 2681,
+        "sha256": "b2a55e2ab735fa9d7c3b17a449e9726be994fa10b75913d45f6f55559e0a072d",
+        "gitBlob": "b22d68e2debd15b514b63aa4b4d612cd4cb2c9b2"
+      }
+    },
+    {
+      "package": "@red-cup-engineering/signcell",
+      "selected": "0.13.1-dev.198",
+      "installed": "0.13.1-dev.198",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+      "manifest": {
+        "bytes": 3353,
+        "sha256": "77c8230fdb639048b8ebc6d30ca3f0f6911f3ec19b17677985010af8836520e5",
+        "gitBlob": "e1ecbda0adef95335033d9f24b704b88a538060b"
+      }
+    },
+    {
+      "package": "@red-cup-engineering/semiotic-content-address",
+      "selected": "0.1.1",
+      "installed": "0.1.1",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+semiotic-content-address@0.1.1/node_modules/@red-cup-engineering/semiotic-content-address",
+      "manifest": {
+        "bytes": 1198,
+        "sha256": "808a818b081125ddaeca3d8022a677150e7bd412ffe30f4fe7f153c596f42f31",
+        "gitBlob": "7dddb4544fdef4632ffdc54b2589e8c7bf55ad13"
+      }
+    },
+    {
+      "package": "@red-cup-engineering/json-schema-services-section",
+      "selected": "0.5.0",
+      "installed": "0.5.0",
+      "actualPath": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "manifest": {
+        "bytes": 6953,
+        "sha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7",
+        "gitBlob": "eb67d873c2a8934e17a564502e91ae431f5f6083"
+      }
+    }
+  ],
+  "limitations": [
+    "This qualifies the named native receiving scope, not a hosted deployment or every downstream consumer.",
+    "No repository source implementation or other direct dependency pin changed during this adoption."
+  ],
+  "frozenInstall": {
+    "result": "passed",
+    "command": "pnpm install --frozen-lockfile --offline --ignore-scripts --reporter=append-only --store-dir /root/.local/share/pnpm/store",
+    "directory": "/workspace/scratch/455c183ed200/evidence/signcell198-frozen-install/signchain",
+    "packagesReused": 46,
+    "packagesDownloaded": 0,
+    "packageImportMethod": "hard links from the existing content-addressable store",
+    "scriptsExecuted": false,
+    "receivingUsesThisInstalledCohort": true
+  }
+}
