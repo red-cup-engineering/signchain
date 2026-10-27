@@ -218,3 +218,18 @@ schema-shape fallback or newly fabricated producer registry. Once a
 qualified supplier is installed, genuine producer-carrier admission is
 unchanged. The native producer-to-consumer conformance suite remains a
 release gate, not an excuse to skip tests.
+
+## Publication-gated SignCell constructor-origin receiving
+
+The existing `theoryOfBase` source uses a module-namespace read of
+`isAdmittedPredicationBase`, so an installed historical SignCell lacking
+that export fails **only this capability** closed instead of preventing
+unrelated typed-theory import. The original native test now uses the same
+provider namespace: four producer-dependent tests are reported as
+**SKIPPED / unqualified**, not passed, when the current package cannot
+provide the new export. One independent regression verifies that old
+suppliers refuse the capability. A newer supplier must actually expose
+the constructor-origin guard before the tests can report full receiving.
+This is not a substitute for immutable package publication/pinning or a
+full installed end-to-end test, and no caller may interpret a skip as
+an authorized typed inference result.

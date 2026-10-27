@@ -1,6 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { predicationSite, specializationMorphism, isAdmittedPredicationBase } from "@red-cup-engineering/signcell/predication";
+import * as signCellPredication from "@red-cup-engineering/signcell/predication";
+const { predicationSite, specializationMorphism } = signCellPredication;
+const isAdmittedPredicationBase = signCellPredication.isAdmittedPredicationBase;
+// Do NOT call unqualified tests "passed" when the pinned source package lacks
+// its constructor-origin guard; explicitly report those receiving cases skipped.
+const hasAdmission = typeof isAdmittedPredicationBase === "function";
+const originalSourceTest = (name, fn) => test(name, {
+  skip: hasAdmission ? false :
+    "installed SignCell predication producer lacks original base construction admission",
+}, fn);
 import { cell } from "@red-cup-engineering/signcell/cell";
 import {
   cellOf,
@@ -38,7 +47,7 @@ test("inferenceRules: a cell witness yields three rules (converse, subject- and 
 
 const originalBase = () => predicationSite([cell("alice","likes","bob")]).base;
 
-test("source-closed base projects all witnessed generator endpoints into one typed theory",()=>{
+originalSourceTest("source-closed base projects all witnessed generator endpoints into one typed theory",()=>{
   const base=originalBase();
   const output=theoryOfBase(base);
   assert.equal(output.kind,"typedTheory.carrier");
@@ -57,7 +66,7 @@ test("source-closed base projects all witnessed generator endpoints into one typ
     "the receiving theory retains the original closed object list");
 });
 
-test("incomplete original categorical source refuses; cannot invent absent nodes or specialization endpoints",()=>{
+originalSourceTest("incomplete original categorical source refuses; cannot invent absent nodes or specialization endpoints",()=>{
   const source=originalBase();
   for(const altered of [
     {...source,objects:["alice","bob","likes"]},
@@ -75,7 +84,7 @@ test("incomplete original categorical source refuses; cannot invent absent nodes
     "typedTheory.inferenceMorphism.specialization");
 });
 
-test("getter-backed source edges and sparse carriers never execute while obtaining proof rules",()=>{
+originalSourceTest("getter-backed source edges and sparse carriers never execute while obtaining proof rules",()=>{
   let calls=0;
   const source=originalBase();
   const bad={...source};
@@ -92,7 +101,7 @@ test("getter-backed source edges and sparse carriers never execute while obtaini
   assert.equal(calls,0);
 });
 
-test("a syntactically closed forged base cannot enter an authentic inference theory",()=>{
+originalSourceTest("a syntactically closed forged base cannot enter an authentic inference theory",()=>{
  const genuine=originalBase(), forged=JSON.parse(JSON.stringify(genuine));
  assert.deepEqual(forged.objects,genuine.objects,
    "source identity and a matching mathematical object list are separate concerns");
@@ -101,4 +110,15 @@ test("a syntactically closed forged base cannot enter an authentic inference the
  assert.throws(()=>theoryOfBase({...genuine}),/originally constructed SignCell/u);
  const correct=theoryOfBase(genuine);
  assert.equal(correct.rules.length,3);
+});
+
+test("unqualified installed SignCell source refuses typed base construction instead of guessing",()=>{
+  if (hasAdmission) {
+    const valid=predicationSite([cell("alice","likes","bob")]).base;
+    assert.equal(isAdmittedPredicationBase(valid),true);
+    assert.equal(theoryOfBase(valid).kind,"typedTheory.carrier");
+  } else {
+    assert.throws(()=>theoryOfBase({kind:"predication.base"}),
+      /source owner lacks predication-base construction admission/u);
+  }
 });
