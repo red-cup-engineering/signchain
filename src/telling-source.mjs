@@ -19,3 +19,23 @@ export function sourceField(source, name, required = true) {
     throw new TypeError(`signchain log: ${name} must be an enumerable data property, not an accessor`);
   return field.value;
 }
+
+/**
+ * Retain one snapshot of a query's own predication coordinates before any
+ * canonical lookup. Unknown auxiliary fields are not selectors. This outer
+ * descriptor guard does not reimplement SignCell's nested semantic carrier.
+ */
+export function sourcePattern(source) {
+  if (source === null || typeof source !== "object" || Array.isArray(source) ||
+      ![Object.prototype, null].includes(Object.getPrototypeOf(source)))
+    throw new TypeError("signchain log: a query pattern must be a plain record");
+  const selected = Object.create(null);
+  for (const name of ["subject", "predicate", "object"]) {
+    const field = Object.getOwnPropertyDescriptor(source, name);
+    if (field === undefined) continue;
+    if (!Object.hasOwn(field, "value") || !field.enumerable)
+      throw new TypeError(`signchain log: query ${name} must be an enumerable data property, not an accessor`);
+    Object.defineProperty(selected, name, { value: field.value, enumerable: true });
+  }
+  return Object.freeze(selected);
+}

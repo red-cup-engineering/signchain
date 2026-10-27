@@ -17,7 +17,7 @@ import { cellEventOfMessage, cellFromCloudEvent } from "@red-cup-engineering/sig
 import { observedTimeUnixNano } from "@red-cup-engineering/signcell/observability";
 import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { sourceField } from "./telling-source.mjs";
+import { sourceField, sourcePattern } from "./telling-source.mjs";
 
 const ROLES = ["subject", "predicate", "object"];
 const SIDES = ["for", "against"];
@@ -114,29 +114,48 @@ export class TellingLog {
   /** How many tellings, repeats included. */
   get size() { return this.#rows.length; }
 
+  // Read and retain a single immutable coordinate snapshot. A query cannot
+  // execute a user-defined getter, nor change its predicate between index
+  // selection and matching. SignCell still owns canonical nested identities.
+  #pattern(input) { return retainedCarrier(sourcePattern(input)); }
+
   /** The rows telling for a triple matching a pattern of any of subject, predicate, object, in order. */
-  where(pattern = {}) { return Object.freeze(this.#candidates(pattern).filter((row) => row.side === "for" && matches(pattern, row))); }
+  where(pattern = {}) {
+    const selected = this.#pattern(pattern);
+    return Object.freeze(this.#candidates(selected).filter(row => row.side === "for" && matches(selected, row)));
+  }
 
   /** The rows telling against a triple matching a pattern, in order. */
-  against(pattern = {}) { return Object.freeze(this.#candidates(pattern).filter((row) => row.side === "against" && matches(pattern, row))); }
+  against(pattern = {}) {
+    const selected = this.#pattern(pattern);
+    return Object.freeze(this.#candidates(selected).filter(row => row.side === "against" && matches(selected, row)));
+  }
 
   /** The latest row telling for a pattern, if any. */
   latest(pattern = {}) { const found = this.where(pattern); return found[found.length - 1]; }
 
   /** The cells (all of them, or those matching a pattern). */
-  cells(pattern = {}) { return Object.freeze(cellsOfRows(this.#candidates(pattern).filter((row) => matches(pattern, row)))); }
+  cells(pattern = {}) {
+    const selected = this.#pattern(pattern);
+    return Object.freeze(cellsOfRows(this.#candidates(selected).filter(row => matches(selected, row))));
+  }
 
   /** FOUR is a valuation of one proposition, never an aggregation across
    * unrelated cells. Broad where/against queries remain possible for discovery,
    * but asking for a knowledge value requires all three predication terms. */
-  readingWhere(pattern) {
-    if (!pattern || typeof pattern !== "object" || !ROLES.every(role => Object.hasOwn(pattern, role) && pattern[role] !== undefined))
+  readingWhere(input) {
+    const source = sourcePattern(input);
+    if (!ROLES.every(role => Object.hasOwn(source, role) && source[role] !== undefined))
       throw new TypeError("signchain log: a FOUR reading requires one complete subject/predicate/object proposition");
-    return readingOfSides("knowledge", this.where(pattern).length > 0, this.against(pattern).length > 0);
+    const selected = retainedCarrier(source);
+    const candidates = this.#candidates(selected).filter(row => matches(selected, row));
+    return readingOfSides("knowledge",
+      candidates.some(row => row.side === "for"),
+      candidates.some(row => row.side === "against"));
   }
 
-  /** The knowledge reading at one triple. */
-  readingAt(at) { return this.readingWhere({ subject: at.subject, predicate: at.predicate, object: at.object }); }
+  /** The knowledge reading at one triple; no early getter-backed coordinate reads. */
+  readingAt(at) { return this.readingWhere(at); }
 }
 
 /** Tell a triple on the sides given as [for, against]. */

@@ -67,3 +67,17 @@ Conformance includes source-only descriptor tests and the original native
 `test/log.test.mjs`, `test/log-finalization.test.mjs`, and
 `test/claim-event-log.test.mjs`. No extra ledger, wire format, source
 authentication, durability, delivery, or authority is claimed.
+
+## Single-snapshot native telling queries
+
+All original `TellingLog` read operations (`where`, `against`, `latest`,
+`cells`, `readingWhere`, `readingAt`) use the same small descriptor
+source guard as append admission. Only own enumerable data coordinates may
+select an indexed query, and the snapshot is retained through the original
+SignCell/SCA carrier before accessing the existing canonical indices. FOUR
+readings inspect both polarity lanes in one selected proposition cut rather
+than evaluating the caller's potentially changing object twice. Additional
+unrecognized query properties do not silently become authority or evidence.
+Canonical byte coincidence and repeated/contradictory source tellings keep
+their original semantics; there is no second index or truth evaluator.
+JavaScript Proxy traps still require host sandbox/capability protection.

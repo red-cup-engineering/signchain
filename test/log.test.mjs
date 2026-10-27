@@ -129,3 +129,34 @@ test("untrusted outer source accessors never execute or append witness history",
   assert.throws(()=>logOfSeavtRows([seavt]),/data property/);
   assert.equal(called,0);
 });
+
+test("indexed read queries never execute accessor-backed coordinates",()=>{
+ const at={subject:"s",predicate:"p",object:"o"};
+ const log=new TellingLog().tell(at,"support").deny(at,"opposition");
+ let calls=0;
+ for(const role of ["subject","predicate","object"]){
+   const malicious={...at};
+   Object.defineProperty(malicious,role,{enumerable:true,get(){calls++;return "forged";}});
+   for(const query of [()=>log.where(malicious),()=>log.against(malicious),
+      ()=>log.latest(malicious),()=>log.cells(malicious),
+      ()=>log.readingWhere(malicious),()=>log.readingAt(malicious)])
+     assert.throws(query,/data property/u);
+ }
+ assert.equal(calls,0);
+ assert.equal(log.readingAt(at),"stable");
+ assert.equal(log.size,2);
+});
+test("readingWhere evaluates one original complete source-pattern snapshot",()=>{
+ const triple={subject:"w",predicate:"claims",object:"x"};
+ const log=new TellingLog().tell(triple,"one").deny(triple,"two");
+ const visited=[];
+ const pattern=new Proxy({...triple},{
+   get(target,key){ if(["subject","predicate","object"].includes(key)) assert.fail("no direct coordinate getters"); return Reflect.get(target,key); },
+   getOwnPropertyDescriptor(target,key){if(["subject","predicate","object"].includes(key))visited.push(key);return Reflect.getOwnPropertyDescriptor(target,key);}
+ });
+ assert.equal(log.readingWhere(pattern),"stable");
+ assert.deepEqual(visited,["subject","predicate","object"],
+   "a witnessed proposition is never split into two independently read patterns");
+ assert.equal(log.where({subject:"w"}).length,1);
+ assert.equal(log.against({subject:"w"}).length,1);
+});
