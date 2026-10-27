@@ -8,6 +8,7 @@ import { observationalLens } from "./observation-lens.mjs";
 import { evidencePolicy } from "./evidence-policy.mjs";
 import { energeticObligation, energeticLawForPhase } from "./energetics.mjs";
 import { admissibilityPresentation } from "./admissibility-presentation.mjs";
+import { retainedCarrier } from "@red-cup-engineering/signcell/cell";
 import {
   semanticJudgment, fiberAspectWitnessed,
 } from "./judgment.mjs";
@@ -501,11 +502,11 @@ export function protocolInstrument(protocol) {
 }
 
 export function instrumentsCompose(left, right) {
+  ({ left, right } = retainedCarrier({ left, right }));
   const leftContract = instrumentContract(left);
   const rightContract = instrumentContract(right);
   const contractReport = contractsCompose(leftContract, rightContract);
-  const boundaryCompatible = left.move.codomain !== undefined &&
-    right.move.domain !== undefined &&
+  const boundaryCompatible = fiberAspectWitnessed(contractReport.aspects, "boundary-compatibility") &&
     left.presentations.some((presentation) => presentation.address === left.move.codomain) &&
     right.presentations.some((presentation) => presentation.address === right.move.domain) &&
     left.move.codomain === right.move.domain;
@@ -526,6 +527,7 @@ export function instrumentsCompose(left, right) {
     right: right.id,
     leftContract: leftContract.id,
     rightContract: rightContract.id,
+    cellEvidence: contractReport.cellEvidence,
     missing: Object.freeze(missing),
     aspects: Object.freeze([
       semanticJudgment("presentation-boundary-compatibility", boundaryCompatible ? [] : ["presentation-boundary-compatibility"]),

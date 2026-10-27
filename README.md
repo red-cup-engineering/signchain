@@ -7,6 +7,24 @@ The [original application-peer requirement](data/records/requirements-records/si
 
 The original `./contracts/contract-operation` operation now rejects equal-but-untyped schema coordinates (including `null`/`null`), distinguishing a missing schema boundary from malformed claimed identities. Native tests exercise the **pure** inspect → transform → validate cut used in R11-SCH-M1. This does not simulate model/tool calls, perform a graph checkpoint, grant an effect, or substitute for SignCraft/AOE/FeltOS/Computer Systems execution and receiving.
 
+## Source-bound contract composition
+
+The ordinary contract and instrument composition paths now retain their original
+contract declarations as native SignCell evidence. A declared Hoare cut requires
+an admitted schema boundary and an explicitly directed predicate implication
+(or predicate identity). Two predicates sharing a consequence cannot license one
+another. The existing SignChain rule owner derives the conditional composition
+Cell from both source-bearing premise Cells; the complete rule and sources are
+replayable through `admitContractCompositionEvidence`.
+
+Missing evidence leaves the relevant Cell untold, with a separate pair-bound
+diagnostic. These computations check the supplied declarations; runtime effects,
+source authentication, global constraint support and customer acceptance remain
+separate observations. Exposure constructors retain nested source data, and
+duplicated time, observer and boundary coordinates must agree. See the
+[source-bound contract specification](docs/source-bound-contract-cuts.md) for
+the clauses, native carrier/JSON distinction and receiving conditions.
+
 ## Source-admitted token fibers
 
 The `0.4.2-dev.0` source edition consumes SignCell `0.13.1-dev.0` and its

@@ -7,6 +7,9 @@ import { phaseSignature, phaseEvidence } from "./phase.mjs";
 import { observationalLens } from "./observation-lens.mjs";
 import { evidencePolicy } from "./evidence-policy.mjs";
 import { energeticObligation } from "./energetics.mjs";
+import { schemaOperationsCompose } from "./contract-operation.mjs";
+import { address, bytesToHex, cell, cellSchema, tripleSchema, cellSet, coincides, retainedCarrier, semanticId } from "@red-cup-engineering/signcell/cell";
+import { rule, fireRule } from "../rules.mjs";
 import {
   semanticJudgment, semanticJudgmentWitnessed, fiberAspectWitnessed,
 } from "./judgment.mjs";
@@ -58,11 +61,27 @@ export function relationalMove(spec) {
   return Object.freeze({ ...spec, effects: Object.freeze([...spec.effects]) });
 }
 
+const predicateId = value => typeof value === "string" && value.trim().length > 0;
+
+// Read declarations through the same inert carrier owner as their Cells. In
+// particular, neither getters nor string.includes may manufacture an entails
+// edge, and two missing identifiers are not the identity law.
+function predicateDeclaration(input) {
+  try {
+    const value = retainedCarrier(input);
+    if (value === null || typeof value !== "object" || Array.isArray(value)
+        || !Object.hasOwn(value, "id") || !predicateId(value.id)) return undefined;
+    if (Object.hasOwn(value, "entails")
+        && (!Array.isArray(value.entails) || !value.entails.every(predicateId))) return undefined;
+    return value;
+  } catch { return undefined; }
+}
+
 export function relationalPredicate(spec) {
-  return Object.freeze({
-    ...spec,
-    ...(spec.entails === undefined ? {} : { entails: Object.freeze([...spec.entails]) }),
-  });
+  const value = predicateDeclaration(spec);
+  if (value === undefined)
+    throw new TypeError("relationalPredicate: an inert declaration with a nonblank id and optional entails id array is required");
+  return value;
 }
 
 export function relationalContract(spec) {
@@ -100,17 +119,14 @@ export function contractFingerprint(contract) {
 }
 
 export function predicatesCompose(postcondition, precondition) {
-  const postEntails = postcondition.entails ?? [];
-  const preEntails = precondition.entails ?? [];
-  return postcondition.id === precondition.id ||
-    postEntails.includes(precondition.id) ||
-    postEntails.some((predicate) => preEntails.includes(predicate));
+  const post = predicateDeclaration(postcondition), pre = predicateDeclaration(precondition);
+  return post !== undefined && pre !== undefined
+    && (post.id === pre.id || (post.entails ?? []).includes(pre.id));
 }
 
 export function contractsCompose(left, right) {
-  const boundaryCompatible = left.move.codomain !== undefined &&
-    right.move.domain !== undefined &&
-    left.move.codomain === right.move.domain;
+  ({ left, right } = retainedCarrier({ left, right }));
+  const boundaryCompatible = schemaOperationsCompose(left.move, right.move);
   const predicateCompatible = predicatesCompose(left.postcondition, right.precondition);
   const phaseCompatible = left.phase.id === right.phase.id;
   const lensCompatible = left.lens.id === right.lens.id;
@@ -123,6 +139,7 @@ export function contractsCompose(left, right) {
     kind: "metroplat.contract.composition",
     left: left.id,
     right: right.id,
+    cellEvidence: contractCompositionEvidence(left, right),
     missing: Object.freeze(missing),
     aspects: Object.freeze([
       semanticJudgment("boundary-compatibility", boundaryCompatible ? [] : ["boundary-compatibility"]),
@@ -134,6 +151,126 @@ export function contractsCompose(left, right) {
     judgment: semanticJudgment(`${left.id}.then.${right.id}.composition`, missing),
   });
 }
+
+/** Source-bearing evidence for a declared Hoare cut, not proof of the declarations
+ * or of an executed move. An unestablished cut stays unknown; its diagnostic is
+ * a separate observation. The existing rule owner licenses the conclusion. */
+export function contractCompositionEvidence(left, right) {
+  ({ left, right } = retainedCarrier({ left, right }));
+  if ([left, right].some(value => value === null || typeof value !== "object" || Array.isArray(value)))
+    throw new TypeError("contractCompositionEvidence: two inert contract source objects are required");
+  const sources = retainedCarrier({
+    left: { id: semanticId(left), contract: left },
+    right: { id: semanticId(right), contract: right },
+  });
+  const l = sources.left.contract, r = sources.right.contract;
+  const sourceIds = { left: sources.left.id, right: sources.right.id };
+  const boundaryCompatible = schemaOperationsCompose(l.move, r.move);
+  const predicateCompatible = predicatesCompose(l.postcondition, r.precondition);
+  // Schema and predicate identifiers use their existing literal comparison.
+  // Native content identity normalizes text; that quotient must not erase a
+  // distinction on which this observation depends. Retain the inspected text
+  // as standard UTF-8 bytes of its JSON string, projected by the Cell owner to
+  // ASCII hex. JSON string escaping also distinguishes unpaired surrogates.
+  const literal = value => typeof value === "string"
+    ? bytesToHex(new TextEncoder().encode(JSON.stringify(value))) : null;
+  const predicateCoordinates = value => ({
+    id: literal(value?.id),
+    entails: Array.isArray(value?.entails) ? value.entails.map(literal) : null,
+  });
+  const boundaryObject = {
+    right: sourceIds.right,
+    comparison: { encoding: "utf8-json-string-hex", codomain: literal(l.move?.codomain), domain: literal(r.move?.domain) },
+  };
+  const predicateObject = {
+    right: sourceIds.right,
+    comparison: { encoding: "utf8-json-string-hex",
+      postcondition: predicateCoordinates(l.postcondition), precondition: predicateCoordinates(r.precondition) },
+  };
+  const witness = (law, paths) => ({
+    kind: "signchain.contract-cut-observation", version: 1,
+    sourceIds, law, paths, scope: "supplied-contract-declarations",
+  });
+  const boundary = cell(sourceIds.left, "signchain.contract.schema-cut-to", boundaryObject, {
+    for: boundaryCompatible ? [witness("named-schema-identity", {
+      left: "/move/codomain", right: "/move/domain",
+    })] : [],
+  });
+  const samePredicate = predicateCompatible && l.postcondition.id === r.precondition.id;
+  const predicate = cell(sourceIds.left, "signchain.contract.predicate-cut-to", predicateObject, {
+    for: predicateCompatible ? [witness(samePredicate ? "predicate-identity" : "declared-directed-entailment", {
+      left: samePredicate ? "/postcondition/id"
+        : `/postcondition/entails/${l.postcondition.entails.indexOf(r.precondition.id)}`,
+      right: "/precondition/id",
+    })] : [],
+  });
+  const premises = [boundary, predicate];
+  const unasserted = cell(sourceIds.left, "signchain.contract.composes-with", {
+    right: sourceIds.right, boundary: address(boundary), predicate: address(predicate),
+  });
+  const license = rule("signchain.contract.declared-hoare-cut.v1",
+    premises.map(at => ({ cell: at, atLeast: "potential" })),
+    { cell: unasserted, reading: "potential" });
+  const conclusion = fireRule(license, premises)[0] ?? unasserted;
+  const diagnostics = [
+    ...(boundaryCompatible ? [] : ["boundary-compatibility"]),
+    ...(predicateCompatible ? [] : ["predicate-compatibility"]),
+  ].map(reason => cell(sourceIds.left, "signchain.contract.unestablished-cut", {
+    right: sourceIds.right, reason, cut: address(unasserted),
+  }, { for: [witness("declared-cut-admission", {
+    left: reason === "boundary-compatibility" ? "/move/codomain" : "/postcondition",
+    right: reason === "boundary-compatibility" ? "/move/domain" : "/precondition",
+  })] }));
+  const body = retainedCarrier({
+    kind: "signchain.contract-composition-evidence", version: 1,
+    sources, premises, rule: license, conclusion,
+    cells: cellSet([...premises, conclusion, ...diagnostics]),
+  });
+  return retainedCarrier({ ...body, id: semanticId(body) });
+}
+
+/** Replay against the supplied original sources, never trust a declared id,
+ * schema pass or apparent positive reading in the transported result. */
+export function admitContractCompositionEvidence(left, right, received) {
+  try {
+    const value = contractCompositionEvidence(left, right);
+    if (!coincides(received, value))
+      return Object.freeze({ admitted: false, reason: "composition evidence differs from its source replay" });
+    return Object.freeze({ admitted: true, value });
+  } catch (error) {
+    return Object.freeze({ admitted: false, reason: `composition evidence cannot replay: ${error.message}` });
+  }
+}
+
+const sourceSchema = {
+  type: "object", required: ["id", "contract"], additionalProperties: false,
+  properties: { id: { type: "string", minLength: 1 }, contract: { type: "object" } },
+};
+/** JSON shape only; native replay additionally verifies sources, rule and Cells. */
+export const contractCompositionEvidenceSchema = retainedCarrier({
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  $id: "https://schemas.561.group/signchain/contract-composition-evidence.schema.json",
+  title: "ContractCompositionEvidence", type: "object", additionalProperties: false,
+  required: ["kind", "version", "sources", "premises", "rule", "conclusion", "cells", "id"],
+  properties: {
+    kind: { const: "signchain.contract-composition-evidence" }, version: { const: 1 },
+    id: { type: "string", minLength: 1 },
+    sources: { type: "object", required: ["left", "right"], additionalProperties: false,
+      properties: { left: sourceSchema, right: sourceSchema } },
+    premises: { type: "array", minItems: 2, maxItems: 2, items: cellSchema },
+    rule: { type: "object", required: ["kind", "name", "antecedent", "consequent"], additionalProperties: false,
+      properties: {
+        kind: { const: "signchain.rule" }, name: { const: "signchain.contract.declared-hoare-cut.v1" },
+        antecedent: { type: "array", minItems: 2, maxItems: 2, items: {
+          type: "object", required: ["cell", "atLeast"], additionalProperties: false,
+          properties: { cell: tripleSchema, atLeast: { const: "potential" } },
+        } },
+        consequent: { type: "object", required: ["cell", "reading"], additionalProperties: false,
+          properties: { cell: tripleSchema, reading: { const: "potential" } } },
+      } },
+    conclusion: cellSchema, cells: { type: "array", minItems: 3, items: cellSchema },
+  },
+});
 
 export function uniqueStrings(values) {
   return Object.freeze([...new Set(values)]);
@@ -303,7 +440,9 @@ export function contractCoordinates(
 
  = {},
 ) {
-  return Object.freeze({
+  contract = retainedCarrier(contract);
+  exposure = retainedCarrier(exposure);
+  return retainedCarrier({
     kind: "metroplat.contract.coordinates",
     contract: contract.id,
     fingerprint: contractFingerprint(contract),
@@ -332,6 +471,8 @@ export function contractExposure(
 
  = {},
 ) {
+  contract = retainedCarrier(contract);
+  exposure = retainedCarrier(exposure);
   const coordinateExposure = {
     ...exposure,
     ...(exposure.at === undefined && defaultExposureStage(contract) !== undefined
@@ -339,7 +480,7 @@ export function contractExposure(
       : {}),
   };
   const coordinates = contractCoordinates(contract, coordinateExposure);
-  return Object.freeze({
+  return retainedCarrier({
     kind: "metroplat.contract-exposure",
     contract: contract.id,
     fingerprint: coordinates.fingerprint,
@@ -386,12 +527,25 @@ function exposureHasRecord(exposure, record) {
   ].map(normalizedToken).some((value) => value === token || value.includes(token));
 }
 
+// A legacy coordinates-only observation keeps its existing policy meaning.
+// When the outer exposure supplies a value, the nested coordinate must carry
+// that same native value. Keep both original representatives untouched.
+function observationCoordinateMatches(outer, inner) {
+  if (outer === undefined) return true;
+  if (inner === undefined) return false;
+  try { return coincides(outer, inner); } catch { return false; }
+}
+
 /** Judge whether a concrete boundary exposure satisfies the contract and its evidence policy Ω. */
 
 export function contractExposureReport(
   contract,
   exposure,
 ) {
+  // Capture the received observation before inspection. A caller cannot change
+  // nested provenance during a read or turn a getter into observed testimony.
+  contract = retainedCarrier(contract);
+  exposure = retainedCarrier(exposure);
   const fingerprint = contractFingerprint(contract);
   const expectedCoordinates = contractCoordinates(contract, {
     ...(exposure.at === undefined ? {} : { at: exposure.at }),
@@ -414,9 +568,9 @@ export function contractExposureReport(
     exposure.coordinates.phase === expectedCoordinates.phase &&
     exposure.coordinates.lens === expectedCoordinates.lens &&
     exposure.coordinates.evidencePolicy === expectedCoordinates.evidencePolicy &&
-    (expectedCoordinates.at === undefined || exposure.coordinates.at !== undefined) &&
-    (expectedCoordinates.caller === undefined || exposure.coordinates.caller !== undefined) &&
-    (expectedCoordinates.boundary === undefined || exposure.coordinates.boundary !== undefined);
+    observationCoordinateMatches(expectedCoordinates.at, exposure.coordinates.at) &&
+    observationCoordinateMatches(expectedCoordinates.caller, exposure.coordinates.caller) &&
+    observationCoordinateMatches(expectedCoordinates.boundary, exposure.coordinates.boundary);
   const recordsPresent = contract.evidencePolicy.records.filter((record) => exposureHasRecord(exposure, record));
   const recordsMissing = contract.evidencePolicy.records.filter((record) => !recordsPresent.includes(record));
   const timeAccounted = contract.evidencePolicy.time === "none" ||
