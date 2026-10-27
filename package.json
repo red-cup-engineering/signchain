@@ -5,7 +5,7 @@
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
     "src",
-    "data/records/requirements-records",
+    "data/records/service-records/requirements-service-records",
     "data/schema",
     "data/examples",
     "test",
@@ -37,7 +37,7 @@
     "@red-cup-engineering/computer-data-engineering-services-section": "0.3.1",
     "@red-cup-engineering/exact-number-data-service": "0.1.1",
     "@red-cup-engineering/semiotic-eavt-services-section": "0.3.2",
-    "@red-cup-engineering/signcell": "0.13.1-dev.212",
+    "@red-cup-engineering/signcell": "0.13.3-dev.225",
     "@red-cup-engineering/semiotic-content-address": "0.1.1",
     "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },

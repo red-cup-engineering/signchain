@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { cell, address } from '@red-cup-engineering/signcell/cell';
 import { channel, message } from '@red-cup-engineering/signcell/signal';
 import { cellToCloudEvent, cellEventMessage, cellEventOfMessage, cellFromCloudEvent } from '@red-cup-engineering/signcell/cloud-events';
@@ -123,4 +124,27 @@ test('claim retention still refuses unowned witness accessors without executing 
   assert.throws(()=>log.tell({subject:'s',predicate:'p',object:'o'},foreign),/accessors/u);
   assert.equal(reads,0);
   assert.equal(log.size,0);
+});
+
+test('CL1/CL3/CL5: retained RFC3986 event sources reach the telling log without changing evidence',()=>{
+  // This observation was produced by the independently issued Cell225. Keeping
+  // its original wire message exercises this consumer's parser, rather than
+  // asking the same supplier to construct the event that it must receive.
+  const fixture=JSON.parse(readFileSync(new URL('./fixtures/rfc3986-native-event.json',import.meta.url),'utf8'));
+  const before=JSON.stringify(fixture);
+  const a=fixture.message;
+  const b=message({channel:other,observedAt:second,body:a.body,causes:[a]});
+  const log=logOfCellEventMessages([a,a,b]);
+  assert.equal(log.sealed,true);
+  assert.equal(log.size,2,'retry and forwarding add no new witness');
+  assert.deepEqual(log.where()[0].witness,witness);
+  assert.deepEqual(log.against()[0].witness,against);
+  assert.equal(log.readingAt(claim()),'stable','the original opposing evidence remains opposed');
+  assert.equal(address(log.cells()[0]),address(claim()));
+  assert.deepEqual(log.rows.map(row=>row.observedAt),[first,first]);
+  assert.equal(logOfCellEventMessages([a,b],{asOf:'2026-10-26T18:00:00Z'}).size,0);
+  assert.equal(logOfCellEventMessages([a,b],{asOf:first}).size,2);
+  assert.equal(cellEventOfMessage(a).source,fixture.source,'IPvFuture and percent-encoded spelling are retained exactly');
+  assert.equal(cellEventOfMessage(b).source,fixture.source);
+  assert.equal(JSON.stringify(fixture),before,'reading cannot mutate the source observation');
 });

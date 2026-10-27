@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: CL1/CL3/CL5: retained RFC3986 event sources reach the telling log without changing evidence
+not ok 1 - CL1/CL3/CL5: retained RFC3986 event sources reach the telling log without changing evidence
+  ---
+  duration_ms: 9.209064
+  type: 'test'
+  location: '/workspace/scratch/2909a2a1d403/downstream/signchain/test/claim-event-log.test.mjs:129:1'
+  failureType: 'testCodeFailure'
+  error: 'CloudEvent source: invalid URI reference'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    uriReference (file:///workspace/scratch/2909a2a1d403/downstream/issued/signcell212/package/src/cloud-events.mjs:82:17)
+    envelope (file:///workspace/scratch/2909a2a1d403/downstream/issued/signcell212/package/src/cloud-events.mjs:104:3)
+    claimEnvelope (file:///workspace/scratch/2909a2a1d403/downstream/issued/signcell212/package/src/cloud-events.mjs:182:17)
+    cellEventOfMessage (file:///workspace/scratch/2909a2a1d403/downstream/issued/signcell212/package/src/cloud-events.mjs:245:10)
+    logOfCellEventMessages (file:///workspace/scratch/2909a2a1d403/downstream/signchain/src/log.mjs:216:19)
+    TestContext.<anonymous> (file:///workspace/scratch/2909a2a1d403/downstream/signchain/test/claim-event-log.test.mjs:137:13)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.start (node:internal/test_runner/test:1262:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 143.525582
