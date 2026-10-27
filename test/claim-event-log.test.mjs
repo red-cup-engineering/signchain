@@ -148,3 +148,26 @@ test('CL1/CL3/CL5: retained RFC3986 event sources reach the telling log without 
   assert.equal(cellEventOfMessage(b).source,fixture.source);
   assert.equal(JSON.stringify(fixture),before,'reading cannot mutate the source observation');
 });
+
+test('CL4: recursively reordered admitted CloudEvents JSON retains the same event source/id',()=>{
+ const original=event();
+ const reorder=value=>Array.isArray(value)?value.map(reorder):
+   value!==null&&typeof value==='object'?
+    Object.fromEntries(Object.entries(value).reverse().map(([k,v])=>[k,reorder(v)])):value;
+ const equivalent=reorder(original);
+ assert.notEqual(JSON.stringify(original),JSON.stringify(equivalent));
+ const log=logOfCellEventMessages([observed(original),observed(equivalent,second,other)]);
+ assert.equal(log.sealed,true);
+ assert.equal(log.size,2);
+ assert.equal(log.readingAt(claim()),'stable');
+ assert.deepEqual(log.where()[0].witness,witness);
+ assert.deepEqual(log.against()[0].witness,against);
+});
+
+test('CL4: changing nested claim content under reused event source/id still refuses',()=>{
+ const first=observed(event());
+ const changed=event(cell('sample','temperature',{value:4,unit:'C'},
+   {for:[witness],against:[against]}),'one');
+ assert.throws(()=>logOfCellEventMessages([first,observed(changed,second)]),
+   error=>error.code==='event-identity-conflict');
+});

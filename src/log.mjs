@@ -218,6 +218,23 @@ export function logOfSeavtRows(rows, { asOf } = {}) {
 }
 
 /**
+ * Compare already-admitted CloudEvents by structural JSON member content:
+ * object key order is immaterial, while array position and literal text
+ * spelling are not. Never use this read-only comparison as an SCA identifier.
+ */
+function cloudEventComparison(event) {
+  const walk = value => {
+    if (Array.isArray(value)) return ["array", value.map(walk)];
+    if (value !== null && typeof value === "object")
+      return ["object", Object.entries(value)
+        .sort(([a],[b])=>a<b?-1:a>b?1:0)
+        .map(([key,member])=>[key,walk(member)])];
+    return ["scalar", value];
+  };
+  return JSON.stringify(walk(event));
+}
+
+/**
  * Read retained native claim-event observations through the existing telling
  * log. The receiver's observation clock selects the cut; the event's asserted
  * occurrence time never makes a later-received witness available earlier.
@@ -244,10 +261,8 @@ export function logOfCellEventMessages(messages, { asOf } = {}) {
     if (cut !== undefined && instant > cut) break;
     const event = cellEventOfMessage(message);
     const eventKey = JSON.stringify([event.source, event.id]);
-    // The admitted claim profile has scalar fields only. Sorting their names
-    // removes object insertion order without changing Unicode or URI spelling.
-    const content = JSON.stringify(Object.entries(event).sort(([left], [right]) =>
-      left < right ? -1 : left > right ? 1 : 0));
+    // Recursive JSON object order is immaterial; original codepoints are not.
+    const content = cloudEventComparison(event);
     if (events.has(eventKey) && events.get(eventKey) !== content) {
       const conflict = new TypeError("signchain log: CloudEvents source/id identifies conflicting envelope content");
       conflict.code = "event-identity-conflict";

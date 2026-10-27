@@ -81,3 +81,14 @@ unrecognized query properties do not silently become authority or evidence.
 Canonical byte coincidence and repeated/contradictory source tellings keep
 their original semantics; there is no second index or truth evaluator.
 JavaScript Proxy traps still require host sandbox/capability protection.
+
+## Native CloudEvents JSON structural equality
+
+The original `logOfCellEventMessages` source/id collision guard now compares
+nested JSON **object members** independent of transport enumeration order,
+while preserving ordered arrays, exact source URIs, witness content and
+literal Unicode spelling. This does not convert SignCell evidence into another
+codec, SCA content identity, signed authority or durable event ledger:
+`cellEventOfMessage` first admits the existing SignCell CloudEvent, and
+the comparison merely detects reuse of its declared source/id with a
+different structured JSON body.
