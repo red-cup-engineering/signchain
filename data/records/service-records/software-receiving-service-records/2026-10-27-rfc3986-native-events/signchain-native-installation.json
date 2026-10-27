@@ -1,0 +1,153 @@
+{
+  "kind": "signchain.native-rfc3986-supplier-reconciliation/v1",
+  "sourceBase": "be457fdcb0685845f6f6381fc4c60549e4ffa96c",
+  "source": "/workspace/scratch/2909a2a1d403/downstream/signchain",
+  "ownedProviderRoot": "/dev/shm/signchain-logging-2909a2a1d403",
+  "priorPhysicalCell": "0.13.1-dev.198",
+  "sourceBaseCell": "0.13.1-dev.212",
+  "selectedCell": "0.13.3-dev.225",
+  "policySha256": "cdf1f31bdb733aa5b19f3c88efc30497b7b0d86fa69102623725ede464015d26",
+  "nativePackageManager": "pnpm11.28.5",
+  "executionNamespace": "require_escalated persistent native namespace",
+  "cache": "/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+  "history": [
+    {
+      "label": "native-relock",
+      "command": [
+        "node",
+        "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+        "install",
+        "--lockfile-only",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org/",
+        "--config.@561-group:registry=https://registry.561.group/",
+        "--config.@causeway-services:registry=https://registry.561.group/",
+        "--config.@coesite-operations:registry=https://registry.561.group/",
+        "--config.@emsenn:registry=https://registry.561.group/",
+        "--config.@emsweb:registry=https://registry.561.group/",
+        "--config.@harmonious-union:registry=https://registry.561.group/",
+        "--config.@koios-news:registry=https://registry.561.group/",
+        "--config.@lenticule-science:registry=https://registry.561.group/",
+        "--config.@red-cup-engineering:registry=https://registry.561.group/",
+        "--config.@red-cup-science:registry=https://registry.561.group/",
+        "--config.@rsc-quiescent:registry=https://registry.561.group/",
+        "--network-concurrency=4",
+        "--fetch-timeout=20000",
+        "--fetch-retries=0",
+        "--cache-dir=/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+        "--store-dir=/root/.local/share/pnpm/store/v11"
+      ],
+      "startedAt": "2026-10-27T03:42:31.788990+00:00",
+      "exitCode": 0,
+      "seconds": 1.5210220929875504,
+      "log": "/workspace/scratch/2909a2a1d403/downstream/signchain-native-relock.log",
+      "sha256": "0f58f383c14703bd5ea5954e03b8d602d48b838f08d4457fc812369f88117856"
+    },
+    {
+      "label": "native-frozen-install",
+      "command": [
+        "node",
+        "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--prefer-offline",
+        "--package-import-method=copy",
+        "--registry=https://registry.npmjs.org/",
+        "--config.@561-group:registry=https://registry.561.group/",
+        "--config.@causeway-services:registry=https://registry.561.group/",
+        "--config.@coesite-operations:registry=https://registry.561.group/",
+        "--config.@emsenn:registry=https://registry.561.group/",
+        "--config.@emsweb:registry=https://registry.561.group/",
+        "--config.@harmonious-union:registry=https://registry.561.group/",
+        "--config.@koios-news:registry=https://registry.561.group/",
+        "--config.@lenticule-science:registry=https://registry.561.group/",
+        "--config.@red-cup-engineering:registry=https://registry.561.group/",
+        "--config.@red-cup-science:registry=https://registry.561.group/",
+        "--config.@rsc-quiescent:registry=https://registry.561.group/",
+        "--network-concurrency=4",
+        "--fetch-timeout=20000",
+        "--fetch-retries=0",
+        "--cache-dir=/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+        "--store-dir=/root/.local/share/pnpm/store/v11"
+      ],
+      "startedAt": "2026-10-27T03:42:33.310421+00:00",
+      "exitCode": 0,
+      "seconds": 1.0166372809908353,
+      "log": "/workspace/scratch/2909a2a1d403/downstream/signchain-native-frozen-install.log",
+      "sha256": "5828320b047648e020a2c7842fd51759d58f26ef8db8844fb97245f45c2bbb93"
+    }
+  ],
+  "status": "native-reconciliation-passed",
+  "lockDelta": {
+    "packages": {
+      "added": [
+        "@red-cup-engineering/signcell@0.13.3-dev.225"
+      ],
+      "removed": [
+        "@red-cup-engineering/signcell@0.13.1-dev.212"
+      ],
+      "changedExisting": []
+    },
+    "snapshots": {
+      "added": [
+        "@red-cup-engineering/signcell@0.13.3-dev.225"
+      ],
+      "removed": [
+        "@red-cup-engineering/signcell@0.13.1-dev.212"
+      ],
+      "changedExisting": []
+    }
+  },
+  "providers": [
+    {
+      "name": "@red-cup-engineering/metrologic",
+      "version": "0.14.3-dev.1364",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+metrologic@0.14.3-dev.1364/node_modules/@red-cup-engineering/metrologic",
+      "manifestSha256": "5312d764a56065c8e72ce552ce9bea32efa435aa3c5f00d8a402ec3ea805766c"
+    },
+    {
+      "name": "@red-cup-engineering/computer-data-engineering-services-section",
+      "version": "0.3.1",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.3.1/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+      "manifestSha256": "5f2467568734022f482aa4db9fd875c74d507781088634452c3abbda1952bd90"
+    },
+    {
+      "name": "@red-cup-engineering/exact-number-data-service",
+      "version": "0.1.1",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+exact-number-data-service@0.1.1/node_modules/@red-cup-engineering/exact-number-data-service",
+      "manifestSha256": "649d29f830c72470d7dccd1465b6b4c5f200db1f65d4e1841fdcf9399bbb8b33"
+    },
+    {
+      "name": "@red-cup-engineering/semiotic-eavt-services-section",
+      "version": "0.3.2",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+semiotic-eavt-services-section@0.3.2/node_modules/@red-cup-engineering/semiotic-eavt-services-section",
+      "manifestSha256": "b2a55e2ab735fa9d7c3b17a449e9726be994fa10b75913d45f6f55559e0a072d"
+    },
+    {
+      "name": "@red-cup-engineering/signcell",
+      "version": "0.13.3-dev.225",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+signcell@0.13.3-dev.225/node_modules/@red-cup-engineering/signcell",
+      "manifestSha256": "7631c157a69f86f426c632f40ecfed7ac8517b9d960a8f4debe6862f7024d7e3"
+    },
+    {
+      "name": "@red-cup-engineering/semiotic-content-address",
+      "version": "0.1.1",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+semiotic-content-address@0.1.1/node_modules/@red-cup-engineering/semiotic-content-address",
+      "manifestSha256": "808a818b081125ddaeca3d8022a677150e7bd412ffe30f4fe7f153c596f42f31"
+    },
+    {
+      "name": "@red-cup-engineering/json-schema-services-section",
+      "version": "0.5.0",
+      "realPath": "/dev/shm/signchain-logging-2909a2a1d403/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "manifestSha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7"
+    }
+  ],
+  "sourceAndInstalledLockEqual": true,
+  "policyUnchanged": true,
+  "onlyNativeLockSourceChangedByInstaller": true,
+  "originalProviderEntriesUnchanged": 2417,
+  "actualCell225ArchiveFilesMatched": 46,
+  "actualCell225ArchiveSha256": "9fdc401dd973ca473f977a2afa67c3752ce41ae61d8e16a6e6814db245a89600"
+}

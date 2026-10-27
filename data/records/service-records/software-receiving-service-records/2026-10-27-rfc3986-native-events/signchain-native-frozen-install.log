@@ -1,0 +1,14 @@
+✓ Lockfile passes supply-chain policies (verified 649ms ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +3 -2
++++--
+Progress: resolved 3, reused 3, downloaded 0, added 3, done
+
+dependencies:
+- @red-cup-engineering/metrologic 0.14.3-dev.3
++ @red-cup-engineering/metrologic 0.14.3-dev.1364
+- @red-cup-engineering/signcell 0.13.1-dev.198
++ @red-cup-engineering/signcell 0.13.3-dev.225
+
+Done in 960ms using pnpm v11.28.5
