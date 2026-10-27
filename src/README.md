@@ -45,3 +45,24 @@ this binding does not grant them admission. The explicit SCA dependency remains
 for the packaged historical carrier-encoding comparisons.
 Nothing here imports
 SignGraph or SignCraft; SignCraft imports this.
+
+## Finite truth nuclei, downstream of Obsmetrologia
+
+The existing `./token-fiber` now provides `truthPoleClosure` and
+`truthNuclearQuartet` as **bounded readouts over original SignCell token
+frames**, not a rival algebra, certificate of authentic witnessing, execution
+system or independently generated settlement. Their implementation reuses
+Computer Data's original `truthJoinReading` pointwise. Poles must be total
+admitted FOUR assignments over the complete original frame, so absent
+testimony never quietly becomes a mathematically selected truth pole.
+
+The four one-input projections are `source`, `first`, `second`, and
+`both`; the last lies in the intersection of the two fixed-point layers
+because truth-pole nuclei commute. Original `test/token-fiber.test.mjs` now
+checks exhaustive charge-level truth nucleus laws and 4096 two-token
+commutation/fixed-layer combinations, as well as the *counterexample*
+where truth closure is not knowledge inflationary. This corresponds to the
+truth-grade nuclei in Obsmetrologia `Language/Positing/FiberAlgebra.lean`.
+It is not the source-generated `sigma/Delta` action on a performed
+Mark→Articulating→Predicating→Positing→Settling trace; those proofs and
+effects remain Science/SignCraft responsibilities.
