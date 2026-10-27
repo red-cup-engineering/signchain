@@ -60,7 +60,8 @@
     "test/telling-source.test.mjs",
     "test/log.test.mjs",
     "test/log-finalization.test.mjs",
-    "test/rule-index-consistency.test.mjs"
+    "test/rule-index-consistency.test.mjs",
+    "test/token-fiber.test.mjs"
   ],
   "repository": {
     "type": "git",

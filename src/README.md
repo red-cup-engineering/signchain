@@ -129,3 +129,39 @@ Original SignCraft settlement replay still owns source-site validation,
 the derivation-version choice and effects. In-memory rule admission
 does not verify external authority, signatures, provenance chains,
 chronological facts, or that a closure fixed point was reached.
+
+## Finite truth nuclei, downstream of Obsmetrologia
+
+The existing `./token-fiber` now provides `truthPoleClosure` and
+`truthNuclearQuartet` as **bounded readouts over original SignCell token
+frames**, not a rival algebra, certificate of authentic witnessing, execution
+system or independently generated settlement. Their implementation reuses
+Computer Data's original `truthJoinReading` pointwise. Poles must be total
+admitted FOUR assignments over the complete original frame, so absent
+testimony never quietly becomes a mathematically selected truth pole.
+
+The four one-input projections are `source`, `first`, `second`, and
+`both`; the last lies in the intersection of the two fixed-point layers
+because truth-pole nuclei commute. Original `test/token-fiber.test.mjs` now
+checks exhaustive charge-level truth nucleus laws and 4096 two-token
+commutation/fixed-layer combinations, as well as the *counterexample*
+where truth closure is not knowledge inflationary. This corresponds to the
+truth-grade nuclei in Obsmetrologia `Language/Positing/FiberAlgebra.lean`.
+It is not the source-generated `sigma/Delta` action on a performed
+Mark→Articulating→Predicating→Positing→Settling trace; those proofs and
+effects remain Science/SignCraft responsibilities.
+
+## Inert finite valuations — same boundary as truth poles
+
+All `./token-fiber` valuation readers now admit only dense, undecorated,
+plain finite data arrays with own enumerable `token` and `reading` data
+descriptors before any reading or truth-pole projection. That rule applies
+to knowledge/truth ordering, both modal adjoints, `pointwise`,
+`truthPoleClosure`, and `truthNuclearQuartet`. Getter-backed, sparse,
+decorated, or fabricated prototype-backed values refuse rather than
+invoking foreign code to produce a false witness. Same-token contradictory
+FOUR values still knowledge-join in their original order-independent
+lattice. Token coincidence and reading admission still come from the
+original SignCell and Computer Data owners; the descriptor guard is not
+another hash, schema/ledger, or authentication certificate. Executable
+Proxy traps still require the host's separate capability boundary.

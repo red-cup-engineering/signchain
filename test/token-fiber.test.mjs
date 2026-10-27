@@ -3,9 +3,9 @@ import test from "node:test";
 import { cell, claimCoordinate } from "@red-cup-engineering/signcell/cell";
 import { SPECIALIZES, tokenFrame } from "@red-cup-engineering/signcell/token-frame";
 import {
-  knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingFamilies, truthImplyReading, truthMeetReading,
+  knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingFamilies, truthImplyReading, truthJoinReading, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { knowledgeWithin, necessitate, necessitateIn, pointwise, possibilize, possibilizeIn, truthWithin, valuationOf } from "../src/token-fiber.mjs";
+import { knowledgeWithin, necessitate, necessitateIn, pointwise, possibilize, possibilizeIn, truthWithin, valuationOf, truthPoleClosure, truthNuclearQuartet } from "../src/token-fiber.mjs";
 
 const told = (special, general) => cell(special, SPECIALIZES, general, { for: ["leader"] });
 const readingAt = (valuation, token) => valuation.find((entry) => entry.token === token).reading;
@@ -228,4 +228,103 @@ test("mutated transported source cells are read again instead of trusting stale 
   assert.deepEqual(possibilize(wire, newValuation), newValuation);
   assert.deepEqual(necessitate(wire, newValuation), newValuation);
   assert.throws(() => pointwise(wire, x => x, [{ token: { id: "old" }, reading: "potential" }]), /not a token/u);
+});
+
+test("truth poles are total typed SignCell fibers, not invented absent observations",()=>{
+ const frame=tokenFrame([told("specific","general")]);
+ const complete=[{token:"specific",reading:"absurd"},{token:"general",reading:"potential"}];
+ const sample=[{token:"specific",reading:"stable"}];
+ assert.equal(truthPoleClosure(frame,complete,sample).length,2);
+ const bad=[
+  [],[{token:"specific",reading:"absurd"}],
+  [{token:"specific",reading:"potential"},{token:"specific",reading:"active"}],
+  [{token:"specific",reading:"absurd"},{token:"foreign",reading:"potential"}],
+  [{token:"specific",reading:"unknown"},{token:"general",reading:"active"}],
+ ];
+ for(const pole of bad)assert.throws(()=>truthPoleClosure(frame,pole,sample),/truth pole/u);
+ let reads=0;
+ const forged={get token(){reads++;return "specific";},reading:"absurd"};
+ assert.throws(()=>truthPoleClosure(frame,[forged,complete[1]],sample),/inert data/u);
+ assert.equal(reads,0);
+});
+test("all finite FOUR truth pole nuclei preserve meet, order and idempotence",()=>{
+ const frame=tokenFrame([cell("one","asserts","claim")]);
+ const readings=readingFamilies.knowledge;
+ const v=r=>[{token:"one",reading:r}];
+ let checked=0;
+ for(const a of readings)for(const x of readings)for(const y of readings){
+   const pole=v(a),one=truthPoleClosure(frame,pole,v(x));
+   const other=truthPoleClosure(frame,pole,v(y));
+   assert.equal(truthWithin(frame,v(x),one),true,"truth-extensive");
+   assert.deepEqual(truthPoleClosure(frame,pole,one),one,"truth-idempotent");
+   if(truthWithin(frame,v(x),v(y)))assert.equal(truthWithin(frame,one,other),true,"truth-monotone");
+   const lhs=truthPoleClosure(frame,pole,pointwise(frame,truthMeetReading,v(x),v(y)));
+   const rhs=pointwise(frame,truthMeetReading,one,other);
+   assert.deepEqual(lhs,rhs,"meet-preserving nucleus");
+   assert.deepEqual(one,pointwise(frame,truthJoinReading,pole,v(x)));
+   checked++;
+ }
+ assert.equal(checked,64);
+});
+test("two truth nuclei commute and fix exactly their common layer on complete two-token fibers",()=>{
+ const frame=tokenFrame([told("specific","general")]);
+ const four=readingFamilies.knowledge;
+ const values=four.flatMap(x=>four.map(y=>[{token:"specific",reading:x},{token:"general",reading:y}]));
+ let checked=0;
+ for(const a of values)for(const b of values)for(const state of values){
+   const reading=truthNuclearQuartet(frame,a,b,state);
+   assert.equal(reading.kind,"signchain.finite-truth-nuclear-quartet.v1");
+   assert.deepEqual(reading.both,truthPoleClosure(frame,b,truthPoleClosure(frame,a,state)),
+     "two truth nuclei commute over FOUR^T");
+   assert.deepEqual(reading.both,truthPoleClosure(frame,a,reading.both),"fixed by first");
+   assert.deepEqual(reading.both,truthPoleClosure(frame,b,reading.both),"fixed by second");
+   assert.equal(truthWithin(frame,state,reading.both),true);
+   checked++;
+ }
+ assert.equal(checked,4096);
+});
+test("truth nuclear closure is not falsely advertised as a knowledge nucleus",()=>{
+ const frame=tokenFrame([cell("source","reports","claim")]);
+ const pole=[{token:"source",reading:"absurd"}],state=[{token:"source",reading:"stable"}];
+ const changed=truthPoleClosure(frame,pole,state);
+ assert.equal(changed[0].reading,"potential");
+ assert.equal(truthWithin(frame,state,changed),true);
+ assert.equal(knowledgeWithin(frame,state,changed),false,
+   "Obsmetrologia's counterexample: truth closure need not be knowledge inflationary");
+});
+
+test("every native fiber reader refuses accessor-backed source valuations before invoking getters",()=>{
+ const frame=tokenFrame([cell("one","reports","claim")]);
+ let read=0;
+ const entry={reading:"potential"};
+ Object.defineProperty(entry,"token",{enumerable:true,get(){read++;return "one";}});
+ const malicious=[entry];
+ const calls=[
+   ()=>pointwise(frame,x=>x,malicious),
+   ()=>knowledgeWithin(frame,malicious,[]),
+   ()=>truthWithin(frame,[],malicious),
+   ()=>possibilizeIn(frame,malicious,"knowledge"),
+   ()=>necessitateIn(frame,malicious,"truth"),
+   ()=>truthPoleClosure(frame,[{token:"one",reading:"potential"}],malicious),
+   ()=>truthNuclearQuartet(frame,[{token:"one",reading:"potential"}],
+     [{token:"one",reading:"active"}],malicious),
+ ];
+ for(const readFiber of calls) assert.throws(readFiber,/inert data/u);
+ assert.equal(read,0);
+ const array=[{token:"one",reading:"potential"}];
+ Object.defineProperty(array,"0",{enumerable:true,get(){read++;return entry;}});
+ assert.throws(()=>pointwise(frame,x=>x,array),/inert data/u);
+ assert.throws(()=>truthPoleClosure(frame,array,[]),/inert data/u);
+ assert.equal(read,0);
+});
+test("fiber data arrays refuse hidden extras, prototypes and gaps, preserving valid repeated knowledge joins",()=>{
+ const frame=tokenFrame([cell("one","reports","claim")]);
+ const original=[{token:"one",reading:"potential"},{token:"one",reading:"active"}];
+ assert.deepEqual(pointwise(frame,x=>x,original),[{token:"one",reading:"stable"}]);
+ const sparse=new Array(2);sparse[0]=original[0];
+ const decorated=[original[0]];decorated.unlicensed=true;
+ const symbol=[original[0]];symbol[Symbol("hidden")]=true;
+ const foreign=[Object.create({token:"one",reading:"potential"})];
+ for(const bad of [sparse,decorated,symbol,foreign])
+   assert.throws(()=>pointwise(frame,x=>x,bad),/array|plain records/u);
 });
