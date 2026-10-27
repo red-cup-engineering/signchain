@@ -17,8 +17,10 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   log as a fixed history; `log.sealed` reports the state. No second storage,
   index or query engine is created. Every private append checks the sealed
   state before changing rows or indexes, including a second check after input
-  admission in case an input getter finalizes the log. Public `tell` and `deny`
-  also reject a sealed receiver before inspecting new input. Repeated sealing
+  admission in case an executable Proxy trap seals the log. Ordinary getter
+  properties in the original source positions, polarity, witness and timestamp
+  are refused WITHOUT invocation. Public `tell` and `deny` also reject a
+  sealed receiver before inspecting new input. Repeated sealing
   returns the same history. Existing unsealed consumers retain their append
   behavior. Sealing does not authenticate witnesses or imply source authority.
 - `typed-theory` — consequence over SignCell's predication base objects:
@@ -45,3 +47,23 @@ this binding does not grant them admission. The explicit SCA dependency remains
 for the packaged historical carrier-encoding comparisons.
 Nothing here imports
 SignGraph or SignCraft; SignCraft imports this.
+
+## Inert outer telling-source admission (2026-10-27)
+
+The original `./log` reader now imports a tiny descriptor guard from
+`src/telling-source.mjs`. This guard inspects only the ordinary outer row
+fields before constructing the existing SignCell `retainedCarrier`; its
+nesting, typed bytes, canonical CBOR, provenance and evidence identities
+still belong to SignCell, not another SignChain codec. Source-row getters,
+including the observation clock consulted for time cuts, cannot execute merely
+because a log is being read or appended. Invalid/missing persisted polarity
+still refuses rather than defaulting to positive. Indexed appends calculate
+all canonical source keys before changing row or index state. A sealed log
+refuses before inspection and remains unchanged after reentrant Proxy
+descriptor traps. Arbitrary in-process Proxy traps are executable and cannot
+be made intrinsically safe without an external sandbox/capability boundary.
+
+Conformance includes source-only descriptor tests and the original native
+`test/log.test.mjs`, `test/log-finalization.test.mjs`, and
+`test/claim-event-log.test.mjs`. No extra ledger, wire format, source
+authentication, durability, delivery, or authority is claimed.

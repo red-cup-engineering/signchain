@@ -106,3 +106,26 @@ test("persisted telling rows refuse unknown or missing evidence side", () => {
   }
   assert.deepEqual(new TellingLog([{ ...at, witness: "source", side: "against" }]).rows[0].side, "against");
 });
+
+test("untrusted outer source accessors never execute or append witness history", () => {
+  const at = { subject: "s", predicate: "p", object: "o" };
+  const log = new TellingLog().tell(at, "seed");
+  let called=0;
+  const rogue = { ...at };
+  Object.defineProperty(rogue, "subject", { enumerable:true, get(){called++;return "forged";} });
+  assert.throws(()=>telling(rogue,"unlicensed"),/data property/);
+  assert.throws(()=>log.tell(rogue,"unlicensed"),/data property/);
+  assert.throws(()=>log.deny(rogue,"unlicensed"),/data property/);
+  assert.equal(log.size,1);
+  assert.equal(log.readingAt(at),"potential");
+  const row={...at,witness:"source",side:"for"};
+  Object.defineProperty(row,"side",{enumerable:true,get(){called++;return "for";}});
+  assert.throws(()=>new TellingLog([row]),/data property/);
+  assert.throws(()=>cellsOfRows([row]),/data property/);
+  const timestamp={...at,witness:"source",side:"against"};
+  Object.defineProperty(timestamp,"observedAt",{enumerable:true,get(){called++;return "later";}});
+  assert.throws(()=>new TellingLog([timestamp]),/data property/);
+  const seavt={e:"s",a:"p",v:"o",get t(){called++;return "2026-10-26T00:00:00Z";}};
+  assert.throws(()=>logOfSeavtRows([seavt]),/data property/);
+  assert.equal(called,0);
+});

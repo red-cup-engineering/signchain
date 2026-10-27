@@ -17,6 +17,7 @@ import { cellEventOfMessage, cellFromCloudEvent } from "@red-cup-engineering/sig
 import { observedTimeUnixNano } from "@red-cup-engineering/signcell/observability";
 import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { sourceField } from "./telling-source.mjs";
 
 const ROLES = ["subject", "predicate", "object"];
 const SIDES = ["for", "against"];
@@ -29,21 +30,29 @@ const keyOf = coincidenceKey;
 
 /** One telling: a triple, the side it tells, and its witness. */
 export function telling(at, witness, side = "for", observedAt = undefined) {
-  for (const role of ROLES) if (at?.[role] === undefined) throw new TypeError(`signchain log: a telling needs a ${role}`);
+  // Do not evaluate role accessors while copying an unadmitted witness.
+  const [subject, predicate, object] = ROLES.map((role) => sourceField(at, role));
+  for (const [role, term] of [["subject", subject], ["predicate", predicate], ["object", object]])
+    if (term === undefined) throw new TypeError(`signchain log: a telling needs a ${role}`);
   if (!SIDES.includes(side)) throw new TypeError(`signchain log: a telling's side is "for" or "against", not ${JSON.stringify(side)}`);
   if (witness === undefined) throw new TypeError("signchain log: a telling must carry a witness");
-  // Own the entire event, including nested witnesses, before indexing it. A
-  // later mutation of provider-owned input cannot rewrite a past telling.
-  // Retain through the Cell's own carrier owner, including its byte snapshots.
-  return retainedCarrier({ subject: at.subject, predicate: at.predicate, object: at.object, side, witness, ...(observedAt === undefined ? {} : { observedAt }) });
+  // Original SignCell/SCA owns nested terms and witnesses, including bytes.
+  return retainedCarrier({ subject, predicate, object, side, witness,
+    ...(observedAt === undefined ? {} : { observedAt }) });
+}
+
+/** Persisted rows must carry an explicit polarity. A missing side is never "for". */
+function persistedTelling(row) {
+  const side = sourceField(row, "side", false);
+  if (!SIDES.includes(side))
+    throw new TypeError("signchain log: persisted telling requires an explicit for/against side");
+  return telling(row, sourceField(row, "witness", false), side, sourceField(row, "observedAt", false));
 }
 
 /** The cells a list of tellings tells. Unknown/missing sides must never
  * silently become affirmative evidence. */
 export const cellsOfRows = (rows) => cellSet(rows.map((row) => {
-  if (!SIDES.includes(row?.side))
-    throw new TypeError("signchain log: persisted telling requires an explicit for/against side");
-  const admitted = telling(row, row.witness, row.side);
+  const admitted = persistedTelling(row);
   return cell(admitted.subject, admitted.predicate, admitted.object, { [admitted.side]: [admitted.witness] });
 }));
 
@@ -55,11 +64,7 @@ export class TellingLog {
   #byRole = Object.fromEntries(ROLES.map((role) => [role, new Map()]));
 
   constructor(rows = []) {
-    for (const row of rows) {
-      if (!SIDES.includes(row?.side))
-        throw new TypeError("signchain log: persisted telling requires an explicit for/against side");
-      this.#push(telling(row, row.witness, row.side, row.observedAt));
-    }
+    for (const row of rows) this.#push(persistedTelling(row));
   }
 
   #assertAppendable() {
@@ -68,10 +73,14 @@ export class TellingLog {
 
   #push(row) {
     this.#assertAppendable();
+    // Obtain every canonical key BEFORE changing rows or indexes. Failure of
+    // carrier/key admission must not create a partially indexed telling.
+    const keys = ROLES.map(role => keyOf(row[role]));
+    this.#assertAppendable(); // preserve reentrant-source safety
     const position = this.#rows.length;
     this.#rows.push(row);
-    for (const role of ROLES) {
-      const key = keyOf(row[role]), positions = this.#byRole[role].get(key);
+    for (let i = 0; i < ROLES.length; i++) {
+      const role = ROLES[i], key = keys[i], positions = this.#byRole[role].get(key);
       if (positions) positions.push(position); else this.#byRole[role].set(key, [position]);
     }
   }
@@ -174,16 +183,17 @@ export function logOfSeavtRows(rows, { asOf } = {}) {
   const log = new TellingLog(), seen = new Set();
   let preceding = null;
   for (const row of rows) {
-    if (!isAbsoluteSeavtClock(row?.t))
+    const observedAt = sourceField(row, "t", false);
+    if (!isAbsoluteSeavtClock(observedAt))
       throw new TypeError("signchain log: SEAVT observation clock must be absolute");
-    if (preceding !== null && compareAbsoluteSeavtClocks(row.t, preceding) < 0)
+    if (preceding !== null && compareAbsoluteSeavtClocks(observedAt, preceding) < 0)
       throw new RangeError("signchain log: SEAVT observations must be time-ordered");
-    preceding = row.t;
+    preceding = observedAt;
     // Exact fractional-second filtration: no future witness may cross a cut
     // merely because two distinct instants share a JavaScript millisecond.
-    if (asOf !== undefined && compareAbsoluteSeavtClocks(row.t, asOf) > 0) break;
+    if (asOf !== undefined && compareAbsoluteSeavtClocks(observedAt, asOf) > 0) break;
     const at = signCellOfSeavt(row); // SEN admission and SCA subject verification
-    appendWitnesses(log, seen, at, row.t);
+    appendWitnesses(log, seen, at, observedAt);
   }
   return log;
 }

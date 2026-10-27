@@ -46,7 +46,14 @@ test("sealed logs refuse before input inspection and recheck after reentrant adm
   for (const method of ["tell", "deny"]) {
     const log = new TellingLog().tell(at, "original");
     const before = observe(log);
-    const input = { ...at, get subject() { log.seal(); return "new-source"; } };
+    // A Proxy's descriptor trap is intrinsically executable JavaScript even
+    // though ordinary getters are now refused. Recheck sealing after custody.
+    const input = new Proxy({ ...at, subject: "new-source" }, {
+      getOwnPropertyDescriptor(target, key) {
+        if (key === "subject") log.seal();
+        return Reflect.getOwnPropertyDescriptor(target, key);
+      }
+    });
     assert.throws(() => log[method](input, "new-witness"), refusal);
     assert.equal(log.sealed, true);
     assert.deepEqual(observe(log), before);

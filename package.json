@@ -55,7 +55,10 @@
     "test/contract-adversarial.test.mjs",
     "test/contract-evidence-adversarial.test.mjs",
     "test/contract-exposure-custody.test.mjs",
-    "test/contract-literal-identity.test.mjs"
+    "test/contract-literal-identity.test.mjs",
+    "test/telling-source.test.mjs",
+    "test/log.test.mjs",
+    "test/log-finalization.test.mjs"
   ],
   "repository": {
     "type": "git",
