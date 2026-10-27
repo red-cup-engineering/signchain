@@ -85,3 +85,16 @@ rather than the former handwritten fake `predication.base` fixture.
 The correction requires an immutable SignCell release containing its
 new producer guard; it will not run against the historical package until
 that dependency is pinned, installed, and independently tested.
+
+### Receiving an older installed SignCell supplier
+
+The original typed-theory module now imports the SignCell predication
+*namespace*, rather than statically importing a symbol that might be absent
+from the current pinned version. Other previously supported typed-theory
+operations therefore remain importable. `theoryOfBase` fails **closed**
+with a specific missing-source-owner error until its installed SignCell
+instance actually exports `isAdmittedPredicationBase`; there is no
+schema-shape fallback or newly fabricated producer registry. Once a
+qualified supplier is installed, genuine producer-carrier admission is
+unchanged. The native producer-to-consumer conformance suite remains a
+release gate, not an excuse to skip tests.

@@ -8,7 +8,8 @@
  * and predicate words (composition of predicates along a path). Self-contained
  * over predication coincidence and the exact `count`/`natZero`.
  */
-import { baseObjectCoincides, predicateCoincides, termCoincides, isSpecializationMorphism, isAdmittedPredicationBase } from "@red-cup-engineering/signcell/predication";
+import * as signCellPredication from "@red-cup-engineering/signcell/predication";
+const { baseObjectCoincides, predicateCoincides, termCoincides, isSpecializationMorphism } = signCellPredication;
 import { count, natZero } from "@red-cup-engineering/exact-number-data-service/exact-number";
 /** Build a cell from subject, predicate, object. */
 export const cellOf = (subject, predicate, object) => ({ subject, predicate, object });
@@ -54,7 +55,13 @@ export function theoryOfBase(base) {
     // Source qualification is an exact in-process producer receipt, not a
     // kind string or mathematical graph-shape test. A JSON replica must be
     // regenerated using the original SignCell constructors first.
-    if (!isAdmittedPredicationBase(base))
+    // Older, still-pinned SignCell distributions may lack this newer
+    // construction-origin capability. Refuse this operation rather than
+    // breaking every other typed-theory import or accepting a forged base.
+    const sourceGuard = signCellPredication.isAdmittedPredicationBase;
+    if (typeof sourceGuard !== "function")
+        throw new TypeError("typed theory: source owner lacks predication-base construction admission");
+    if (!sourceGuard(base))
         throw new TypeError("typed theory: source must be an originally constructed SignCell predication.base");
     const own = (record, name) => {
         if (!record || typeof record !== "object" || Array.isArray(record))
