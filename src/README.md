@@ -17,8 +17,10 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   log as a fixed history; `log.sealed` reports the state. No second storage,
   index or query engine is created. Every private append checks the sealed
   state before changing rows or indexes, including a second check after input
-  admission in case an input getter finalizes the log. Public `tell` and `deny`
-  also reject a sealed receiver before inspecting new input. Repeated sealing
+  admission in case an executable Proxy trap seals the log. Ordinary getter
+  properties in the original source positions, polarity, witness and timestamp
+  are refused WITHOUT invocation. Public `tell` and `deny` also reject a
+  sealed receiver before inspecting new input. Repeated sealing
   returns the same history. Existing unsealed consumers retain their append
   behavior. Sealing does not authenticate witnesses or imply source authority.
 - `typed-theory` — consequence over SignCell's predication base objects:
@@ -45,6 +47,88 @@ this binding does not grant them admission. The explicit SCA dependency remains
 for the packaged historical carrier-encoding comparisons.
 Nothing here imports
 SignGraph or SignCraft; SignCraft imports this.
+
+## Inert outer telling-source admission (2026-10-27)
+
+The original `./log` reader now imports a tiny descriptor guard from
+`src/telling-source.mjs`. This guard inspects only the ordinary outer row
+fields before constructing the existing SignCell `retainedCarrier`; its
+nesting, typed bytes, canonical CBOR, provenance and evidence identities
+still belong to SignCell, not another SignChain codec. Source-row getters,
+including the observation clock consulted for time cuts, cannot execute merely
+because a log is being read or appended. Invalid/missing persisted polarity
+still refuses rather than defaulting to positive. Indexed appends calculate
+all canonical source keys before changing row or index state. A sealed log
+refuses before inspection and remains unchanged after reentrant Proxy
+descriptor traps. Arbitrary in-process Proxy traps are executable and cannot
+be made intrinsically safe without an external sandbox/capability boundary.
+
+Conformance includes source-only descriptor tests and the original native
+`test/log.test.mjs`, `test/log-finalization.test.mjs`, and
+`test/claim-event-log.test.mjs`. No extra ledger, wire format, source
+authentication, durability, delivery, or authority is claimed.
+
+## Single-snapshot native telling queries
+
+All original `TellingLog` read operations (`where`, `against`, `latest`,
+`cells`, `readingWhere`, `readingAt`) use the same small descriptor
+source guard as append admission. Only own enumerable data coordinates may
+select an indexed query, and the snapshot is retained through the original
+SignCell/SCA carrier before accessing the existing canonical indices. FOUR
+readings inspect both polarity lanes in one selected proposition cut rather
+than evaluating the caller's potentially changing object twice. Additional
+unrecognized query properties do not silently become authority or evidence.
+Canonical byte coincidence and repeated/contradictory source tellings keep
+their original semantics; there is no second index or truth evaluator.
+JavaScript Proxy traps still require host sandbox/capability protection.
+
+## Native CloudEvents JSON structural equality
+
+The original `logOfCellEventMessages` source/id collision guard now compares
+nested JSON **object members** independent of transport enumeration order,
+while preserving ordered arrays, exact source URIs, witness content and
+literal Unicode spelling. This does not convert SignCell evidence into another
+codec, SCA content identity, signed authority or durable event ledger:
+`cellEventOfMessage` first admits the existing SignCell CloudEvent, and
+the comparison merely detects reuse of its declared source/id with a
+different structured JSON body.
+
+## Rules are source-admitted before generating inference evidence
+
+The original SignChain `./rules` now admits an inert, dense, undecorated
+antecedent array, each threshold and original Cell coordinate as own data,
+and one similarly guarded consequent. It then delegates actual triple
+retention and semantic addressing to SignCell. Plain getters cannot execute
+to select a premise or generate a rule witness; a malformed index cannot
+silently omit a needed antecedent. An always-firing rule also guards its
+source Cell *before* obtaining a content address. This is not a private rule
+hash, a new scripting language, or authority to perform an effect.
+
+The original `test/rule-index-consistency.test.mjs` now covers malicious
+rules and the four-stage cascading positive implication model from
+[Obsmetrologia #106](https://github.com/lenticule-science/obsmetrologia-science-services-section/issues/106).
+As proved there, a charge fiber's finite height does not bound the number
+of **global** synchronous Tstep rounds. Only an actually reached and
+checked fixed point is closed; SignCraft's original `closureOrbit` remains
+the owner of complete settlement and its evidence receipts.
+
+## Public rule receiving must never bypass constructor admission
+
+The original `rule()` now qualifies its exact immutable in-process result.
+All public `derivation`, `fireRule`, `fireRuleIn`, `antecedentHolds`,
+`fire`, `step` and `firedRuleNames` operations use that qualified
+instance or re-admit a strict four-field transported rule through the
+same source constructor. Legacy JSON settlement records may be received
+only after reconstructing their original rule under SignCell's canonical
+triple semantics. Re-read rather than cache mutable external records:
+a changed rule means a changed provenance identity. Executable getter
+traps and unauthorized extra fields refuse without invoking source code;
+a matching `kind` string alone never confers producer admission.
+
+Original SignCraft settlement replay still owns source-site validation,
+the derivation-version choice and effects. In-memory rule admission
+does not verify external authority, signatures, provenance chains,
+chronological facts, or that a closure fixed point was reached.
 
 ## Finite truth nuclei, downstream of Obsmetrologia
 
