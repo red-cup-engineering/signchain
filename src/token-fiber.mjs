@@ -21,16 +21,50 @@
  */
 import { cellSet, claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
 import { extent, generalizations, top } from "@red-cup-engineering/signcell/token-frame";
-import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthJoinReading, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const frozen = (values) => Object.freeze([...values]);
+
+/**
+ * A finite valuation is plain positional data, not an executable iterator or
+ * getter-backed observation. Read own descriptors BEFORE evaluating terms.
+ * Original SignCell coincidence and Computer Data FOUR remain the only
+ * semantic admission, identification and lattice owners.
+ *
+ * This does not sandbox Proxy traps or authenticate who made a valuation.
+ */
+function inertFiberEntries(values, label) {
+  if (!Array.isArray(values) || Object.getPrototypeOf(values) !== Array.prototype)
+    throw new TypeError("signchain: " + label + " must be an ordinary finite data array");
+  const descriptors = Object.getOwnPropertyDescriptors(values);
+  if (Reflect.ownKeys(descriptors).length !== values.length + 1)
+    throw new TypeError("signchain: " + label + " must not be a sparse or decorated array");
+  const entries = [];
+  for (let i = 0; i < values.length; i++) {
+    const item = descriptors[String(i)];
+    if (!item || !item.enumerable || !Object.hasOwn(item, "value"))
+      throw new TypeError("signchain: " + label + " entries must be inert data, not accessors");
+    const row = item.value;
+    if (!row || typeof row !== "object" || Array.isArray(row) ||
+        ![Object.prototype, null].includes(Object.getPrototypeOf(row)))
+      throw new TypeError("signchain: " + label + " entries must be plain records");
+    const token = Object.getOwnPropertyDescriptor(row, "token");
+    const reading = Object.getOwnPropertyDescriptor(row, "reading");
+    if (!token || !reading || !token.enumerable || !reading.enumerable ||
+        !Object.hasOwn(token, "value") || !Object.hasOwn(reading, "value"))
+      throw new TypeError("signchain: " + label + " coordinates must be inert data, not accessors");
+    entries.push(Object.freeze({ token: token.value, reading: reading.value }));
+  }
+  return Object.freeze(entries);
+}
+
 // The canonical predicate/object coordinate is owned upstream by SignCell.
 
 // A valuation's readings by token key, every frame token present; absent tokens read absurd.
 function readingsOf(tokens, valuation) {
   const known = new Set(tokens.map(coincidenceKey));
   const readings = new Map();
-  for (const { token, reading } of valuation) {
+  for (const { token, reading } of inertFiberEntries(valuation, "valuation")) {
     if (!isReading(reading)) throw new TypeError(`signchain: a valuation reads FOUR, not ${JSON.stringify(reading)}`);
     const key = coincidenceKey(token);
     if (!known.has(key)) throw new TypeError(`signchain: ${JSON.stringify(token)} is not a token of this frame`);
@@ -114,3 +148,56 @@ export const necessitateIn = (frame, valuation, order) =>
 /** Backward-compatible knowledge-order existential and universal. */
 export const possibilize = (frame, valuation) => possibilizeIn(frame, valuation, "knowledge");
 export const necessitate = (frame, valuation) => necessitateIn(frame, valuation, "knowledge");
+
+/**
+ * A total FOUR^T truth-order pole, not an inference from absent testimony.
+ * Require one lawful reading for every original SignCell frame token; distinct
+ * spellings with the same canonical source term cannot appear twice.
+ * Uses SignCell's original token/coincidence owners, not a new frame or hash.
+ */
+function completeTruthPole(frame, declared) {
+  const tokens = top(frame);
+  const entries = inertFiberEntries(declared, "truth pole");
+  if (entries.length !== tokens.length)
+    throw new TypeError("signchain: truth pole must explicitly cover every original frame token");
+  const allowed = new Set(tokens.map(coincidenceKey)), byToken = new Map();
+  for (const entry of entries) {
+    const key = coincidenceKey(entry.token);
+    if (!allowed.has(key) || byToken.has(key) || !isReading(entry.reading))
+      throw new TypeError("signchain: truth pole has foreign, repeated or invalid FOUR testimony");
+    byToken.set(key, readingAs("knowledge", entry.reading));
+  }
+  return over(tokens, token => byToken.get(coincidenceKey(token)));
+}
+
+/**
+ * Exact finite nucleus j_s(v) = s ∨_truth v, lifted pointwise from the
+ * original Computer Data FOUR operation and the original SignCell token frame.
+ * Any fully specified pole supplies a truth-order inflationary, monotone,
+ * idempotent meet-preserving closure. Neither a pole nor its result confers
+ * source testimony, closure ordinals, execution rights or the generated
+ * Obsmetrologia sigma/Delta settlement regime.
+ */
+export function truthPoleClosure(frame, pole, valuation) {
+  return pointwise(frame, truthJoinReading, completeTruthPole(frame, pole), valuation);
+}
+
+/**
+ * Four finite readings of one original fiber valuation under two commuting
+ * truth-order nuclei. The native theorem is j_a j_b = j_b j_a and the
+ * common-fixed layer is Fix(j_a) ∩ Fix(j_b), not an asserted physical regime.
+ * The poles are explicit caller-qualified mathematical parameters.
+ */
+export function truthNuclearQuartet(frame, firstPole, secondPole, valuation) {
+  const a = completeTruthPole(frame, firstPole);
+  const b = completeTruthPole(frame, secondPole);
+  const source = pointwise(frame, x => x, valuation);
+  const first = pointwise(frame, truthJoinReading, a, source);
+  const second = pointwise(frame, truthJoinReading, b, source);
+  const both = pointwise(frame, truthJoinReading, a, second);
+  return Object.freeze({
+    kind: "signchain.finite-truth-nuclear-quartet.v1",
+    poles: Object.freeze([a, b]), source, first, second, both,
+    qualification: "abstract-finite-truth-fiber-not-source-generated-settlement",
+  });
+}
