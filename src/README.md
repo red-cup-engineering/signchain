@@ -68,3 +68,20 @@ theoryOfBase` path is executed with that exact dependency. The heterogeneous
 term-extraction morphisms are NOT the diagonal cellwise projection generators;
 those retain their original SignCell/Obsmetrologia semantics. No new graph
 runtime, theorem, source authority or ledger is introduced.
+
+## Producer origin is required, not just categorical source shape
+
+The consumer `theoryOfBase` now calls the original exported SignCell
+`isAdmittedPredicationBase` before inspecting any purported source object
+carrier, generator endpoint, or `kind`. A same-shaped JSON copy or a
+hand-constructed base cannot become a proof theory merely by reproducing
+fields or hashes. Legitimate `predicationSite` and its source-generated
+`closeSpecialization` qualify through the **same installed SignCell module
+instance**. This is local construction custody, not authentication of an
+external observation, principal, ledger transfer, or signed proof.
+
+The receiving test now uses actual SignCell `predicationSite` carriers,
+rather than the former handwritten fake `predication.base` fixture.
+The correction requires an immutable SignCell release containing its
+new producer guard; it will not run against the historical package until
+that dependency is pinned, installed, and independently tested.

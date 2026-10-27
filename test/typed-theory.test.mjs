@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { predicationSite, specializationMorphism, isAdmittedPredicationBase } from "@red-cup-engineering/signcell/predication";
+import { cell } from "@red-cup-engineering/signcell/cell";
 import {
   cellOf,
   specializationInferenceMorphism,
@@ -34,17 +36,7 @@ test("inferenceRules: a cell witness yields three rules (converse, subject- and 
   ]));
 });
 
-const originalBase = () => {
-  const a=["alice","likes","bob"], b=["bob","likes","alice"];
-  return {
-    kind:"predication.base",
-    objects:["alice","bob","likes",a,b],
-    specialization:[],
-    converse:[{domain:a,codomain:b}],
-    subjectProjection:[{domain:a,codomain:"alice"}],
-    objectProjection:[{domain:a,codomain:"bob"}],
-  };
-};
+const originalBase = () => predicationSite([cell("alice","likes","bob")]).base;
 
 test("source-closed base projects all witnessed generator endpoints into one typed theory",()=>{
   const base=originalBase();
@@ -58,8 +50,11 @@ test("source-closed base projects all witnessed generator endpoints into one typ
     "typedTheory.inferenceMorphism.objectProjection",
   ]);
   assert.equal(Object.isFrozen(output.objects),true);
-  base.objects.push("foreign");
-  assert.equal(output.objects.length,5,"readout does not share a mutable object-list wrapper");
+  assert.equal(isAdmittedPredicationBase(base),true);
+  assert.throws(()=>base.objects.push("foreign"),TypeError,
+    "producer freezes the original category object carrier");
+  assert.equal(output.objects.length,5,
+    "the receiving theory retains the original closed object list");
 });
 
 test("incomplete original categorical source refuses; cannot invent absent nodes or specialization endpoints",()=>{
@@ -70,9 +65,10 @@ test("incomplete original categorical source refuses; cannot invent absent nodes
     {...source,specialization:[{domain:"specific",codomain:"general"}]},
     {...source,kind:"foreign.category"},
   ])assert.throws(()=>theoryOfBase(altered),/source|undeclared/u);
-  const repaired=originalBase();
-  repaired.objects.push("specific","general");
-  repaired.specialization=[{domain:"specific",codomain:"general"}];
+  const repaired=predicationSite([
+    cell("alice","likes","bob"),
+    specializationMorphism("specific","general")
+  ]).base;
   const accepted=theoryOfBase(repaired);
   assert.equal(accepted.rules.length,4);
   assert.equal(accepted.rules[0].trace.morphisms[0].kind,
@@ -84,14 +80,25 @@ test("getter-backed source edges and sparse carriers never execute while obtaini
   const source=originalBase();
   const bad={...source};
   Object.defineProperty(bad,"objects",{enumerable:true,get(){calls++;return source.objects;}});
-  assert.throws(()=>theoryOfBase(bad),/own data property/u);
+  assert.throws(()=>theoryOfBase(bad),/originally constructed SignCell/u);
   const edge={codomain:"alice"};
   Object.defineProperty(edge,"domain",{enumerable:true,get(){calls++;return source.converse[0].domain;}});
-  assert.throws(()=>theoryOfBase({...source,subjectProjection:[edge]}),/own data property/u);
+  assert.throws(()=>theoryOfBase({...source,subjectProjection:[edge]}),/originally constructed SignCell/u);
   const list=[...source.converse];
   Object.defineProperty(list,"0",{enumerable:true,get(){calls++;return source.converse[0];}});
-  assert.throws(()=>theoryOfBase({...source,converse:list}),/own source data/u);
+  assert.throws(()=>theoryOfBase({...source,converse:list}),/originally constructed SignCell/u);
   const sparse=new Array(2);sparse[0]=source.converse[0];
-  assert.throws(()=>theoryOfBase({...source,converse:sparse}),/dense unadorned/u);
+  assert.throws(()=>theoryOfBase({...source,converse:sparse}),/originally constructed SignCell/u);
   assert.equal(calls,0);
+});
+
+test("a syntactically closed forged base cannot enter an authentic inference theory",()=>{
+ const genuine=originalBase(), forged=JSON.parse(JSON.stringify(genuine));
+ assert.deepEqual(forged.objects,genuine.objects,
+   "source identity and a matching mathematical object list are separate concerns");
+ assert.equal(isAdmittedPredicationBase(forged),false);
+ assert.throws(()=>theoryOfBase(forged),/originally constructed SignCell/u);
+ assert.throws(()=>theoryOfBase({...genuine}),/originally constructed SignCell/u);
+ const correct=theoryOfBase(genuine);
+ assert.equal(correct.rules.length,3);
 });
