@@ -165,3 +165,71 @@ lattice. Token coincidence and reading admission still come from the
 original SignCell and Computer Data owners; the descriptor guard is not
 another hash, schema/ledger, or authentication certificate. Executable
 Proxy traps still require the host's separate capability boundary.
+
+## Witnessed predication-base endpoint receiving
+
+`theoryOfBase` now requires the original SignCell `predication.base`
+carrier to contain every endpoint of every declared specialization, converse
+and heterogeneous subject/object extraction generator. All four families
+are read and validated before constructing their typed inference rules.
+If even one source endpoint is absent, the original theory refuses
+instead of manufacturing an object or laundering an incomplete site into
+a well-typed derivation. SignCell's `baseObjectCoincides` is the sole
+semantic comparison. The returned object's wrapper is immutable and
+getter/sparse-array source controls reject executable inputs without
+evaluating foreign accessors.
+
+This is a **receiving gate for** [SignCell predication-base correction
+#35](https://github.com/red-cup-engineering/signcell/pull/35). The current
+published SignCell supplier may still emit an incomplete historical base;
+do not merge or claim installed product readiness until the corrected source
+is published at an immutable version and the original `predicationSite →
+theoryOfBase` path is executed with that exact dependency. The heterogeneous
+term-extraction morphisms are NOT the diagonal cellwise projection generators;
+those retain their original SignCell/Obsmetrologia semantics. No new graph
+runtime, theorem, source authority or ledger is introduced.
+
+## Producer origin is required, not just categorical source shape
+
+The consumer `theoryOfBase` now calls the original exported SignCell
+`isAdmittedPredicationBase` before inspecting any purported source object
+carrier, generator endpoint, or `kind`. A same-shaped JSON copy or a
+hand-constructed base cannot become a proof theory merely by reproducing
+fields or hashes. Legitimate `predicationSite` and its source-generated
+`closeSpecialization` qualify through the **same installed SignCell module
+instance**. This is local construction custody, not authentication of an
+external observation, principal, ledger transfer, or signed proof.
+
+The receiving test now uses actual SignCell `predicationSite` carriers,
+rather than the former handwritten fake `predication.base` fixture.
+The correction requires an immutable SignCell release containing its
+new producer guard; it will not run against the historical package until
+that dependency is pinned, installed, and independently tested.
+
+### Receiving an older installed SignCell supplier
+
+The original typed-theory module now imports the SignCell predication
+*namespace*, rather than statically importing a symbol that might be absent
+from the current pinned version. Other previously supported typed-theory
+operations therefore remain importable. `theoryOfBase` fails **closed**
+with a specific missing-source-owner error until its installed SignCell
+instance actually exports `isAdmittedPredicationBase`; there is no
+schema-shape fallback or newly fabricated producer registry. Once a
+qualified supplier is installed, genuine producer-carrier admission is
+unchanged. The native producer-to-consumer conformance suite remains a
+release gate, not an excuse to skip tests.
+
+## Publication-gated SignCell constructor-origin receiving
+
+The existing `theoryOfBase` source uses a module-namespace read of
+`isAdmittedPredicationBase`, so an installed historical SignCell lacking
+that export fails **only this capability** closed instead of preventing
+unrelated typed-theory import. The original native test now uses the same
+provider namespace: four producer-dependent tests are reported as
+**SKIPPED / unqualified**, not passed, when the current package cannot
+provide the new export. One independent regression verifies that old
+suppliers refuse the capability. A newer supplier must actually expose
+the constructor-origin guard before the tests can report full receiving.
+This is not a substitute for immutable package publication/pinning or a
+full installed end-to-end test, and no caller may interpret a skip as
+an authorized typed inference result.

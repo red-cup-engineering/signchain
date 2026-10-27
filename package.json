@@ -10,7 +10,8 @@
     "data/examples",
     "test",
     "docs",
-    "test/rule-index-consistency.test.mjs"
+    "test/rule-index-consistency.test.mjs",
+    "test/typed-theory.test.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -61,7 +62,8 @@
     "test/log.test.mjs",
     "test/log-finalization.test.mjs",
     "test/rule-index-consistency.test.mjs",
-    "test/token-fiber.test.mjs"
+    "test/token-fiber.test.mjs",
+    "test/typed-theory.test.mjs"
   ],
   "repository": {
     "type": "git",
