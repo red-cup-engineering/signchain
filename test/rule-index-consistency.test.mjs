@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { address, cell, cellSet, merge } from "@red-cup-engineering/signcell/cell";
 import {
-  antecedentHolds, fire, fireRule, fireRuleIn, firedRuleNames, rule, always, step,
+  antecedentHolds, derivation, fire, fireRule, fireRuleIn, firedRuleNames, rule, always, step,
 } from "../src/rules.mjs";
 
 const premise = cell("source", "claims", "outcome");
@@ -137,4 +137,45 @@ test("four positive global propagation rounds are required despite finite FOUR f
   assert.deepEqual(counts,[1,2,3,4,5]);
   assert.deepEqual(step(cascade,state),state,
     "a fixed-point test, not arbitrary fuel, certifies settlement");
+});
+
+test("public rule readers refuse forged executable rule records before any source getter",()=>{
+ let executed=0;
+ const malicious={kind:"signchain.rule",name:"foreign",consequent:{cell:consequence,reading:"potential"}};
+ Object.defineProperty(malicious,"antecedent",{enumerable:true,get(){executed++;return []}});
+ const source=[forTelling];
+ for(const go of [
+   ()=>antecedentHolds(malicious,source),()=>derivation(malicious),
+   ()=>fireRule(malicious,source),()=>fireRuleIn(malicious,new Map()),
+   ()=>fire([malicious],source),()=>step([malicious],source),
+   ()=>firedRuleNames([malicious],source)
+ ]) assert.throws(go,/inert original rule positions/u);
+ assert.equal(executed,0);
+ const decorated={...positive,sourceAuthority:"fabricated"};
+ assert.throws(()=>fireRule(decorated,source),/inert original rule positions/u);
+});
+
+test("historical JSON rule re-admission preserves versioned derivation and four-sided evidence",()=>{
+ const source=JSON.parse(JSON.stringify(positive));
+ assert.deepEqual(fireRule(source,[forTelling]),fireRule(positive,[forTelling]));
+ assert.deepEqual(fireRule(source,[againstTelling]),fireRule(positive,[againstTelling]));
+ assert.deepEqual(derivation(source,1),derivation(positive,1),
+   "legacy v1 derivation remains reproducible without rewriting the witness");
+ assert.deepEqual(derivation(source,2),derivation(positive,2),
+   "v2 derivation is still content-identified from the same admitted rule");
+ const before=derivation(source,2).ruleId;
+ source.consequent.reading="active";
+ const after=derivation(source,2).ruleId;
+ assert.notEqual(after,before,
+   "mutable received JSON must be re-admitted at each read, not cached as source-owned");
+});
+
+test("public rule arrays cannot execute indexed getters or erase antecedents",()=>{
+ let reads=0;
+ const array=[positive];Object.defineProperty(array,"0",{enumerable:true,
+   get(){reads++;return positive;}});
+ for(const read of [()=>fire(array,[forTelling]),
+   ()=>firedRuleNames(array,[forTelling]),()=>step(array,[forTelling])])
+   assert.throws(read,/inert data/u);
+ assert.equal(reads,0);
 });

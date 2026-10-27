@@ -39,6 +39,12 @@ const validateDerivationVersion = (version) => {
   if (version !== 1 && version !== 2) throw new TypeError("signchain derivation: unsupported version");
 };
 
+// Only the original constructor qualifies a rule for fast repeated firing.
+// JSON wire records must be re-admitted instead of being treated as already
+// proven just because they carry "kind": "signchain.rule". This is local
+// construction custody, not a signed source certificate or permission grant.
+const admittedRules = new WeakSet();
+
 /** Read one source triple through original SignCell retained-carrier custody.
  * SourceField is a descriptor guard, not a competing schema or content hash.
  */
@@ -85,12 +91,14 @@ export function rule(name, antecedent, consequent) {
   const reading = sourceField(consequent, "reading");
   if (!isReading(reading))
     throw new TypeError("signchain rule: consequent must have a valid knowledge reading");
-  return Object.freeze({
+  const admitted = Object.freeze({
     kind: "signchain.rule",
     name,
     antecedent: Object.freeze(conditions),
     consequent: Object.freeze({ cell: ruleTriple(originalConsequence), reading }),
   });
+  admittedRules.add(admitted);
+  return admitted;
 }
 
 /** A rule with no antecedent: it always tells its consequent. */
@@ -99,17 +107,42 @@ export const always = (at, reading) => {
   return rule(`always:${address(origin)}:${reading}`, [], { cell: origin, reading });
 };
 
+/**
+ * Receive an in-process qualified original rule or re-admit the exact wire
+ * shape through the same original builder. No property getter may determine
+ * a premise or consequence. A non-frozen caller record is never cached.
+ */
+const receivedRule = source => {
+  if (source && typeof source === "object" && admittedRules.has(source)) return source;
+  if (!source || typeof source !== "object" || Array.isArray(source) ||
+      ![Object.prototype, null].includes(Object.getPrototypeOf(source)))
+    throw new TypeError("signchain rule: requires original source rule record");
+  const descriptors = Object.getOwnPropertyDescriptors(source);
+  const names = Reflect.ownKeys(descriptors);
+  if (names.length !== 4 ||
+      !["kind","name","antecedent","consequent"].every(name =>
+        Object.hasOwn(descriptors,name) && descriptors[name].enumerable &&
+        Object.hasOwn(descriptors[name],"value")))
+    throw new TypeError("signchain rule: requires exact inert original rule positions");
+  if (sourceField(source,"kind") !== "signchain.rule")
+    throw new TypeError("signchain rule: unknown source kind");
+  return rule(sourceField(source,"name"),sourceField(source,"antecedent"),
+    sourceField(source,"consequent"));
+};
+
 /** Shared addressed rule judgment for public arrays and SignCraft Maps. */
 const antecedentHoldsIn = (r, valuation) => r.antecedent.every((condition) =>
   knowledgeLeqReading(condition.atLeast, knowledgeReading(indexedCellAtTriple(valuation, condition.cell))));
 /** Whether every antecedent holds after repeated source tellings are merged. */
-export const antecedentHolds = (r, valuation) => antecedentHoldsIn(r, indexValuation(valuation));
+export const antecedentHolds = (r, valuation) =>
+  antecedentHoldsIn(receivedRule(r), indexValuation(valuation));
 
 /** A stable witness per rule, including thresholds, conclusion and evidence lane in its identity.
  * Version 1 is retained only to replay historical settlements; it identifies labels and premise
  * addresses, not the complete license. Neither version is a signature or authenticates an issuer. */
 export function derivation(r, version = 2) {
   validateDerivationVersion(version);
+  r = receivedRule(r);
   return Object.freeze({
     rule: r.name,
     from: Object.freeze(r.antecedent.map((condition) => address(condition.cell))),
@@ -120,12 +153,13 @@ export function derivation(r, version = 2) {
 /** What one rule tells in a valuation: its consequent cell, on the sides its reading tells, witnessed by
  *  its derivation; nothing if its antecedent fails. */
 export function fireRule(r, valuation, derivationVersion = 2) {
-  return fireRuleIn(r, indexValuation(valuation), derivationVersion);
+  return fireRuleIn(receivedRule(r), indexValuation(valuation), derivationVersion);
 }
 
 /** Fire against an addressed valuation. Settlement can reuse this index across stages. */
 export function fireRuleIn(r, valuation, derivationVersion = 2) {
   validateDerivationVersion(derivationVersion);
+  r = receivedRule(r);
   if (!antecedentHoldsIn(r, valuation)) return cellSet();
   const [forTold, againstTold] = sidesOfReading(r.consequent.reading);
   const witness = derivation(r, derivationVersion), at = r.consequent.cell;
@@ -137,8 +171,8 @@ export function fireRuleIn(r, valuation, derivationVersion = 2) {
 export function fire(rules, valuation) {
   const indexed = indexValuation(valuation);
   const tellings = [];
-  for (const r of rules) {
-    tellings.push(...fireRuleIn(r, indexed));
+  for (const r of ruleConditions(rules)) {
+    tellings.push(...fireRuleIn(receivedRule(r), indexed));
   }
   return cellSet(tellings);
 }
@@ -149,5 +183,6 @@ export const step = (rules, valuation) => mergeCellSets(valuation, fire(rules, v
 /** The names of the rules whose antecedents hold. */
 export const firedRuleNames = (rules, valuation) => {
   const indexed = indexValuation(valuation);
-  return Object.freeze(rules.filter((r) => antecedentHoldsIn(r, indexed)).map((r) => r.name));
+  return Object.freeze(ruleConditions(rules).map(receivedRule)
+    .filter(r => antecedentHoldsIn(r, indexed)).map(r => r.name));
 };

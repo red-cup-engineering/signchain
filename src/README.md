@@ -111,3 +111,21 @@ As proved there, a charge fiber's finite height does not bound the number
 of **global** synchronous Tstep rounds. Only an actually reached and
 checked fixed point is closed; SignCraft's original `closureOrbit` remains
 the owner of complete settlement and its evidence receipts.
+
+## Public rule receiving must never bypass constructor admission
+
+The original `rule()` now qualifies its exact immutable in-process result.
+All public `derivation`, `fireRule`, `fireRuleIn`, `antecedentHolds`,
+`fire`, `step` and `firedRuleNames` operations use that qualified
+instance or re-admit a strict four-field transported rule through the
+same source constructor. Legacy JSON settlement records may be received
+only after reconstructing their original rule under SignCell's canonical
+triple semantics. Re-read rather than cache mutable external records:
+a changed rule means a changed provenance identity. Executable getter
+traps and unauthorized extra fields refuse without invoking source code;
+a matching `kind` string alone never confers producer admission.
+
+Original SignCraft settlement replay still owns source-site validation,
+the derivation-version choice and effects. In-memory rule admission
+does not verify external authority, signatures, provenance chains,
+chronological facts, or that a closure fixed point was reached.
