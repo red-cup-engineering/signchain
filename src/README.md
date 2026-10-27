@@ -66,3 +66,18 @@ truth-grade nuclei in Obsmetrologia `Language/Positing/FiberAlgebra.lean`.
 It is not the source-generated `sigma/Delta` action on a performed
 Mark→Articulating→Predicating→Positing→Settling trace; those proofs and
 effects remain Science/SignCraft responsibilities.
+
+## Inert finite valuations — same boundary as truth poles
+
+All `./token-fiber` valuation readers now admit only dense, undecorated,
+plain finite data arrays with own enumerable `token` and `reading` data
+descriptors before any reading or truth-pole projection. That rule applies
+to knowledge/truth ordering, both modal adjoints, `pointwise`,
+`truthPoleClosure`, and `truthNuclearQuartet`. Getter-backed, sparse,
+decorated, or fabricated prototype-backed values refuse rather than
+invoking foreign code to produce a false witness. Same-token contradictory
+FOUR values still knowledge-join in their original order-independent
+lattice. Token coincidence and reading admission still come from the
+original SignCell and Computer Data owners; the descriptor guard is not
+another hash, schema/ledger, or authentication certificate. Executable
+Proxy traps still require the host's separate capability boundary.

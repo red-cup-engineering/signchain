@@ -292,3 +292,39 @@ test("truth nuclear closure is not falsely advertised as a knowledge nucleus",()
  assert.equal(knowledgeWithin(frame,state,changed),false,
    "Obsmetrologia's counterexample: truth closure need not be knowledge inflationary");
 });
+
+test("every native fiber reader refuses accessor-backed source valuations before invoking getters",()=>{
+ const frame=tokenFrame([cell("one","reports","claim")]);
+ let read=0;
+ const entry={reading:"potential"};
+ Object.defineProperty(entry,"token",{enumerable:true,get(){read++;return "one";}});
+ const malicious=[entry];
+ const calls=[
+   ()=>pointwise(frame,x=>x,malicious),
+   ()=>knowledgeWithin(frame,malicious,[]),
+   ()=>truthWithin(frame,[],malicious),
+   ()=>possibilizeIn(frame,malicious,"knowledge"),
+   ()=>necessitateIn(frame,malicious,"truth"),
+   ()=>truthPoleClosure(frame,[{token:"one",reading:"potential"}],malicious),
+   ()=>truthNuclearQuartet(frame,[{token:"one",reading:"potential"}],
+     [{token:"one",reading:"active"}],malicious),
+ ];
+ for(const readFiber of calls) assert.throws(readFiber,/inert data/u);
+ assert.equal(read,0);
+ const array=[{token:"one",reading:"potential"}];
+ Object.defineProperty(array,"0",{enumerable:true,get(){read++;return entry;}});
+ assert.throws(()=>pointwise(frame,x=>x,array),/inert data/u);
+ assert.throws(()=>truthPoleClosure(frame,array,[]),/inert data/u);
+ assert.equal(read,0);
+});
+test("fiber data arrays refuse hidden extras, prototypes and gaps, preserving valid repeated knowledge joins",()=>{
+ const frame=tokenFrame([cell("one","reports","claim")]);
+ const original=[{token:"one",reading:"potential"},{token:"one",reading:"active"}];
+ assert.deepEqual(pointwise(frame,x=>x,original),[{token:"one",reading:"stable"}]);
+ const sparse=new Array(2);sparse[0]=original[0];
+ const decorated=[original[0]];decorated.unlicensed=true;
+ const symbol=[original[0]];symbol[Symbol("hidden")]=true;
+ const foreign=[Object.create({token:"one",reading:"potential"})];
+ for(const bad of [sparse,decorated,symbol,foreign])
+   assert.throws(()=>pointwise(frame,x=>x,bad),/array|plain records/u);
+});
