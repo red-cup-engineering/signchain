@@ -92,3 +92,22 @@ codec, SCA content identity, signed authority or durable event ledger:
 `cellEventOfMessage` first admits the existing SignCell CloudEvent, and
 the comparison merely detects reuse of its declared source/id with a
 different structured JSON body.
+
+## Rules are source-admitted before generating inference evidence
+
+The original SignChain `./rules` now admits an inert, dense, undecorated
+antecedent array, each threshold and original Cell coordinate as own data,
+and one similarly guarded consequent. It then delegates actual triple
+retention and semantic addressing to SignCell. Plain getters cannot execute
+to select a premise or generate a rule witness; a malformed index cannot
+silently omit a needed antecedent. An always-firing rule also guards its
+source Cell *before* obtaining a content address. This is not a private rule
+hash, a new scripting language, or authority to perform an effect.
+
+The original `test/rule-index-consistency.test.mjs` now covers malicious
+rules and the four-stage cascading positive implication model from
+[Obsmetrologia #106](https://github.com/lenticule-science/obsmetrologia-science-services-section/issues/106).
+As proved there, a charge fiber's finite height does not bound the number
+of **global** synchronous Tstep rounds. Only an actually reached and
+checked fixed point is closed; SignCraft's original `closureOrbit` remains
+the owner of complete settlement and its evidence receipts.

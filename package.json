@@ -9,7 +9,8 @@
     "data/schema",
     "data/examples",
     "test",
-    "docs"
+    "docs",
+    "test/rule-index-consistency.test.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -58,7 +59,8 @@
     "test/contract-literal-identity.test.mjs",
     "test/telling-source.test.mjs",
     "test/log.test.mjs",
-    "test/log-finalization.test.mjs"
+    "test/log-finalization.test.mjs",
+    "test/rule-index-consistency.test.mjs"
   ],
   "repository": {
     "type": "git",

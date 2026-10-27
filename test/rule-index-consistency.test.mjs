@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { address, cell, merge } from "@red-cup-engineering/signcell/cell";
+import { address, cell, cellSet, merge } from "@red-cup-engineering/signcell/cell";
 import {
-  antecedentHolds, fire, fireRule, fireRuleIn, firedRuleNames, rule, step,
+  antecedentHolds, fire, fireRule, fireRuleIn, firedRuleNames, rule, always, step,
 } from "../src/rules.mjs";
 
 const premise = cell("source", "claims", "outcome");
@@ -75,4 +75,66 @@ test("public rule readers preserve Map evidence and refuse forged Map-key attrib
   assert.equal(antecedentHolds(contested, forged), false);
   assert.deepEqual(firedRuleNames(rules, forged), []);
   assert.deepEqual(fireRule(contested, forged), []);
+});
+
+test("rules cannot execute untrusted source reading or Cell coordinate getters",()=>{
+  let calls = 0;
+  const plain = {subject:"from",predicate:"claims",object:"to"};
+  const tests = [
+    () => {
+      const condition = {cell:plain};
+      Object.defineProperty(condition,"atLeast",{enumerable:true,get(){calls++;return "potential";}});
+      return rule("bad-antecedent",[condition],{cell:plain,reading:"potential"});
+    },
+    () => {
+      const consequence = {cell:plain};
+      Object.defineProperty(consequence,"reading",{enumerable:true,get(){calls++;return "potential";}});
+      return rule("bad-consequence",[],consequence);
+    },
+    () => {
+      const sourceCell = {predicate:"claims",object:"to"};
+      Object.defineProperty(sourceCell,"subject",{enumerable:true,get(){calls++;return "from";}});
+      return rule("bad-cell",[{cell:sourceCell,atLeast:"potential"}],{cell:plain,reading:"potential"});
+    },
+    () => {
+      const sourceCell = {predicate:"claims",object:"to"};
+      Object.defineProperty(sourceCell,"subject",{enumerable:true,get(){calls++;return "from";}});
+      return always(sourceCell,"potential");
+    }
+  ];
+  for(const attempt of tests)
+    assert.throws(attempt,/data property|accessor/u);
+  assert.equal(calls,0);
+});
+
+test("source rule antecedents refuse sparse, decorated and executable indexed arrays",()=>{
+  const condition={cell:premise,atLeast:"potential"};
+  const sparse=new Array(2);sparse[0]=condition;
+  const decorated=[condition];decorated.authority="forged";
+  let calls=0;
+  const getters=[condition];
+  Object.defineProperty(getters,"0",{enumerable:true,get(){calls++;return condition;}});
+  for(const supplied of [sparse,decorated,getters]){
+    assert.throws(()=>rule("bad-list",supplied,{cell:consequence,reading:"potential"}),
+      /sparse|decorated|inert data/u);
+  }
+  assert.equal(calls,0);
+});
+
+test("four positive global propagation rounds are required despite finite FOUR fibers",()=>{
+  const symbols=["a","b","c","d","e"].map(x=>cell(x,"supports","claim"));
+  const cascade=symbols.slice(0,-1).map((premise,i)=>
+    rule("cascade:"+i,[{cell:premise,atLeast:"potential"}],
+      {cell:symbols[i+1],reading:"potential"}));
+  let state=cellSet([cell("a","supports","claim",{for:["seed"]})]);
+  const counts=[1];
+  for(let round=1;round<=4;round++){
+    state=step(cascade,state);
+    counts.push(state.filter(x=>x.for.length>0).length);
+    if(round===3) assert.equal(state.some(x=>address(x)===address(symbols[4])),false,
+      "three rounds cannot create a terminal FOUR witness through four dependencies");
+  }
+  assert.deepEqual(counts,[1,2,3,4,5]);
+  assert.deepEqual(step(cascade,state),state,
+    "a fixed-point test, not arbitrary fuel, certifies settlement");
 });

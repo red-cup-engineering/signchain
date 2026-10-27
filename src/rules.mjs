@@ -18,6 +18,7 @@
  */
 import { address, cell, cellSet, knowledgeReading, merge, mergeCellSets, semanticId, triple } from "@red-cup-engineering/signcell/cell";
 import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { sourceField } from "./telling-source.mjs";
 
 /** Index one functional valuation, joining repeated tellings of the SAME cell
  * through SignCell rather than letting first/last insertion order choose which
@@ -38,21 +39,65 @@ const validateDerivationVersion = (version) => {
   if (version !== 1 && version !== 2) throw new TypeError("signchain derivation: unsupported version");
 };
 
-/** A rule: antecedents [{ cell, atLeast }], consequent { cell, reading }. */
+/** Read one source triple through original SignCell retained-carrier custody.
+ * SourceField is a descriptor guard, not a competing schema or content hash.
+ */
+const ruleTriple = source => triple({
+  subject: sourceField(source, "subject"),
+  predicate: sourceField(source, "predicate"),
+  object: sourceField(source, "object"),
+});
+
+/** A finite rule antecedent is an inert, dense data array. The outer
+ * positional guards run BEFORE invoking any source predicate or Cell encoder.
+ */
+const ruleConditions = value => {
+  if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype)
+    throw new TypeError("signchain rule: antecedent needs a finite plain array");
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  if (Reflect.ownKeys(descriptors).length !== value.length + 1)
+    throw new TypeError("signchain rule: antecedent cannot be sparse or decorated");
+  const out = [];
+  for (let index = 0; index < value.length; index++) {
+    const descriptor = descriptors[String(index)];
+    if (!descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor, "value"))
+      throw new TypeError("signchain rule: antecedent entries must be inert data");
+    out.push(descriptor.value);
+  }
+  return out;
+};
+
+/** One original source-qualified positive rule. Each condition's cell and
+ * reading is captured once, then the immutable SignCell triple is admitted.
+ * This does NOT authenticate the provenance or issuer of a rule.
+ */
 export function rule(name, antecedent, consequent) {
-  if (typeof name !== "string" || name === "") throw new TypeError("signchain rule: name must be a non-empty string");
-  for (const condition of antecedent) if (!isReading(condition.atLeast)) throw new TypeError(`signchain rule ${name}: ${String(condition.atLeast)} is not a reading`);
-  if (!isReading(consequent.reading)) throw new TypeError(`signchain rule ${name}: ${String(consequent.reading)} is not a reading`);
+  if (typeof name !== "string" || name === "")
+    throw new TypeError("signchain rule: name must be a non-empty string");
+  const conditions = ruleConditions(antecedent).map(condition => {
+    const atLeast = sourceField(condition, "atLeast");
+    const originalCell = sourceField(condition, "cell");
+    if (!isReading(atLeast))
+      throw new TypeError("signchain rule: condition must have a valid knowledge reading");
+    return Object.freeze({cell: ruleTriple(originalCell), atLeast});
+  });
+  const originalConsequence = sourceField(consequent, "cell");
+  const reading = sourceField(consequent, "reading");
+  if (!isReading(reading))
+    throw new TypeError("signchain rule: consequent must have a valid knowledge reading");
   return Object.freeze({
     kind: "signchain.rule",
     name,
-    antecedent: Object.freeze(antecedent.map((condition) => Object.freeze({ cell: triple(condition.cell), atLeast: condition.atLeast }))),
-    consequent: Object.freeze({ cell: triple(consequent.cell), reading: consequent.reading }),
+    antecedent: Object.freeze(conditions),
+    consequent: Object.freeze({ cell: ruleTriple(originalConsequence), reading }),
   });
 }
 
 /** A rule with no antecedent: it always tells its consequent. */
-export const always = (at, reading) => rule(`always:${address(at)}:${reading}`, [], { cell: at, reading });
+export const always = (at, reading) => {
+  const origin = ruleTriple(at);
+  return rule(`always:${address(origin)}:${reading}`, [], { cell: origin, reading });
+};
 
 /** Shared addressed rule judgment for public arrays and SignCraft Maps. */
 const antecedentHoldsIn = (r, valuation) => r.antecedent.every((condition) =>
