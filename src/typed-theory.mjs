@@ -73,7 +73,7 @@ export function theoryOfBase(base) {
         }));
     };
     if (own(base, "kind") !== "predication.base")
-        throw new TypeError("typed theory: requires the original SignCell predication.base");
+        throw new TypeError("typed theory: source must be the original SignCell predication.base");
     const objects = finite(own(base, "objects"), "objects");
     const categories = [
         ["specialization", specializationInferenceMorphism],
