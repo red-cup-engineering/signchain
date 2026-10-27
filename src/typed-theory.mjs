@@ -42,17 +42,60 @@ export function inferenceRules(witnesses) {
     return Object.freeze(out);
 }
 const ruleOfBaseEdge = (morphism) => (edge) => inferenceRule(morphism, edge.domain, edge.codomain);
-/** Build a typed theory from a base category. */
+/** Build a typed theory from a SOURCE-CLOSED predication generator base.
+ * One SignCell base generator may not become a derivation morphism if either of
+ * its endpoints is absent from the original declared object carrier.
+ * Use the canonical SignCell baseObjectCoincides; no Graph-local equality,
+ * new hash, silently invented endpoint, or automatic logical completion.
+ * The base's entity extraction arrows are distinct from homogeneous cellwise
+ * four-generator projections in Obsmetrologia Predicating/Cell.lean.
+ */
 export function theoryOfBase(base) {
+    const own = (record, name) => {
+        if (!record || typeof record !== "object" || Array.isArray(record))
+            throw new TypeError("typed theory: source base must contain original records");
+        const descriptor = Object.getOwnPropertyDescriptor(record, name);
+        if (!descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor, "value"))
+            throw new TypeError("typed theory: source " + name + " must be an own data property");
+        return descriptor.value;
+    };
+    const finite = (items, role) => {
+        if (!Array.isArray(items) || Object.getPrototypeOf(items) !== Array.prototype)
+            throw new TypeError("typed theory: " + role + " must be a finite source array");
+        const descriptor = Object.getOwnPropertyDescriptors(items);
+        if (Reflect.ownKeys(descriptor).length !== items.length + 1)
+            throw new TypeError("typed theory: " + role + " must be a dense unadorned array");
+        return Object.freeze(Array.from({ length: items.length }, (_, index) => {
+            const entry = descriptor[String(index)];
+            if (!entry || !entry.enumerable || !Object.hasOwn(entry, "value"))
+                throw new TypeError("typed theory: " + role + " entries must be own source data");
+            return entry.value;
+        }));
+    };
+    if (own(base, "kind") !== "predication.base")
+        throw new TypeError("typed theory: requires the original SignCell predication.base");
+    const objects = finite(own(base, "objects"), "objects");
+    const categories = [
+        ["specialization", specializationInferenceMorphism],
+        ["converse", converseInferenceMorphism],
+        ["subjectProjection", subjectProjectionInferenceMorphism],
+        ["objectProjection", objectProjectionInferenceMorphism],
+    ];
+    const rules = [];
+    for (const [name, morphism] of categories) {
+        for (const edge of finite(own(base, name), name)) {
+            const domain = own(edge, "domain"), codomain = own(edge, "codomain");
+            for (const endpoint of [domain, codomain]) {
+                if (!objects.some(object => baseObjectCoincides(object, endpoint)))
+                    throw new TypeError("typed theory: source " + name +
+                        " has an undeclared base morphism endpoint");
+            }
+            rules.push(inferenceRule(morphism, domain, codomain));
+        }
+    }
     return Object.freeze({
-        kind: "typedTheory.carrier",
-        objects: base.objects,
-        rules: Object.freeze([
-            ...base.specialization.map(ruleOfBaseEdge(specializationInferenceMorphism)),
-            ...base.converse.map(ruleOfBaseEdge(converseInferenceMorphism)),
-            ...base.subjectProjection.map(ruleOfBaseEdge(subjectProjectionInferenceMorphism)),
-            ...base.objectProjection.map(ruleOfBaseEdge(objectProjectionInferenceMorphism)),
-        ]),
+        kind: "typedTheory.carrier", objects,
+        rules: Object.freeze(rules),
     });
 }
 /** Build a typed theory from predication data. */

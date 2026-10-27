@@ -45,3 +45,26 @@ this binding does not grant them admission. The explicit SCA dependency remains
 for the packaged historical carrier-encoding comparisons.
 Nothing here imports
 SignGraph or SignCraft; SignCraft imports this.
+
+## Witnessed predication-base endpoint receiving
+
+`theoryOfBase` now requires the original SignCell `predication.base`
+carrier to contain every endpoint of every declared specialization, converse
+and heterogeneous subject/object extraction generator. All four families
+are read and validated before constructing their typed inference rules.
+If even one source endpoint is absent, the original theory refuses
+instead of manufacturing an object or laundering an incomplete site into
+a well-typed derivation. SignCell's `baseObjectCoincides` is the sole
+semantic comparison. The returned object's wrapper is immutable and
+getter/sparse-array source controls reject executable inputs without
+evaluating foreign accessors.
+
+This is a **receiving gate for** [SignCell predication-base correction
+#35](https://github.com/red-cup-engineering/signcell/pull/35). The current
+published SignCell supplier may still emit an incomplete historical base;
+do not merge or claim installed product readiness until the corrected source
+is published at an immutable version and the original `predicationSite →
+theoryOfBase` path is executed with that exact dependency. The heterogeneous
+term-extraction morphisms are NOT the diagonal cellwise projection generators;
+those retain their original SignCell/Obsmetrologia semantics. No new graph
+runtime, theorem, source authority or ledger is introduced.
