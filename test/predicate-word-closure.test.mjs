@@ -122,3 +122,21 @@ test("independent finite path oracle agrees on all two-edge three-node graphs an
   }
   assert.equal(scenarios, 108);
 });
+
+test("duplicate source-coincidence work is charged to the bounded closure effort", () => {
+  // Previously this dense duplicate search was not counted in pairChecks:
+  // only the outer extend() calls consumed budget.
+  const loops = carrier([
+    arrow("a","p","a"), arrow("a","q","a"), arrow("a","r","a"),
+  ]);
+  assert.throws(() => boundedPredicateWordClosure(loops, {
+    maxWordLength: 3, maxArrows: 100, maxPairChecks: 12,
+  }), /comparison budget exhausted/);
+  const received = boundedPredicateWordClosure(loops, {
+    maxWordLength: 3, maxArrows: 100, maxPairChecks: 10000,
+  });
+  assert.ok(received.pairChecks > 2 * loops.arrows.length * received.carrier.arrows.length,
+    "all duplicate source-word comparisons must count as work");
+  assert.equal(received.complete,false,"the three-loop language is unbounded");
+  assert.equal(received.carrier.arrows.length,39,"3 + 9 + 27 distinct words");
+});
