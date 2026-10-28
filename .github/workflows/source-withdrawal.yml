@@ -1,0 +1,46 @@
+name: source-owned FOUR withdrawal receiving
+on:
+  pull_request:
+    paths:
+      - 'src/source-withdrawal.mjs'
+      - 'test/source-withdrawal.test.mjs'
+      - 'package.json'
+      - '.github/workflows/source-withdrawal.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/source-withdrawal.mjs'
+      - 'test/source-withdrawal.test.mjs'
+      - 'package.json'
+      - '.github/workflows/source-withdrawal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Admit original source and test syntax without local dependency stand-ins
+        run: |
+          node --check src/source-withdrawal.mjs
+          node --check test/source-withdrawal.test.mjs
+  original-FOUR-dependency-receiving:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install original exact SignCell, FOUR, Metrologic and SignChain closure
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+      - name: Run original source-withdrawal and full SignChain suites
+        run: |
+          node --test test/source-withdrawal.test.mjs
+          npm test
