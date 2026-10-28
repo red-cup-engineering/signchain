@@ -3,7 +3,7 @@ import test from "node:test";
 import { cell, claimCoordinate } from "@red-cup-engineering/signcell/cell";
 import { SPECIALIZES, tokenFrame } from "@red-cup-engineering/signcell/token-frame";
 import {
-  knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingFamilies, truthImplyReading, truthJoinReading, truthMeetReading,
+  knowledgeImplyReading, knowledgeJoinReading, knowledgeMeetReading, negateReading, readingAs, readingFamilies, truthImplyReading, truthJoinReading, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { knowledgeWithin, necessitate, necessitateIn, pointwise, possibilize, possibilizeIn, truthWithin, valuationOf, truthPoleClosure, truthNuclearQuartet } from "../src/token-fiber.mjs";
 
@@ -239,13 +239,23 @@ test("truth poles are total typed SignCell fibers, not invented absent observati
   [],[{token:"specific",reading:"absurd"}],
   [{token:"specific",reading:"potential"},{token:"specific",reading:"active"}],
   [{token:"specific",reading:"absurd"},{token:"foreign",reading:"potential"}],
-  [{token:"specific",reading:"unknown"},{token:"general",reading:"active"}],
+  [{token:"specific",reading:"not-a-four-reading"},{token:"general",reading:"active"}],
  ];
  for(const pole of bad)assert.throws(()=>truthPoleClosure(frame,pole,sample),/truth pole/u);
  let reads=0;
  const forged={get token(){reads++;return "specific";},reading:"absurd"};
  assert.throws(()=>truthPoleClosure(frame,[forged,complete[1]],sample),/inert data/u);
  assert.equal(reads,0);
+});
+test("truth poles normalize every original Data FOUR reading family, including unknown",()=>{
+ const frame=tokenFrame([told("specific","general")]);
+ const sample=[{token:"specific",reading:"stable"}];
+ for(const names of Object.values(readingFamilies))for(const reading of names){
+  const declared=[{token:"specific",reading},{token:"general",reading}];
+  const normalized=declared.map(entry=>({...entry,reading:readingAs("knowledge",entry.reading)}));
+  assert.deepEqual(truthPoleClosure(frame,declared,sample),truthPoleClosure(frame,normalized,sample));
+ }
+ assert.equal(readingAs("knowledge","unknown"),"absurd");
 });
 test("all finite FOUR truth pole nuclei preserve meet, order and idempotence",()=>{
  const frame=tokenFrame([cell("one","asserts","claim")]);

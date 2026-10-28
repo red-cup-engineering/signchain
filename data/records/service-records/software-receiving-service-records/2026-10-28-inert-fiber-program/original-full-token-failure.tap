@@ -1,0 +1,133 @@
+TAP version 13
+# Subtest: a valuation reads what is told of each token, told nothing where nothing is
+ok 1 - a valuation reads what is told of each token, told nothing where nothing is
+  ---
+  duration_ms: 8.690791
+  type: 'test'
+  ...
+# Subtest: two actors' same-token evidence joins in FOUR rather than overwriting by order
+ok 2 - two actors' same-token evidence joins in FOUR rather than overwriting by order
+  ---
+  duration_ms: 3.084268
+  type: 'test'
+  ...
+# Subtest: necessitating reads at a type what its whole extent holds
+ok 3 - necessitating reads at a type what its whole extent holds
+  ---
+  duration_ms: 4.908947
+  type: 'test'
+  ...
+# Subtest: the fiber is FOUR taken pointwise: each order's meet is residuated by its implication
+ok 4 - the fiber is FOUR taken pointwise: each order's meet is residuated by its implication
+  ---
+  duration_ms: 52437.251167
+  type: 'test'
+  ...
+# Subtest: possibilizing is a closure, necessitating an interior, and they are adjoint
+ok 5 - possibilizing is a closure, necessitating an interior, and they are adjoint
+  ---
+  duration_ms: 17284.988328
+  type: 'test'
+  ...
+# Subtest: truth-order modality retains a contradiction's different logical reading
+ok 6 - truth-order modality retains a contradiction's different logical reading
+  ---
+  duration_ms: 2.124374
+  type: 'test'
+  ...
+# Subtest: both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers
+ok 7 - both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers
+  ---
+  duration_ms: 116.827218
+  type: 'test'
+  ...
+# Subtest: FOUR claim fiber uses SignCell's canonical predicate/object coordinate
+ok 8 - FOUR claim fiber uses SignCell's canonical predicate/object coordinate
+  ---
+  duration_ms: 7.930052
+  type: 'test'
+  ...
+# Subtest: transported claim tellings preserve both evidence sides in either wire order
+ok 9 - transported claim tellings preserve both evidence sides in either wire order
+  ---
+  duration_ms: 2.759556
+  type: 'test'
+  ...
+# Subtest: every fiber reader derives transported tokens from original SignCells
+ok 10 - every fiber reader derives transported tokens from original SignCells
+  ---
+  duration_ms: 9.952155
+  type: 'test'
+  ...
+# Subtest: a transported frame's display token accessor is never an admission authority
+ok 11 - a transported frame's display token accessor is never an admission authority
+  ---
+  duration_ms: 1.183337
+  type: 'test'
+  ...
+# Subtest: mutated transported source cells are read again instead of trusting stale display tokens
+ok 12 - mutated transported source cells are read again instead of trusting stale display tokens
+  ---
+  duration_ms: 2.321096
+  type: 'test'
+  ...
+# Subtest: truth poles are total typed SignCell fibers, not invented absent observations
+not ok 13 - truth poles are total typed SignCell fibers, not invented absent observations
+  ---
+  duration_ms: 1.394671
+  type: 'test'
+  location: '/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/token-fiber.test.mjs:233:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/token-fiber.test.mjs:244:31)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: all finite FOUR truth pole nuclei preserve meet, order and idempotence
+ok 14 - all finite FOUR truth pole nuclei preserve meet, order and idempotence
+  ---
+  duration_ms: 38.453016
+  type: 'test'
+  ...
+# Subtest: two truth nuclei commute and fix exactly their common layer on complete two-token fibers
+ok 15 - two truth nuclei commute and fix exactly their common layer on complete two-token fibers
+  ---
+  duration_ms: 3573.919772
+  type: 'test'
+  ...
+# Subtest: truth nuclear closure is not falsely advertised as a knowledge nucleus
+ok 16 - truth nuclear closure is not falsely advertised as a knowledge nucleus
+  ---
+  duration_ms: 0.570186
+  type: 'test'
+  ...
+# Subtest: every native fiber reader refuses accessor-backed source valuations before invoking getters
+ok 17 - every native fiber reader refuses accessor-backed source valuations before invoking getters
+  ---
+  duration_ms: 1.007065
+  type: 'test'
+  ...
+# Subtest: fiber data arrays refuse hidden extras, prototypes and gaps, preserving valid repeated knowledge joins
+ok 18 - fiber data arrays refuse hidden extras, prototypes and gaps, preserving valid repeated knowledge joins
+  ---
+  duration_ms: 0.530678
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 17
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73566.010552
