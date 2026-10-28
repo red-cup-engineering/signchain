@@ -120,3 +120,23 @@ test("results do not certify authority, source independence, source withdrawal, 
   assert.ok(r.boundaries.some(s=>s.includes("no source is actually withdrawn")));
   assert.equal(r.withdrawals.length,0);
 });
+
+test("conditional all-producer removal support distinguishes independent attributions from repeated documents",()=>{
+  const c=cell("s","p","o"),a="report-a",b="report-b";
+  const log=new TellingLog().tell(c,a).tell(c,b).seal();
+  const same=assay(log,{proposition:c,attributions:[origin(a,"one"),origin(b,"one")]});
+  const different=assay(log,{proposition:c,attributions:[origin(a,"one"),origin(b,"two")]});
+  assert.equal(same.sourceRemovalSupport.evaluatedProducerCount,1);
+  assert.equal(same.sourceRemovalSupport.supportSurvivesEverySingleProducerRemoval,false);
+  assert.equal(different.sourceRemovalSupport.evaluatedProducerCount,2);
+  assert.equal(different.sourceRemovalSupport.supportSurvivesEverySingleProducerRemoval,true);
+  assert.equal(different.sourceRemovalSupport.oppositionSurvivesEverySingleProducerRemoval,false);
+  assert.match(different.sourceRemovalSupport.standing,/conditional/);
+});
+test("zero producer attributions never produce vacuous source-independence certification",()=>{
+  const c=cell("s","p","o");
+  const r=assay(new TellingLog().seal(),{proposition:c,attributions:[]});
+  assert.equal(r.sourceRemovalSupport.evaluatedProducerCount,0);
+  assert.equal(r.sourceRemovalSupport.supportSurvivesEverySingleProducerRemoval,null);
+  assert.equal(r.sourceRemovalSupport.oppositionSurvivesEverySingleProducerRemoval,null);
+});
