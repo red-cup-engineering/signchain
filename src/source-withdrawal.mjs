@@ -114,6 +114,17 @@ export function assessOriginalSourceWithdrawal(history, {proposition,attribution
     attributedProducerCount:origins.length,
     attributedProducers:origins,
     withdrawals,
+    // Universal quantification is over the supplied COMPLETE attribution partition,
+    // not a certificate of independent, authentic or independently located sources.
+    // Zero-producer cases are explicitly unknown, not vacuous corroboration.
+    sourceRemovalSupport:{
+      evaluatedProducerCount:origins.length,
+      supportSurvivesEverySingleProducerRemoval:origins.length===0 ? null :
+        withdrawals.every(w=>w.remaining.positiveWitnesses>0),
+      oppositionSurvivesEverySingleProducerRemoval:origins.length===0 ? null :
+        withdrawals.every(w=>w.remaining.negativeWitnesses>0),
+      standing:"conditional on the supplied original-producer partition, not an independent-source certificate",
+    },
     epistemicStanding:"conditional finite FOUR evidence restriction over source-declared origin partitions",
     boundaries:Object.freeze([
       "original source and institution identity must be independently verified",
