@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: the checked-in JSON Schema is a recursive executable expression grammar
+ok 1 - the checked-in JSON Schema is a recursive executable expression grammar
+  ---
+  duration_ms: 1.943295
+  type: 'test'
+  ...
+# Subtest: schema runs distinct truth/knowledge quantifiers across an enumerated family
+ok 2 - schema runs distinct truth/knowledge quantifiers across an enumerated family
+  ---
+  duration_ms: 40.831682
+  type: 'test'
+  ...
+# Subtest: source-frame identity uses the owner of retained byte-valued claims
+ok 3 - source-frame identity uses the owner of retained byte-valued claims
+  ---
+  duration_ms: 11.334659
+  type: 'test'
+  ...
+# Subtest: indexed quantifiers compose with native linear negation in a schema program
+ok 4 - indexed quantifiers compose with native linear negation in a schema program
+  ---
+  duration_ms: 15.603718
+  type: 'test'
+  ...
+# Subtest: schema's multiplicative tensor and residual preserve truth-order adjunction
+ok 5 - schema's multiplicative tensor and residual preserve truth-order adjunction
+  ---
+  duration_ms: 250.515518
+  type: 'test'
+  ...
+# Subtest: malformed, unauthorized and falsely transfinite program shapes refuse execution
+ok 6 - malformed, unauthorized and falsely transfinite program shapes refuse execution
+  ---
+  duration_ms: 3.648808
+  type: 'test'
+  ...
+# Subtest: the packaged schema example evaluates rather than merely passing a declaration check
+ok 7 - the packaged schema example evaluates rather than merely passing a declaration check
+  ---
+  duration_ms: 1.301523
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 383.44477

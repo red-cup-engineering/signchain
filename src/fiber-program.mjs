@@ -16,6 +16,7 @@ import {
   residuumReading, truthImplyReading, truthJoinAll, truthJoinReading,
   truthMeetAll, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { assertInertCarrierSource } from "@red-cup-engineering/semiotic-content-address";
 import { tokenFrame } from "@red-cup-engineering/signcell/token-frame";
 import { semanticId } from "@red-cup-engineering/signcell/cell";
 import {
@@ -30,8 +31,8 @@ const record = (value, location) => {
 };
 const fields = (value, required, permitted, location) => {
   record(value, location);
-  const got = Object.keys(value);
-  for (const name of required) if (!Object.hasOwn(value, name))
+  const got = Object.getOwnPropertyNames(value);
+  for (const name of required) if (!Object.getOwnPropertyDescriptor(value, name)?.enumerable)
     throw new TypeError("signchain fiber program: " + location + " needs " + name);
   for (const name of got) if (!permitted.includes(name))
     throw new TypeError("signchain fiber program: " + location + " has undeclared field " + name);
@@ -71,6 +72,8 @@ const expression = (frame, node) => {
     case "binary": {
       fields(node, ["op", "operation", "left", "right"],
         ["op", "operation", "order", "left", "right"], "binary");
+      if (typeof node.operation !== "string")
+        throw new TypeError("signchain fiber program: binary operation must be a declared name");
       const operation = Object.hasOwn(multiplicative, node.operation)
         ? (() => {
             if (Object.hasOwn(node, "order"))
@@ -78,7 +81,7 @@ const expression = (frame, node) => {
             return multiplicative[node.operation];
           })()
         : (() => {
-            const op = binary[node.operation];
+            const op = Object.hasOwn(binary, node.operation) ? binary[node.operation] : undefined;
             if (op === undefined)
               throw new TypeError("signchain fiber program: unknown binary operation " + String(node.operation));
             return op[orderOf(node.order)];
@@ -119,6 +122,10 @@ const expression = (frame, node) => {
  * The finite frontier is not a proof that the family is exhaustive.
  */
 export function executeFiberProgram(frame, program) {
+  // Original SCA admits inert semiotic data before grammar reads. It preserves
+  // explicit undefined fields, byte/bigint claim literals and owner snapshots.
+  // This is not a sandbox for arbitrary Proxy objects or untrusted intrinsics.
+  assertInertCarrierSource(program);
   fields(program, ["kind", "version", "expression"],
     ["kind", "version", "expression"], "program");
   if (program.kind !== "signchain.fiber-program" || program.version !== 1)

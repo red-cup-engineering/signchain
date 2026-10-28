@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: program and expression accessors refuse without invocation
+ok 1 - program and expression accessors refuse without invocation
+  ---
+  duration_ms: 2.15439
+  type: 'test'
+  ...
+# Subtest: cyclic syntax and executable or sparse families refuse before evaluation
+ok 2 - cyclic syntax and executable or sparse families refuse before evaluation
+  ---
+  duration_ms: 0.627351
+  type: 'test'
+  ...
+# Subtest: unsupported hidden fields and explicit undefined metadata are not erased
+ok 3 - unsupported hidden fields and explicit undefined metadata are not erased
+  ---
+  duration_ms: 0.41111
+  type: 'test'
+  ...
+# Subtest: operator lookup refuses inherited and coerced names even on an empty frame
+ok 4 - operator lookup refuses inherited and coerced names even on an empty frame
+  ---
+  duration_ms: 2.412993
+  type: 'test'
+  ...
+# Subtest: shared finite subterms remain lawful; contradictory evidence is unchanged
+ok 5 - shared finite subterms remain lawful; contradictory evidence is unchanged
+  ---
+  duration_ms: 2.615014
+  type: 'test'
+  ...
+# Subtest: same-owner retained byte and bigint literals remain compatible
+ok 6 - same-owner retained byte and bigint literals remain compatible
+  ---
+  duration_ms: 2.892275
+  type: 'test'
+  ...
+# Subtest: the checked-in JSON Schema is a recursive executable expression grammar
+ok 7 - the checked-in JSON Schema is a recursive executable expression grammar
+  ---
+  duration_ms: 0.986224
+  type: 'test'
+  ...
+# Subtest: schema runs distinct truth/knowledge quantifiers across an enumerated family
+ok 8 - schema runs distinct truth/knowledge quantifiers across an enumerated family
+  ---
+  duration_ms: 15.220873
+  type: 'test'
+  ...
+# Subtest: source-frame identity uses the owner of retained byte-valued claims
+ok 9 - source-frame identity uses the owner of retained byte-valued claims
+  ---
+  duration_ms: 3.687009
+  type: 'test'
+  ...
+# Subtest: indexed quantifiers compose with native linear negation in a schema program
+ok 10 - indexed quantifiers compose with native linear negation in a schema program
+  ---
+  duration_ms: 4.582188
+  type: 'test'
+  ...
+# Subtest: schema's multiplicative tensor and residual preserve truth-order adjunction
+ok 11 - schema's multiplicative tensor and residual preserve truth-order adjunction
+  ---
+  duration_ms: 187.994486
+  type: 'test'
+  ...
+# Subtest: malformed, unauthorized and falsely transfinite program shapes refuse execution
+ok 12 - malformed, unauthorized and falsely transfinite program shapes refuse execution
+  ---
+  duration_ms: 2.76629
+  type: 'test'
+  ...
+# Subtest: the packaged schema example evaluates rather than merely passing a declaration check
+ok 13 - the packaged schema example evaluates rather than merely passing a declaration check
+  ---
+  duration_ms: 2.336091
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 294.512458
