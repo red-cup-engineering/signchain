@@ -55,6 +55,9 @@ test("source generation refuses insufficient arrow and word budgets", () => {
     /maxArrows/);
   assert.throws(() => boundedPredicateWordClosure(chain, { maxWordLength: 1, maxArrows: 1 }),
     /original arrows exceed maxArrows/);
+  assert.throws(() => boundedPredicateWordClosure(chain,
+    { maxWordLength: 2, maxArrows: 8, maxPairChecks: 1 }),
+    /comparison budget exhausted/);
 });
 
 test("foreign or accessor-backed arrow sources refuse without executing getters", () => {
