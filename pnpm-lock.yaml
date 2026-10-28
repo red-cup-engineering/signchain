@@ -21,8 +21,8 @@ importers:
         specifier: 0.14.3-dev.1364
         version: 0.14.3-dev.1364
       '@red-cup-engineering/semiotic-content-address':
-        specifier: 0.1.1
-        version: 0.1.1
+        specifier: 0.1.2-dev.31
+        version: 0.1.2-dev.31
       '@red-cup-engineering/semiotic-eavt-services-section':
         specifier: 0.3.2
         version: 0.3.2
