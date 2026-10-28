@@ -53,7 +53,7 @@ cycle, arbitrarily many words can exist, so no finite enumeration can be
 certified closed simply because a selected depth has been reached. A genuine
 acyclic three-edge path with a three-symbol bound is complete; the same
 path with a two-symbol bound is incomplete. This is a finite conditional
-free-path-language calculation, not source authentication, a SignChain event
+nonempty path-language calculation (not an identity-arrow category), not source authentication, a SignChain event
 log, an institutional inference of authority, a Lean theorem or a runtime
 settlement. Fabrication, Circulation and Enterprise receivers must bind the
 original source acts and evidence before treating any path as an operational
