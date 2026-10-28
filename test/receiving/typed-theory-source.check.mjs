@@ -37,7 +37,8 @@ function originalTypedPredication() {
 
 test("a pinned original SignCell producer constructs the source-closed theory consumed by SignChain",()=>{
   requiresOriginalProducer();
-  const source = predicationSite([originalTypedPredication()]);
+  const generator = originalTypedPredication();
+  const source = predicationSite([generator]);
   assert.equal(isAdmittedPredicationBase(source.base),true);
   const theory = theoryOfBase(source.base);
   assert.equal(theory.kind,"typedTheory.carrier");
@@ -48,6 +49,28 @@ test("a pinned original SignCell producer constructs the source-closed theory co
     "typedTheory.inferenceMorphism.objectProjection",
   ]);
   assert.equal(Object.isFrozen(theory.objects),true);
+  // Neither "three rules" nor the generated kind alone proves preservation
+  // of the source predicate projections. Refuse reversed/swapped endpoints.
+  const originalNode = [generator.subject, generator.predicate, generator.object];
+  const expected = [
+    ["typedTheory.inferenceMorphism.converse", originalNode,
+      [generator.object, generator.predicate, generator.subject]],
+    ["typedTheory.inferenceMorphism.subjectProjection", originalNode, generator.subject],
+    ["typedTheory.inferenceMorphism.objectProjection", originalNode, generator.object],
+  ];
+  assert.equal(typeof signCell.baseObjectCoincides, "function",
+    "original SignCell must own predication endpoint equality");
+  for(const [index,[kind,domain,codomain]] of expected.entries()){
+    const rule=theory.rules[index];
+    assert.equal(rule.kind,"typedTheory.inferenceRule");
+    assert.equal(rule.trace.kind,"typedTheory.inferenceTrace");
+    assert.equal(rule.trace.morphisms.length,1);
+    assert.equal(rule.trace.morphisms[0].kind,kind);
+    assert.equal(signCell.baseObjectCoincides(rule.domain,domain),true,
+      "each rule must retain its actual source-generated domain");
+    assert.equal(signCell.baseObjectCoincides(rule.codomain,codomain),true,
+      "each rule must retain its actual source-generated codomain");
+  }
 });
 
 test("original specialization without predications retains both typed endpoint objects",()=>{
