@@ -28,6 +28,36 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   projection), inference rules and their composition closure,
   breadth-first derivation search, typing judgments, derivation validity
   checking, and predicate words.
+
+## Bounded predicate-word paths: finite proof without false saturation
+
+`composePredicateWords` retains the historical **single pairwise round**
+contract. It composes a self-loop with itself, but cannot be treated as a
+transitive closure: with a → b → c → d, that pass does not produce a → d.
+The historical `predicateWordResidue.saturated` field likewise names a
+pairwise projection, not a completed proof or a witnessed observation.
+
+`boundedPredicateWordClosure({arrows}, {maxWordLength, maxArrows,
+maxPairChecks})` enumerates distinct path words by repeatedly composing
+original source arrows. The original SignCell term and predicate coincidence
+functions remain the sole identity owners; no additional address or ontology
+is minted. Explicit bounds default to 4 symbols, 512 arrows and 65,536
+candidate-comparison checks. Source arrow and word arrays require inert,
+dense own data. Exceeding the arrow or computation budget **throws** rather
+than providing incomplete results under a false claim of success.
+
+The returned `carrier.arrows` contains exact finite syntactic paths.
+`complete` is true only if no composable extension beyond the word-length
+bound exists; otherwise `truncated` is true and `complete` false. For a
+cycle, arbitrarily many words can exist, so no finite enumeration can be
+certified closed simply because a selected depth has been reached. A genuine
+acyclic three-edge path with a three-symbol bound is complete; the same
+path with a two-symbol bound is incomplete. This is a finite conditional
+free-path-language calculation, not source authentication, a SignChain event
+log, an institutional inference of authority, a Lean theorem or a runtime
+settlement. Fabrication, Circulation and Enterprise receivers must bind the
+original source acts and evidence before treating any path as an operational
+claim. The regression is `test/predicate-word-closure.test.mjs`.
 - `token-fiber` — the fiber algebra over SignCell's token frame: a claim
   read at every token in FOUR (FOUR^T, each order's meet residuated by its
   implication), and possibilizing and necessitating along the order, ◇ ⊣ □.
