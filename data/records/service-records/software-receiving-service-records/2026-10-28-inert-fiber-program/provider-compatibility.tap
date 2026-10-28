@@ -1,0 +1,66 @@
+TAP version 13
+# Subtest: previous SCA0.1.1: ordinary bigint record
+ok 1 - previous SCA0.1.1: ordinary bigint record
+  ---
+  duration_ms: 9.920839
+  type: 'test'
+  ...
+# {"before":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}},"after":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}}}
+# Subtest: previous SCA0.1.1: root bytes
+ok 2 - previous SCA0.1.1: root bytes
+  ---
+  duration_ms: 3.171458
+  type: 'test'
+  ...
+# {"before":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}},"after":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}}}
+# Subtest: previous SCA0.1.1: nested byte record
+ok 3 - previous SCA0.1.1: nested byte record
+  ---
+  duration_ms: 1.384715
+  type: 'test'
+  ...
+# {"before":{"accepted":false,"error":"semiotic JSON objects require data properties, never accessors"},"after":{"accepted":false,"error":"semiotic source requires data properties, never accessors"}}
+# Subtest: previous SCA0.1.1: nested byte array
+ok 4 - previous SCA0.1.1: nested byte array
+  ---
+  duration_ms: 1.55598
+  type: 'test'
+  ...
+# {"before":{"accepted":false,"error":"semiotic JSON arrays require present data elements, never accessors"},"after":{"accepted":false,"error":"semiotic source requires data properties, never accessors"}}
+# Subtest: selected Cell-owned SCA31: ordinary bigint record
+ok 5 - selected Cell-owned SCA31: ordinary bigint record
+  ---
+  duration_ms: 2.861928
+  type: 'test'
+  ...
+# {"before":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}},"after":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}}}
+# Subtest: selected Cell-owned SCA31: root bytes
+ok 6 - selected Cell-owned SCA31: root bytes
+  ---
+  duration_ms: 2.333094
+  type: 'test'
+  ...
+# {"before":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}},"after":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}}}
+# Subtest: selected Cell-owned SCA31: nested byte record
+ok 7 - selected Cell-owned SCA31: nested byte record
+  ---
+  duration_ms: 3.350364
+  type: 'test'
+  ...
+# {"before":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}},"after":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}}}
+# Subtest: selected Cell-owned SCA31: nested byte array
+ok 8 - selected Cell-owned SCA31: nested byte array
+  ---
+  duration_ms: 1.064501
+  type: 'test'
+  ...
+# {"before":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}},"after":{"accepted":true,"value":{"kind":"signchain.fiber-program-result","version":1,"carrier":"FOUR^T","scope":"finite-enumerated-frame","valuation":[{"token":"source","reading":"potential"}],"transfiniteSettlement":"not-established","effectAuthority":"not-established"}}}
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 92.528022

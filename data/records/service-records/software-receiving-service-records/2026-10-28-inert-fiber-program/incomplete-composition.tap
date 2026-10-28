@@ -1,0 +1,164 @@
+TAP version 13
+# Subtest: test/fiber-program-admission.test.mjs
+not ok 1 - test/fiber-program-admission.test.mjs
+  ---
+  duration_ms: 1.251577
+  type: 'test'
+  location: '/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/fiber-program-admission.test.mjs:1:1'
+  error: "Cannot find package '@red-cup-engineering/semiotic-content-address' imported from /workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/src/fiber-program.mjs"
+  code: 'ERR_MODULE_NOT_FOUND'
+  stack: |-
+    Object.getPackageJSONURL (node:internal/modules/package_json_reader:331:9)
+    packageResolve (node:internal/modules/esm/resolve:784:25)
+    moduleResolve (node:internal/modules/esm/resolve:873:18)
+    defaultResolve (node:internal/modules/esm/resolve:1006:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)
+    ModuleLoader.resolveSync (node:internal/modules/esm/loader:763:56)
+    #resolve (node:internal/modules/esm/loader:687:17)
+    ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:607:35)
+    ModuleJob.syncLink (node:internal/modules/esm/module_job:276:33)
+  ...
+# Subtest: test/fiber-program.test.mjs
+not ok 2 - test/fiber-program.test.mjs
+  ---
+  duration_ms: 0.115442
+  type: 'test'
+  location: '/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/fiber-program.test.mjs:1:1'
+  error: "Cannot find package '@red-cup-engineering/semiotic-content-address' imported from /workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/src/fiber-program.mjs"
+  code: 'ERR_MODULE_NOT_FOUND'
+  stack: |-
+    Object.getPackageJSONURL (node:internal/modules/package_json_reader:331:9)
+    packageResolve (node:internal/modules/esm/resolve:784:25)
+    moduleResolve (node:internal/modules/esm/resolve:873:18)
+    defaultResolve (node:internal/modules/esm/resolve:1006:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)
+    ModuleLoader.resolveSync (node:internal/modules/esm/loader:763:56)
+    #resolve (node:internal/modules/esm/loader:687:17)
+    ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:607:35)
+    ModuleJob.syncLink (node:internal/modules/esm/module_job:276:33)
+  ...
+# Subtest: a valuation reads what is told of each token, told nothing where nothing is
+ok 3 - a valuation reads what is told of each token, told nothing where nothing is
+  ---
+  duration_ms: 4.413057
+  type: 'test'
+  ...
+# Subtest: two actors' same-token evidence joins in FOUR rather than overwriting by order
+ok 4 - two actors' same-token evidence joins in FOUR rather than overwriting by order
+  ---
+  duration_ms: 2.873203
+  type: 'test'
+  ...
+# Subtest: necessitating reads at a type what its whole extent holds
+ok 5 - necessitating reads at a type what its whole extent holds
+  ---
+  duration_ms: 5.616032
+  type: 'test'
+  ...
+# Subtest: the fiber is FOUR taken pointwise: each order's meet is residuated by its implication
+ok 6 - the fiber is FOUR taken pointwise: each order's meet is residuated by its implication
+  ---
+  duration_ms: 53904.42912
+  type: 'test'
+  ...
+# Subtest: possibilizing is a closure, necessitating an interior, and they are adjoint
+ok 7 - possibilizing is a closure, necessitating an interior, and they are adjoint
+  ---
+  duration_ms: 17328.695378
+  type: 'test'
+  ...
+# Subtest: truth-order modality retains a contradiction's different logical reading
+ok 8 - truth-order modality retains a contradiction's different logical reading
+  ---
+  duration_ms: 4.525595
+  type: 'test'
+  ...
+# Subtest: both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers
+ok 9 - both distinct modal adjoint pairs satisfy S4 laws over all finite two-token FOUR fibers
+  ---
+  duration_ms: 144.047102
+  type: 'test'
+  ...
+# Subtest: FOUR claim fiber uses SignCell's canonical predicate/object coordinate
+ok 10 - FOUR claim fiber uses SignCell's canonical predicate/object coordinate
+  ---
+  duration_ms: 3.614813
+  type: 'test'
+  ...
+# Subtest: transported claim tellings preserve both evidence sides in either wire order
+ok 11 - transported claim tellings preserve both evidence sides in either wire order
+  ---
+  duration_ms: 2.336507
+  type: 'test'
+  ...
+# Subtest: every fiber reader derives transported tokens from original SignCells
+ok 12 - every fiber reader derives transported tokens from original SignCells
+  ---
+  duration_ms: 11.027932
+  type: 'test'
+  ...
+# Subtest: a transported frame's display token accessor is never an admission authority
+ok 13 - a transported frame's display token accessor is never an admission authority
+  ---
+  duration_ms: 1.679562
+  type: 'test'
+  ...
+# Subtest: mutated transported source cells are read again instead of trusting stale display tokens
+ok 14 - mutated transported source cells are read again instead of trusting stale display tokens
+  ---
+  duration_ms: 2.167566
+  type: 'test'
+  ...
+# Subtest: truth poles are total typed SignCell fibers, not invented absent observations
+ok 15 - truth poles are total typed SignCell fibers, not invented absent observations
+  ---
+  duration_ms: 0.948367
+  type: 'test'
+  ...
+# Subtest: truth poles normalize every original Data FOUR reading family, including unknown
+ok 16 - truth poles normalize every original Data FOUR reading family, including unknown
+  ---
+  duration_ms: 3.486102
+  type: 'test'
+  ...
+# Subtest: all finite FOUR truth pole nuclei preserve meet, order and idempotence
+ok 17 - all finite FOUR truth pole nuclei preserve meet, order and idempotence
+  ---
+  duration_ms: 49.937403
+  type: 'test'
+  ...
+# Subtest: two truth nuclei commute and fix exactly their common layer on complete two-token fibers
+ok 18 - two truth nuclei commute and fix exactly their common layer on complete two-token fibers
+  ---
+  duration_ms: 4356.288379
+  type: 'test'
+  ...
+# Subtest: truth nuclear closure is not falsely advertised as a knowledge nucleus
+ok 19 - truth nuclear closure is not falsely advertised as a knowledge nucleus
+  ---
+  duration_ms: 0.484949
+  type: 'test'
+  ...
+# Subtest: every native fiber reader refuses accessor-backed source valuations before invoking getters
+ok 20 - every native fiber reader refuses accessor-backed source valuations before invoking getters
+  ---
+  duration_ms: 1.001937
+  type: 'test'
+  ...
+# Subtest: fiber data arrays refuse hidden extras, prototypes and gaps, preserving valid repeated knowledge joins
+ok 21 - fiber data arrays refuse hidden extras, prototypes and gaps, preserving valid repeated knowledge joins
+  ---
+  duration_ms: 0.667881
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 19
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 75909.884198

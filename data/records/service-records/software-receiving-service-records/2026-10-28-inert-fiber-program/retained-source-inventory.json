@@ -1,0 +1,432 @@
+{
+  "contexts": {
+    ".": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0",
+    "@red-cup-engineering/signcell@0.13.3-dev.225": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1",
+    "@red-cup-engineering/semiotic-content-address@0.1.2-dev.31": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/2",
+    "@red-cup-engineering/cbor-services-section@0.1.1": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/3",
+    "cbor2@2.4.0": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4",
+    "@cto.af/wtf8@0.0.6": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5",
+    "@red-cup-engineering/uri-services-section@0.1.1": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/6",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section@0.3.1": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/7",
+    "@red-cup-engineering/json-services-section@0.4.0": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/8",
+    "@red-cup-engineering/computer-data-engineering-services-section@0.7.1": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/9",
+    "@red-cup-engineering/json-schema-services-section@0.5.0": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/10",
+    "@red-cup-engineering/metrologic@0.14.3-dev.1364": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/11",
+    "@red-cup-engineering/computer-data-engineering-services-section@0.3.1": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/12"
+  },
+  "files": [
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/data/examples/schema-borne-necessity.json",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/data/examples/schema-borne-necessity.json",
+      "bytes": 547,
+      "sha256": "05d7ed451663c5d084dcbaf10dbc99780fc388773c99e06d72585f4152bb054a"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/data/schema/fiber-program.schema.json",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/data/schema/fiber-program.schema.json",
+      "bytes": 4771,
+      "sha256": "b3df518d4762d330b01048597f8b1b87c785cd6f92e3c9eedbe7a164653c0ae0"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/package.json",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/package.json",
+      "bytes": 3208,
+      "sha256": "e69721a105f3fa1e04fa9dd273ab9b01e95d86a112ac31a83cc0c9d7ac5ae9d4"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/src/fiber-program.mjs",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/src/fiber-program.mjs",
+      "bytes": 7885,
+      "sha256": "282bd8fd063e5afb0c39e745ea7292e9468c3a8bc596ed013718b99a3309698f"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/src/token-fiber.mjs",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/src/token-fiber.mjs",
+      "bytes": 11262,
+      "sha256": "5c95a6bdf49334ca846ef44b70656c78266ff05cd66fd1ed2bc29976ad137529"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/fiber-program-admission.test.mjs",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/test/fiber-program-admission.test.mjs",
+      "bytes": 3427,
+      "sha256": "0c7e4b51ac97d4319e84d141d61f0ba6bbc4c637a7d1f1d988bc6ee1a27d1785"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/fiber-program.test.mjs",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/candidate/test/fiber-program.test.mjs",
+      "bytes": 8074,
+      "sha256": "2a52034b69967a179b5ff9f1c4cc1a821d81b39cbb8b22fb642f01de7d0a474b"
+    },
+    {
+      "package": "@red-cup-engineering/signcell@0.13.3-dev.225",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1/package.json",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/signcell-0.13.2-source/package.json",
+      "bytes": 3400,
+      "sha256": "715dcb4705532fbcb1c8e1d288ebcff983af98c2ff396b9c23a308f27e39a502"
+    },
+    {
+      "package": "@red-cup-engineering/signcell@0.13.3-dev.225",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1/src/cell.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/signcell-0.13.2-source/src/cell.mjs",
+      "bytes": 20667,
+      "sha256": "8e4be18a4b8eae5c897b6e8d2c8ea94fe11d2dbf7acc4cd7ec2c8021c01fc16f"
+    },
+    {
+      "package": "@red-cup-engineering/signcell@0.13.3-dev.225",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1/src/mark.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/signcell-0.13.2-source/src/mark.mjs",
+      "bytes": 2029,
+      "sha256": "e6407afea5f78b22499025be9e7f2f10e8ba44c7b26466c043cbfd7c24cbbdaf"
+    },
+    {
+      "package": "@red-cup-engineering/signcell@0.13.3-dev.225",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1/src/token-frame.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/signcell-0.13.2-source/src/token-frame.mjs",
+      "bytes": 12558,
+      "sha256": "64227e540d5658b102674c037a2481874109b9628f403b62bd13e53998b1c9eb"
+    },
+    {
+      "package": "@red-cup-engineering/signcell@0.13.3-dev.225",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1/src/type-system/type-system.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/signcell-0.13.2-source/src/type-system/type-system.mjs",
+      "bytes": 14736,
+      "sha256": "0a45d942a1d1cd4fa9566b2a1b42ba98eee1de9dc68a40b5fb5de95dda27a91b"
+    },
+    {
+      "package": "@red-cup-engineering/signcell@0.13.3-dev.225",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/1/src/utterance.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/signcell-0.13.2-source/src/utterance.mjs",
+      "bytes": 27646,
+      "sha256": "f8b79718cc189a7f2585f9bb7fba95d86bbec8c991305d4dd5f8b71d669229e5"
+    },
+    {
+      "package": "@red-cup-engineering/semiotic-content-address@0.1.2-dev.31",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/2/package.json",
+      "sourcePath": "/workspace/shared/nodejob-request-custody-20261027/source-suppliers/sca/package.json",
+      "bytes": 1470,
+      "sha256": "0dc9610648319b48cc1deafac3a504d3e2cff15eba3334c72cd58916f5d56658"
+    },
+    {
+      "package": "@red-cup-engineering/semiotic-content-address@0.1.2-dev.31",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/2/src/semiotic-content-address.mjs",
+      "sourcePath": "/workspace/shared/nodejob-request-custody-20261027/source-suppliers/sca/src/semiotic-content-address.mjs",
+      "bytes": 13356,
+      "sha256": "6a60487b454d23ee7a7d9611f8ab91c4219efe53df49dfdf90bc5561d8f165a2"
+    },
+    {
+      "package": "@red-cup-engineering/cbor-services-section@0.1.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/3/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+cbor-services-section@0.1.1--13a6cb81e685/package.json",
+      "bytes": 764,
+      "sha256": "e967ffa7703297662ce57efcc05937681f46a75c012c49f17e8c222b7242be49"
+    },
+    {
+      "package": "@red-cup-engineering/cbor-services-section@0.1.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/3/src/cbor.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+cbor-services-section@0.1.1--13a6cb81e685/src/cbor.mjs",
+      "bytes": 8363,
+      "sha256": "8e18cb83f705d9d480f22a7202a88afca9276cb63bcc5359f42ba293c37e8bc4"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/box.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/box.js",
+      "bytes": 6358,
+      "sha256": "ed6bc025bedd15370907cf4faf5b2531f4fdc2cf7b8f09136e7c48e722f028e3"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/constants.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/constants.js",
+      "bytes": 4640,
+      "sha256": "3485449998cc2409c6dd2a95bf08e1a4dadb24d1f10c470dee9a88e909ff5dd6"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/container.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/container.js",
+      "bytes": 32188,
+      "sha256": "6bf9aba839ec44f4e803110c728910395f2d3f343a8057af3f5ee76ba487a260"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/decodeStream.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/decodeStream.js",
+      "bytes": 23038,
+      "sha256": "d8c528fb466dda3d5ed76b4077a2ff4626977de83fc0bc6fa1e13c69f4df1fb6"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/decoder.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/decoder.js",
+      "bytes": 11035,
+      "sha256": "a611d4a0a7a98ad2047b065bd8f09121a2c5622a4515a965710f23b9e6a93d5e"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/encoder.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/encoder.js",
+      "bytes": 42757,
+      "sha256": "5a25acfaf0250014f838bd7994404c4a1106b6d82f268f35c730f12448493e4b"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/float.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/float.js",
+      "bytes": 31156,
+      "sha256": "2807e45502b112edbf27e81bb89e88ef73bd9bf5d3ba55e2d9f2c4a636c3fb39"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/options.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/options.js",
+      "bytes": 1178,
+      "sha256": "b39fa72a622cb52349abe9c609a723076928ef6a6ca8b7590d1bd38468cea894"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/simple.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/simple.js",
+      "bytes": 3222,
+      "sha256": "a4553b33ff455ba1419c9caae85ee12926ef9bdafdd52e5fe8c4f019ee46a693"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/sorts.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/sorts.js",
+      "bytes": 2977,
+      "sha256": "337d7898591e4973989be08b956066fc49bcf09fba125732d859d1c16564d2dc"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/tag.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/tag.js",
+      "bytes": 7555,
+      "sha256": "8938ca0d457906afac32482158050cd0f798c98e09d7aa537d4a2e97edc91297"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/typeEncoderMap.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/typeEncoderMap.js",
+      "bytes": 2218,
+      "sha256": "83c9f4182e310de10569054bd46021e1fc1615a74faf1a2461fa6e460f448217"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/utils.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/utils.js",
+      "bytes": 13231,
+      "sha256": "e0c6bd43b5b8e048816b8e2655967d84be62610a33438521100e01ecdb022ca5"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/lib/writer.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/lib/writer.js",
+      "bytes": 10703,
+      "sha256": "1ee3215e458a7c5bcbd559d2f9fa10c59817950a9ce4a7eb09386fe98cd250f7"
+    },
+    {
+      "package": "cbor2@2.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/4/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/cbor2@2.4.0--b53263db180d/package.json",
+      "bytes": 1690,
+      "sha256": "e60ccbee716aa4cf3c51f1ffc860305cd4b713a02877f772b112c7e912f2d4ba"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/const.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/const.js",
+      "bytes": 297,
+      "sha256": "06b26c849895fe3d0422b22cd3393d62487e1b49a3322819edb533d6501e3699"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/decode.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/decode.js",
+      "bytes": 5467,
+      "sha256": "e1fa199ed85a63566d2fb2d9c45523efeee034e69ee1e8fec8f1ff3d8e33b0aa"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/decodeStream.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/decodeStream.js",
+      "bytes": 1087,
+      "sha256": "64b4df60aa4815bcb2bae959496e15f6e849bc285fef1004f84e485442bdf2b8"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/encode.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/encode.js",
+      "bytes": 2181,
+      "sha256": "949136075a922cd4273f098baa7bd4d18b53b531f700c6c0d01884c6179a585d"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/encodeStream.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/encodeStream.js",
+      "bytes": 1645,
+      "sha256": "d38fb8be70242443c2cd7bf9d46cd570a9e8448b95f2ef89b64ec6474ba13ea8"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/errors.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/errors.js",
+      "bytes": 365,
+      "sha256": "b0ba40b60c36d58fc9a5970c7a597053dbe7e5d7828bcba7cee83d2dcc2de722"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/lib/index.js",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/lib/index.js",
+      "bytes": 239,
+      "sha256": "9f815eb9016dff0aaa5495f3e7bf9499857f1f0994d5afcfbf44fd1224ba7b5e"
+    },
+    {
+      "package": "@cto.af/wtf8@0.0.6",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/5/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@cto.af+wtf8@0.0.6--0101fbb681fe/package.json",
+      "bytes": 1004,
+      "sha256": "eb38688d449e6746ce1817af30e72d36c00e70f8cc657487eb1c0ce5c6386a2b"
+    },
+    {
+      "package": "@red-cup-engineering/uri-services-section@0.1.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/6/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+uri-services-section@0.1.1--76eb8517f76c/package.json",
+      "bytes": 987,
+      "sha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4"
+    },
+    {
+      "package": "@red-cup-engineering/uri-services-section@0.1.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/6/src/ni-uri.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+uri-services-section@0.1.1--76eb8517f76c/src/ni-uri.mjs",
+      "bytes": 5749,
+      "sha256": "91c5c0f5e6da0605df60e1002bb7fd8ad70ba5ff952ca128d7e7f11214e32b2c"
+    },
+    {
+      "package": "@red-cup-engineering/cryptographic-computer-data-engineering-services-section@0.3.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/7/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+cryptographic-computer-data-engineering-services-section@0.3.1--833eb5ea3d65/package.json",
+      "bytes": 1177,
+      "sha256": "a566ae04f9addac8538c1b3a8d23414305de15961c1facfafb5f99751ffd3dd7"
+    },
+    {
+      "package": "@red-cup-engineering/cryptographic-computer-data-engineering-services-section@0.3.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/7/src/portable-bytes.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+cryptographic-computer-data-engineering-services-section@0.3.1--833eb5ea3d65/src/portable-bytes.mjs",
+      "bytes": 2650,
+      "sha256": "f700d9a39a85a896d2d7799db827730a07d68cf275785444e4cf3463aab117b6"
+    },
+    {
+      "package": "@red-cup-engineering/cryptographic-computer-data-engineering-services-section@0.3.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/7/src/portable-sha256.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+cryptographic-computer-data-engineering-services-section@0.3.1--833eb5ea3d65/src/portable-sha256.mjs",
+      "bytes": 3595,
+      "sha256": "7e71288a8d763b17201617b5b7596e04696151ef055a98ec6749a3cd788f4055"
+    },
+    {
+      "package": "@red-cup-engineering/json-services-section@0.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/8/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+json-services-section@0.4.0--d7611314a4b6/package.json",
+      "bytes": 2734,
+      "sha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be"
+    },
+    {
+      "package": "@red-cup-engineering/json-services-section@0.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/8/scripts/canonical-json.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+json-services-section@0.4.0--d7611314a4b6/scripts/canonical-json.mjs",
+      "bytes": 19693,
+      "sha256": "8f78095b4c22f9a171823b789c7918910f4a47eb28b388cae1de0eea1fce90cf"
+    },
+    {
+      "package": "@red-cup-engineering/json-services-section@0.4.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/8/src/json-byte-carrier.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+json-services-section@0.4.0--d7611314a4b6/src/json-byte-carrier.mjs",
+      "bytes": 3658,
+      "sha256": "c95d24ebe2603ae2cc7c690515253ba84e4952a8ced73ca8c1057216d7e32be9"
+    },
+    {
+      "package": "@red-cup-engineering/computer-data-engineering-services-section@0.7.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/9/package.json",
+      "sourcePath": "/workspace/shared/feltos1137-issued-receiving-20261027/suppliers/package-23/package.json",
+      "bytes": 3380,
+      "sha256": "563eabcb8919db7123f1092dd47906ecdfcd86ea1ef5706fac708c91d8478bc7"
+    },
+    {
+      "package": "@red-cup-engineering/computer-data-engineering-services-section@0.7.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/9/src/four.mjs",
+      "sourcePath": "/workspace/shared/feltos1137-issued-receiving-20261027/suppliers/package-23/src/four.mjs",
+      "bytes": 29705,
+      "sha256": "797932a8b3037a1fa9027f768de32ee496c26351e46dbbe8da9343a72277675a"
+    },
+    {
+      "package": "@red-cup-engineering/json-schema-services-section@0.5.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/10/package.json",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+json-schema-services-section@0.5.0--2c7166d67573/package.json",
+      "bytes": 6953,
+      "sha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7"
+    },
+    {
+      "package": "@red-cup-engineering/json-schema-services-section@0.5.0",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/10/src/validation.mjs",
+      "sourcePath": "/workspace/shared/federated-modes-20261026/cie-native-receiving/suppliers/@red-cup-engineering+json-schema-services-section@0.5.0--2c7166d67573/src/validation.mjs",
+      "bytes": 49292,
+      "sha256": "681f52342bbc1e05d48aeb255035a4179b5f2ff652e455036be88cbc50edaf06"
+    },
+    {
+      "package": "@red-cup-engineering/metrologic@0.14.3-dev.1364",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/11/package.json",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/metrologic-0.14.3-dev.1364-source/package.json",
+      "bytes": 24246,
+      "sha256": "a33fcc11171d36bf76d339570891b5bf94f47e1d5b83debcba87dc833a50c084"
+    },
+    {
+      "package": "@red-cup-engineering/metrologic@0.14.3-dev.1364",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/11/src/mark.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/metrologic-0.14.3-dev.1364-source/src/mark.mjs",
+      "bytes": 1093,
+      "sha256": "b29249b661764360082e7749e9c0c0f187e2c0afe77941d4d3145e45299cff37"
+    },
+    {
+      "package": "@red-cup-engineering/metrologic@0.14.3-dev.1364",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/11/src/models/graphs/directed-multigraph.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/metrologic-0.14.3-dev.1364-source/src/models/graphs/directed-multigraph.mjs",
+      "bytes": 18506,
+      "sha256": "5d694cdedd44d7efe4d33e04d80e1dabf5bc25d62afdd7925fd1e76406fce5bc"
+    },
+    {
+      "package": "@red-cup-engineering/metrologic@0.14.3-dev.1364",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/11/src/models/order/finite-preorder.mjs",
+      "sourcePath": "/workspace/shared/signcraft-finite-closure-source-correction-20261027/suppliers/metrologic-0.14.3-dev.1364-source/src/models/order/finite-preorder.mjs",
+      "bytes": 11500,
+      "sha256": "dcf725ca860f03589950fb8755d7e6cda579e298b680a1bdc948d11d0bd7b099"
+    },
+    {
+      "package": "@red-cup-engineering/computer-data-engineering-services-section@0.3.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/12/package.json",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/suppliers/data031/package.json",
+      "bytes": 3139,
+      "sha256": "b4b9b84d5c6b3c01201e9977e598f73abcc4569396a8a87b8e7bfa034f2805a6"
+    },
+    {
+      "package": "@red-cup-engineering/computer-data-engineering-services-section@0.3.1",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/12/src/four.mjs",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/suppliers/data031/src/four.mjs",
+      "bytes": 29705,
+      "sha256": "797932a8b3037a1fa9027f768de32ee496c26351e46dbbe8da9343a72277675a"
+    },
+    {
+      "package": ".",
+      "path": "/workspace/shared/signchain-fiber-admission-20261027/native-full-token/0/test/token-fiber.test.mjs",
+      "sourcePath": "/workspace/shared/signchain-fiber-admission-20261027/baseline/test/token-fiber.test.mjs",
+      "bytes": 20176,
+      "sha256": "ca09912ed1bc980c0069ba3f1ef9c8d772aad78582f1f3522b99b20149cf513f"
+    }
+  ]
+}
