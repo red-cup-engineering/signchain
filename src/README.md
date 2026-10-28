@@ -29,6 +29,12 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   breadth-first derivation search, typing judgments, derivation validity
   checking, and predicate words.
 
+- `token-fiber` — the fiber algebra over SignCell's token frame: a claim
+  read at every token in FOUR (FOUR^T, each order's meet residuated by its
+  implication), and possibilizing and necessitating along the order, ◇ ⊣ □.
+  It sits between the frame (SignCell's Heyting algebra of tokens) and the
+  token sheaf SignGraph glues from it.
+
 ## Bounded predicate-word paths: finite proof without false saturation
 
 `composePredicateWords` retains the historical **single pairwise round**
@@ -58,12 +64,6 @@ log, an institutional inference of authority, a Lean theorem or a runtime
 settlement. Fabrication, Circulation and Enterprise receivers must bind the
 original source acts and evidence before treating any path as an operational
 claim. The regression is `test/predicate-word-closure.test.mjs`.
-- `token-fiber` — the fiber algebra over SignCell's token frame: a claim
-  read at every token in FOUR (FOUR^T, each order's meet residuated by its
-  implication), and possibilizing and necessitating along the order, ◇ ⊣ □.
-  It sits between the frame (SignCell's Heyting algebra of tokens) and the
-  token sheaf SignGraph glues from it.
-
 ## Depends on
 
 `@red-cup-engineering/metrologic` for its metrology and `@red-cup-engineering/signcell`
