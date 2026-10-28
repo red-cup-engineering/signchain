@@ -11,7 +11,8 @@
     "test",
     "docs",
     "test/rule-index-consistency.test.mjs",
-    "test/typed-theory.test.mjs"
+    "test/typed-theory.test.mjs",
+    "test/receiving/typed-theory-source.check.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -44,7 +45,8 @@
     "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\""
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "test:foundations:receiving": "node --test test/receiving/typed-theory-source.check.mjs"
   },
   "receivingTests": [
     "test/claim-event-log.test.mjs",
@@ -63,7 +65,8 @@
     "test/log-finalization.test.mjs",
     "test/rule-index-consistency.test.mjs",
     "test/token-fiber.test.mjs",
-    "test/typed-theory.test.mjs"
+    "test/typed-theory.test.mjs",
+    "test/receiving/typed-theory-source.check.mjs"
   ],
   "repository": {
     "type": "git",

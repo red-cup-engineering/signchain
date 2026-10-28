@@ -233,3 +233,25 @@ the constructor-origin guard before the tests can report full receiving.
 This is not a substitute for immutable package publication/pinning or a
 full installed end-to-end test, and no caller may interpret a skip as
 an authorized typed inference result.
+
+## Strict original SignCell → SignChain source receiving
+
+The ordinary `test/typed-theory.test.mjs` deliberately **skips**
+constructor-origin conformance cases when a historical installed SignCell
+supplier does not expose `isAdmittedPredicationBase`. Such compatibility
+skips are not evidence that the downstream mathematical contract is ready.
+
+Release receiving MUST run `npm run test:foundations:receiving`.
+This independently imports the **installed** original SignCell provider
+and fails (never skips) when its category producer, endpoint admission, or
+SignChain `theoryOfBase` receiving fails. The explicit source-cut file
+`test/receiving/typed-theory-source.check.mjs` is not part of the broad
+`test/**/*.test.mjs` smoke-test glob: ordinary compatibility and strict
+supplier qualification are distinct gates. Only actual installed and
+pinned packages can pass this receiving obligation; a source-only assay
+or a branch-relative test double cannot confer qualification.
+
+The check belongs to the established SignCell and SignChain owners. It
+does not add a content hash, inference engine, transaction store, agent
+authority, or semantic ontology. Fabrication/Circulation/Enterprise must
+require the supplier-backed pass receipt before consuming these typed rules.
