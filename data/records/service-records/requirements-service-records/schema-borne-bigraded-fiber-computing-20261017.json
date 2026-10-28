@@ -11,7 +11,8 @@
     "Preserve distinct truth and knowledge orders, both positive and negative witness incidences, and linear multiplicative operations.",
     "Never equate an enumerated family with all admissible causal descents, an application program with a schema validator, or a finite FOUR result with transfinite settlement.",
     "Never let a schema grant native office, legal, payment, tool or effect powers.",
-    "Only qualify received source-generated SignCell token frames; original evidence authority remains upstream."
+    "Only qualify received source-generated SignCell token frames; original evidence authority remains upstream.",
+    "Program syntax must be inert finite source data admitted by the existing SCA owner before grammar reads; preserve native opaque bigint/byte claim literals and explicit undefined fields. Ordinary accessors/cycles are refused; arbitrary Proxy isolation is outside the profile."
   ],
   "met-when": [
     {
@@ -38,6 +39,11 @@
       "cell": "consumer-receiving",
       "target": "held",
       "says": "The immutable selected SignChain package is installed in a real downstream consumer, which independently exercises positive, different valid, and adverse cases."
+    },
+    {
+      "cell": "inert-program-source",
+      "target": "held",
+      "says": "Existing original fiber-program semantics pass while accessor/cyclic/executable syntax refuses before evaluation, with zero ordinary getter calls and unchanged owner-branded byte/bigint claim receiving."
     }
   ],
   "x-provenance": {
