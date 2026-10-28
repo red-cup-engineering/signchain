@@ -48,7 +48,10 @@ maxPairChecks})` enumerates distinct path words by repeatedly composing
 original source arrows. The original SignCell term and predicate coincidence
 functions remain the sole identity owners; no additional address or ontology
 is minted. Explicit bounds default to 4 symbols, 512 arrows and 65,536
-candidate-comparison checks. Source arrow and word arrays require inert,
+source-coincidence comparison checks, including each duplicate-path
+identity comparison (not merely path-extension attempts). This is an explicit
+total predicate-arrow comparison bound, not a wall-clock guarantee. Source
+arrow and word arrays require inert,
 dense own data. Exceeding the arrow or computation budget **throws** rather
 than providing incomplete results under a false claim of success.
 
