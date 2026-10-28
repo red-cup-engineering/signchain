@@ -82,3 +82,43 @@ test("foreign or accessor-backed arrow sources refuse without executing getters"
   assert.throws(() => boundedPredicateWordClosure(carrier([{...row, kind: "impostor"}])),
     /unrecognized arrow kind/);
 });
+
+test("independent finite path oracle agrees on all two-edge three-node graphs and depth limits", () => {
+  const vertices = ["a", "b", "c"];
+  const edges = vertices.flatMap((subject) => vertices.map((object) => [subject, object]));
+  let scenarios = 0;
+  for (let i = 0; i < edges.length; i += 1) {
+    for (let j = i + 1; j < edges.length; j += 1) {
+      const sources = [edges[i], edges[j]].map(([subject, object], index) => ({
+        subject, object, predicate: "p" + index,
+      }));
+      for (const limit of [1, 2, 3]) {
+        const found = boundedPredicateWordClosure(carrier(sources.map((s) =>
+          arrow(s.subject, s.predicate, s.object))), {
+          maxWordLength: limit, maxArrows: 64, maxPairChecks: 20000,
+        });
+        // This path oracle does NOT call the SignChain composition algorithm;
+        // it traverses the original two-edge adjacency table directly.
+        const expected = new Set();
+        let longer = false;
+        const explore = (start, here, word) => {
+          if (word.length) {
+            if (word.length <= limit) expected.add(JSON.stringify([start, word, here]));
+            else longer = true;
+          }
+          if (word.length >= limit + 1) return;
+          for (const source of sources) {
+            if (source.subject === here) explore(start, source.object, [...word, source.predicate]);
+          }
+        };
+        for (const vertex of vertices) explore(vertex, vertex, []);
+        const received = new Set(found.carrier.arrows.map((r) =>
+          JSON.stringify([r.subject, [...r.word], r.object])));
+        assert.deepEqual(received, expected, "exact nonempty paths " + i + "/" + j + " bound " + limit);
+        assert.equal(found.complete, !longer, "conditional closure " + i + "/" + j + " bound " + limit);
+        scenarios += 1;
+      }
+    }
+  }
+  assert.equal(scenarios, 108);
+});
