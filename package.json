@@ -33,7 +33,8 @@
     "./token-fiber": "./src/token-fiber.mjs",
     "./rules": "./src/rules.mjs",
     "./log": "./src/log.mjs",
-    "./fiber-program": "./src/fiber-program.mjs"
+    "./fiber-program": "./src/fiber-program.mjs",
+    "./source-withdrawal": "./src/source-withdrawal.mjs"
   },
   "dependencies": {
     "@red-cup-engineering/metrologic": "0.14.3-dev.1364",
@@ -68,7 +69,8 @@
     "test/token-fiber.test.mjs",
     "test/typed-theory.test.mjs",
     "test/receiving/typed-theory-source.check.mjs",
-    "test/predicate-word-closure.test.mjs"
+    "test/predicate-word-closure.test.mjs",
+    "test/source-withdrawal.test.mjs"
   ],
   "repository": {
     "type": "git",
