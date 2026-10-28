@@ -378,7 +378,14 @@ export function boundedPredicateWordClosure(input, options = {}) {
             word: Object.freeze([...left.word, ...right.word]),
             object: right.object,
         });
-        if (arrows.some((existing) => samePredicateWordArrow(existing, arrow))) return;
+        // The duplicate search is an actual series of source-coincidence
+        // comparisons. Charge every one against the SAME effort budget;
+        // otherwise a dense language can consume O(arrows²) unreported work.
+        for (const existing of arrows) {
+            if (++pairChecks > maxPairChecks)
+                throw new RangeError("predicateWordClosure: comparison budget exhausted; no closure claim");
+            if (samePredicateWordArrow(existing, arrow)) return;
+        }
         if (arrows.length >= maxArrows)
             throw new RangeError("predicateWordClosure: arrow budget exhausted; no closure claim");
         arrows.push(arrow);
