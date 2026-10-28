@@ -45,7 +45,7 @@
     "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\"",
+    "test": "node --test \"test/**/*.test.mjs\" test/receiving/typed-theory-source.check.mjs",
     "test:foundations:receiving": "node --test test/receiving/typed-theory-source.check.mjs"
   },
   "receivingTests": [
