@@ -67,8 +67,7 @@
     "test/rule-index-consistency.test.mjs",
     "test/token-fiber.test.mjs",
     "test/typed-theory.test.mjs",
-    "test/receiving/typed-theory-source.check.mjs",
-    "test/predicate-word-closure.test.mjs"
+    "test/receiving/typed-theory-source.check.mjs"
   ],
   "repository": {
     "type": "git",
