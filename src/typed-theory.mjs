@@ -347,6 +347,7 @@ export function boundedPredicateWordClosure(input, options = {}) {
     };
     const maxWordLength = option("maxWordLength", 4, 64);
     const maxArrows = option("maxArrows", 512, 4096);
+    const maxPairChecks = option("maxPairChecks", 65536, 1000000);
     const inputs = sourceArray(sourceField(input, "arrows", "input"), "arrows");
     if (inputs.length > maxArrows)
         throw new RangeError("predicateWordClosure: original arrows exceed maxArrows");
@@ -362,7 +363,12 @@ export function boundedPredicateWordClosure(input, options = {}) {
     });
     const arrows = [...sources];
     let truncated = false;
+    let pairChecks = 0;
     const extend = (left, right) => {
+        // A finite word/arrow bound does not by itself limit repeated
+        // compatibility checks across a dense cyclic source category.
+        if (++pairChecks > maxPairChecks)
+            throw new RangeError("predicateWordClosure: comparison budget exhausted; no closure claim");
         if (!termCoincides(left.object, right.subject)) return;
         const length = left.word.length + right.word.length;
         if (length > maxWordLength) { truncated = true; return; }
@@ -394,6 +400,8 @@ export function boundedPredicateWordClosure(input, options = {}) {
         truncated,
         maxWordLength,
         maxArrows,
+        maxPairChecks,
+        pairChecks,
     });
 }
 
