@@ -463,7 +463,7 @@ function defaultExposureStage(contract) {
     : `stage:${contract.phase.finality}:${contract.phase.id}`;
 }
 
-/** Build the observed outcome of a relational contract exposure: boundary plus contract coordinates under the same Φ/Λ/Ω. */
+/** Present caller-supplied boundary data with contract coordinates under Φ/Λ/Ω; this does not acquire an observation or apply the declared lens. */
 
 export function contractExposure(
   contract,
@@ -536,7 +536,7 @@ function observationCoordinateMatches(outer, inner) {
   try { return coincides(outer, inner); } catch { return false; }
 }
 
-/** Judge whether a concrete boundary exposure satisfies the contract and its evidence policy Ω. */
+/** Check supplied contract/coordinate identities and required evidence-policy records. This check does not establish lens preservation, source authentication or a performed effect. */
 
 export function contractExposureReport(
   contract,
