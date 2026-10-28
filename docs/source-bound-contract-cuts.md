@@ -31,9 +31,12 @@ obligations. No new logic, graph, hash, solver or journal is introduced here.
 
 Predicate ids designate the declarations supplied by the caller. An explicit
 entails entry is a declaration, not a theorem prover or authenticated proof.
-Phase/lens/evidence-policy compatibility retains the original report's separate
-meaning. The conditional cut establishes no execution authority, runtime result,
-customer acceptance, complete constraint support, sheaf gluing or global safety.
+A matching lens id in `contractsCompose` or `contractExposureReport` establishes
+coordinate compatibility, not a performed observational projection. The existing
+`observationalLens` retains declared `preserves`/`hides` lists without testing
+their preservation laws; the exposure report checks identities and required
+record presence. The conditional cut establishes no source authentication,
+execution authority, runtime result, customer acceptance or global safety.
 
 ## Representation and refinement
 
