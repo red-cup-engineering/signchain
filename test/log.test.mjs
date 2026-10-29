@@ -183,3 +183,18 @@ test("null-prototype source selectors cross the original SCA admission boundary 
   assert.throws(()=>original.readingWhere(hostile),/data property/);
   assert.equal(invoked,0);
 });
+
+
+test("indexed bounded source reading checks candidate budget before constructing row arrays",()=>{
+  const c=cell("claim","source","research");
+  const history=new TellingLog().tell(c,"support").deny(c,"opposition").seal();
+  const result=history.boundedAt(c,2);
+  assert.equal(result.candidatesInspected,2);
+  assert.deepEqual(result.for,history.where(c));
+  assert.deepEqual(result.against,history.against(c));
+  assert.equal(Object.isFrozen(result.for),true);
+  assert.throws(()=>history.boundedAt(c,1),/budget exceeded before materialization/);
+  // The helper retains the previous null-prototype query admission path.
+  const selector=Object.assign(Object.create(null),{subject:"claim",predicate:"source",object:"research"});
+  assert.equal(history.boundedAt(selector,2).matchedTellings,2);
+});
