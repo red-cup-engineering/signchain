@@ -306,3 +306,49 @@ test("a revised opposition observation clock remains visible without erasing con
   assert.equal(x.requiresReverification,true);
   assert.equal(x.evidenceOrders.knowledgeNondecreasing,true);
 });
+
+
+test("review control: >20k genuine source tellings refuse before unbounded projection",()=>{
+  const c=cell("budget","limits","source-materialization");
+  class GuardedLog extends TellingLog {
+    where(){throw new Error("unbounded where invoked");}
+    against(){throw new Error("unbounded against invoked");}
+    cells(){throw new Error("unbounded cells invoked");}
+    readingAt(){throw new Error("unbounded readingAt invoked");}
+  }
+  const history=new GuardedLog();
+  for(let i=0;i<20001;i++)history.tell(c,i);
+  history.seal();
+  assert.equal(history.size,20001);
+  assert.throws(()=>history.boundedAt(c,20000),/budget exceeded before materialization/);
+  assert.throws(()=>compareOriginalEvidenceSnapshots(history,new TellingLog().seal(),{
+    propositions:[c]}),/budget exceeded before materialization/);
+  assert.equal(history.size,20001);
+});
+
+test("bounded snapshot comparison is native evidence-equivalent under its admitted index budget",()=>{
+  const a=cell("trial","verified-by","first"), b=cell("trial","verified-by","second");
+  const before=new TellingLog().tell(a,"same").deny(a,"counter").tell(b,"other").seal();
+  const current=new TellingLog().tell(a,"same").deny(a,"counter").tell(b,"replacement").seal();
+  const sliced=before.boundedAt(a,2);
+  assert.equal(sliced.candidatesInspected,2);
+  assert.equal(sliced.matchedTellings,2);
+  assert.deepEqual(sliced.for,before.where(a));
+  assert.deepEqual(sliced.against,before.against(a));
+  const result=compareOriginalEvidenceSnapshots(before,current,{propositions:[a,b]});
+  assert.equal(result.inspectedCandidates,6);
+  assert.equal(result.inspectedTellings,6);
+  assert.equal(result.comparisons[0].original.knowledge,before.readingAt(a));
+  assert.equal(result.comparisons[1].revised.knowledge,current.readingAt(b));
+  assert.deepEqual(result.changedPropositionAddresses,[address(b)]);
+});
+
+test("bounded query refuses on missing coordinates, non-integer limits, and index over-budget",()=>{
+  const a=cell("x","p","y"), b=cell("z","p","y");
+  const log=new TellingLog().tell(a,"a").tell(b,"b").seal();
+  assert.throws(()=>log.boundedAt({subject:"x"},2),/complete subject/);
+  for(const limit of [-1,20001,1.5,NaN])assert.throws(()=>log.boundedAt(a,limit),/candidate limit/);
+  assert.throws(()=>log.boundedAt(a,0),/budget exceeded before materialization/);
+  assert.equal(log.boundedAt(a,1).matchedTellings,1);
+  assert.equal(log.boundedAt(cell("unknown","p","none"),0).matchedTellings,0);
+});
