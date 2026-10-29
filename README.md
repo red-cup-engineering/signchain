@@ -236,6 +236,8 @@ Native proposed receiving:
 `node --test test/source-withdrawal.test.mjs` with this repository's
 authentic installed dependencies. Tests cover source replacement and changed reception clocks without
 FOUR change, cross-polarity contradiction, explicit multi-proposition scope,
-duplicate original tellings, empty/forged inputs, and all 16 finite
-FOUR-polarity transitions. Merging and installed consumer receiving remain
+duplicate original tellings, empty/forged inputs, all 16 finite
+FOUR-polarity transitions, **all 256 paired two-proposition finite FOUR
+histories**, and a source-index refusal with over 20,000 authentic tellings.
+Merging and installed consumer receiving remain
 separate from source-authored tests.
