@@ -338,3 +338,42 @@ test("fiber data arrays refuse hidden extras, prototypes and gaps, preserving va
  for(const bad of [sparse,decorated,symbol,foreign])
    assert.throws(()=>pointwise(frame,x=>x,bad),/array|plain records/u);
 });
+
+test("FOUR fibers refuse extra, hidden or executable source coordinates across mathematical readers",()=>{
+  const frame=tokenFrame([cell("one","reports","claim")]);
+  const valid=[{token:"one",reading:"potential"}];
+  assert.deepEqual(pointwise(frame,x=>x,valid),valid,
+    "a canonical TWO-field source valuation remains unchanged");
+  let calls=0;
+  const extra={token:"one",reading:"potential",actor:"unadmitted"};
+  const hidden={token:"one",reading:"potential"};
+  Object.defineProperty(hidden,"authority",{value:"not evidence"});
+  const symbolic={token:"one",reading:"potential"};
+  Object.defineProperty(symbolic,Symbol("hidden"),{value:true});
+  const getter={token:"one",reading:"potential"};
+  Object.defineProperty(getter,"source",{enumerable:true,
+    get(){calls++;throw Error("executed source accessor");}});
+  for(const row of [extra,hidden,symbolic,getter]){
+    const valuation=[row];
+    assert.throws(()=>pointwise(frame,x=>x,valuation),
+      /exactly token and reading/u);
+    assert.throws(()=>knowledgeWithin(frame,valuation,valid),
+      /exactly token and reading/u);
+    assert.throws(()=>truthWithin(frame,valid,valuation),
+      /exactly token and reading/u);
+    assert.throws(()=>possibilizeIn(frame,valuation,"knowledge"),
+      /exactly token and reading/u);
+    assert.throws(()=>necessitateIn(frame,valuation,"truth"),
+      /exactly token and reading/u);
+    assert.throws(()=>truthPoleClosure(frame,valid,valuation),
+      /exactly token and reading/u);
+    assert.throws(()=>truthNuclearQuartet(frame,valid,valid,valuation),
+      /exactly token and reading/u);
+    assert.throws(()=>truthPoleClosure(frame,valuation,valid),
+      /exactly token and reading/u);
+  }
+  assert.equal(calls,0,"no source getter executed or mislabeled as evidence");
+  assert.deepEqual(truthPoleClosure(frame,valid,valid),
+    pointwise(frame,truthJoinReading,valid,valid),
+    "previous nucleus laws remain available to exact native records");
+});
