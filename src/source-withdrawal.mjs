@@ -142,8 +142,9 @@ export function assessOriginalSourceWithdrawal(history, {proposition,attribution
  * their temporal order and the authenticity of their witnesses are NOT proved
  * by this function. This is a read projection, never a second provenance log.
  *
- * A change of original source witnesses requires downstream research review
- * even when the FOUR reading remains exactly the same. Repeated tellings of
+ * A change of original source witnesses OR the associated observedAt clock
+ * testimony requires downstream research review even when the FOUR reading
+ * remains exactly the same. Repeated tellings of
  * one witnessed identity are not independent corroboration. The ordinary
  * SignCell coincidence/semantic identities, not JSON serialization, own the
  * witness relation. No permission or task transition is made here.
@@ -160,23 +161,43 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
   const seen = new Set();
   let inspectedTellings = 0;
   const changes = [];
-  const witnessMap = (history, proposition, side) => {
+  const evidenceMap = (history, proposition, side) => {
     const rows = side === "for" ? history.where(proposition) : history.against(proposition);
     inspectedTellings += rows.length;
     requireEvidence(inspectedTellings <= 20000,
       "evidence comparison exceeds the 20000-telling read budget");
-    const result = new Map();
+    const witnesses = new Map(), observations = new Map();
     for (const row of rows) {
-      const key = coincidenceKey(row.witness);
-      if (!result.has(key)) result.set(key, semanticId(row.witness));
+      const witnessKey = coincidenceKey(row.witness);
+      const witnessAddress = semanticId(row.witness);
+      if (!witnesses.has(witnessKey)) witnesses.set(witnessKey, witnessAddress);
+      // An original witness and its observed reception are different
+      // coordinates. A timestamp correction need not change the FOUR value.
+      // The typed tag separates absent clocks from explicitly present null.
+      const clockPresent = Object.hasOwn(row, "observedAt");
+      const observationKey = coincidenceKey([
+        row.witness, clockPresent ? ["present", row.observedAt] : ["absent"],
+      ]);
+      if (!observations.has(observationKey)) observations.set(
+        observationKey, Object.freeze({
+          witnessAddress,
+          observedAtPresent: clockPresent,
+          observedAt: clockPresent ? row.observedAt : null,
+        }));
     }
-    return result;
+    return { witnesses, observations };
   };
   const delta = (before, after) => Object.freeze({
     added: Object.freeze([...after].filter(([key]) => !before.has(key))
       .map(([, id]) => id).sort(cmp)),
     removed: Object.freeze([...before].filter(([key]) => !after.has(key))
       .map(([, id]) => id).sort(cmp)),
+  });
+  const observationDelta = (before, after) => Object.freeze({
+    added: Object.freeze([...after].filter(([key]) => !before.has(key))
+      .sort(([a], [b]) => cmp(a, b)).map(([, value]) => value)),
+    removed: Object.freeze([...before].filter(([key]) => !after.has(key))
+      .sort(([a], [b]) => cmp(a, b)).map(([, value]) => value)),
   });
   for (let index = 0; index < propositions.length; index++) {
     const slot = Object.getOwnPropertyDescriptor(propositions, String(index));
@@ -190,6 +211,12 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     requireEvidence(!seen.has(propositionAddress),
       "the same original proposition cannot be compared twice");
     seen.add(propositionAddress);
+    // Bound the matched source rows BEFORE constructing aggregated cells.
+    // The old order could perform unbounded aggregation ahead of its guard.
+    const priorFor = evidenceMap(previous, proposition, "for");
+    const laterFor = evidenceMap(current, proposition, "for");
+    const priorAgainst = evidenceMap(previous, proposition, "against");
+    const laterAgainst = evidenceMap(current, proposition, "against");
     const before = previous.cells(proposition)[0] ??
       cell(proposition.subject, proposition.predicate, proposition.object);
     const after = current.cells(proposition)[0] ??
@@ -198,20 +225,21 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     requireEvidence(original.knowledge === previous.readingAt(proposition) &&
       revised.knowledge === current.readingAt(proposition),
       "original log and SignCell/FOUR readings disagree");
-    const forWitnessChanges = delta(
-      witnessMap(previous, proposition, "for"),
-      witnessMap(current, proposition, "for"));
-    const againstWitnessChanges = delta(
-      witnessMap(previous, proposition, "against"),
-      witnessMap(current, proposition, "against"));
+    const forWitnessChanges = delta(priorFor.witnesses, laterFor.witnesses);
+    const againstWitnessChanges = delta(priorAgainst.witnesses, laterAgainst.witnesses);
+    const forObservationChanges = observationDelta(priorFor.observations, laterFor.observations);
+    const againstObservationChanges = observationDelta(priorAgainst.observations, laterAgainst.observations);
     const witnessesChanged = [forWitnessChanges, againstWitnessChanges]
+      .some(x => x.added.length > 0 || x.removed.length > 0);
+    const observationsChanged = [forObservationChanges, againstObservationChanges]
       .some(x => x.added.length > 0 || x.removed.length > 0);
     const readingChanged = original.knowledge !== revised.knowledge ||
       original.truth !== revised.truth || original.posture !== revised.posture;
     changes.push(Object.freeze({
       propositionAddress, original, revised, forWitnessChanges,
-      againstWitnessChanges, witnessesChanged, readingChanged,
-      requiresReverification: witnessesChanged,
+      againstWitnessChanges, forObservationChanges, againstObservationChanges,
+      witnessesChanged, observationsChanged, readingChanged,
+      requiresReverification: witnessesChanged || observationsChanged,
       evidenceOrders: Object.freeze({
         knowledgeNondecreasing: knowledgeLeq(before, after),
         knowledgeNonincreasing: knowledgeLeq(after, before),
@@ -229,11 +257,14 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     readingChangedCount: changes.filter(x => x.readingChanged).length,
     witnessChangedReadingUnchangedCount: changes
       .filter(x => x.witnessesChanged && !x.readingChanged).length,
+    observationChangedWitnessesUnchangedCount: changes
+      .filter(x => x.observationsChanged && !x.witnessesChanged).length,
     comparisons: Object.freeze(changes),
     standing: "conditional read comparison of caller-supplied sealed original histories",
     boundaries: Object.freeze([
       "snapshot order, provenance authenticity and source rights are not established",
-      "identical FOUR readings do not mean the original evidence is unchanged",
+      "identical FOUR readings do not mean original witnesses or observed receipt clocks are unchanged",
+      "observedAt is caller-supplied source testimony, not independent evidence of when a source became public",
       "only explicitly nominated propositions are inspected; dependent claims require original SignGraph or Work owners",
       "this read projection neither withdraws sources nor schedules revalidation or settles Work",
     ]),
