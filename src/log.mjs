@@ -149,7 +149,7 @@ export class TellingLog {
   /** FOUR is a valuation of one proposition, never an aggregation across
    * unrelated cells. Broad where/against queries remain possible for discovery,
    * but asking for a knowledge value requires all three predication terms. */
-  readingWhere(input) {
+  readingWhere(input = {}) {
     const source = sourcePattern(input);
     if (!ROLES.every(role => Object.hasOwn(source, role) && source[role] !== undefined))
       throw new TypeError("signchain log: a FOUR reading requires one complete subject/predicate/object proposition");
