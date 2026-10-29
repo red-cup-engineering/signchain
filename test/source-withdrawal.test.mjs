@@ -245,3 +245,64 @@ test("all 16 bounded FOUR evidence-polarity transitions preserve witness-level c
       (!(before&1)||Boolean(after&1)) && (!(after&2)||Boolean(before&2)));
   }
 });
+
+test("same witness and changed observation clock needs research re-verification even without verdict change",()=>{
+  const c=cell("claim","supported-by","release");
+  const first=new TellingLog().tell(c,{doi:"10.12/release"},"2026-10-27T23:00:00Z").seal();
+  const second=new TellingLog().tell(c,{doi:"10.12/release"},"2026-10-28T00:30:00Z").seal();
+  const r=compareOriginalEvidenceSnapshots(first,second,{propositions:[c]});
+  const x=r.comparisons[0];
+  assert.equal(x.witnessesChanged,false);
+  assert.equal(x.observationsChanged,true);
+  assert.equal(x.readingChanged,false);
+  assert.equal(x.requiresReverification,true);
+  assert.equal(x.forWitnessChanges.added.length,0);
+  assert.equal(x.forWitnessChanges.removed.length,0);
+  assert.equal(x.forObservationChanges.added.length,1);
+  assert.equal(x.forObservationChanges.removed.length,1);
+  assert.equal(x.forObservationChanges.added[0].observedAt,"2026-10-28T00:30:00Z");
+  assert.equal(x.forObservationChanges.removed[0].observedAt,"2026-10-27T23:00:00Z");
+  assert.deepEqual(r.changedPropositionAddresses,[address(c)]);
+  assert.equal(r.observationChangedWitnessesUnchangedCount,1);
+});
+
+test("replayed identical source and observation time is not fabricated independence or revision",()=>{
+  const c=cell("claim","repeated","citation");
+  const old=new TellingLog().tell(c,"one","2026-10-27T23:00:00Z").seal();
+  const same=new TellingLog().tell(c,"one","2026-10-27T23:00:00Z")
+    .tell(c,"one","2026-10-27T23:00:00Z").seal();
+  const x=compareOriginalEvidenceSnapshots(old,same,{propositions:[c]}).comparisons[0];
+  assert.equal(x.witnessesChanged,false);
+  assert.equal(x.observationsChanged,false);
+  assert.equal(x.requiresReverification,false);
+  assert.equal(x.forObservationChanges.added.length,0);
+  assert.equal(x.revised.positiveWitnesses,1);
+});
+
+test("absent clock and explicitly present null are not silently equivalent",()=>{
+  const c=cell("claim","timestamp","unverified");
+  const before=new TellingLog().tell(c,"one").seal();
+  const after=new TellingLog().tell(c,"one",null).seal();
+  const x=compareOriginalEvidenceSnapshots(before,after,{propositions:[c]}).comparisons[0];
+  assert.equal(x.witnessesChanged,false);
+  assert.equal(x.observationsChanged,true);
+  assert.equal(x.requiresReverification,true);
+  assert.deepEqual(x.forObservationChanges.added.map(y=>y.observedAtPresent),[true]);
+  assert.deepEqual(x.forObservationChanges.removed.map(y=>y.observedAtPresent),[false]);
+});
+
+test("a revised opposition observation clock remains visible without erasing contradiction",()=>{
+  const c=cell("claim","has-conflicting","research-evidence");
+  const before=new TellingLog().tell(c,"support","2026-10-27T12:00:00Z")
+    .deny(c,"oppose","2026-10-27T12:00:00Z").seal();
+  const after=new TellingLog().tell(c,"support","2026-10-27T12:00:00Z")
+    .deny(c,"oppose","2026-10-28T12:00:00Z").seal();
+  const x=compareOriginalEvidenceSnapshots(before,after,{propositions:[c]}).comparisons[0];
+  assert.equal(x.original.knowledge,"stable");
+  assert.equal(x.revised.knowledge,"stable");
+  assert.equal(x.againstWitnessChanges.added.length,0);
+  assert.equal(x.againstObservationChanges.added.length,1);
+  assert.equal(x.againstObservationChanges.removed.length,1);
+  assert.equal(x.requiresReverification,true);
+  assert.equal(x.evidenceOrders.knowledgeNondecreasing,true);
+});
