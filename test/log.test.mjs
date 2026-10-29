@@ -160,3 +160,26 @@ test("readingWhere evaluates one original complete source-pattern snapshot",()=>
  assert.equal(log.where({subject:"w"}).length,1);
  assert.equal(log.against({subject:"w"}).length,1);
 });
+
+test("null-prototype source selectors cross the original SCA admission boundary without losing guards",()=>{
+  const c=cell("research","has-source","dated-report");
+  const selector=Object.create(null);
+  selector.subject="research";
+  selector.predicate="has-source";
+  selector.object="dated-report";
+  const original=new TellingLog().tell(c,"attested-for","2026-10-28T12:00:00Z")
+    .deny(c,"attested-against","2026-10-28T13:00:00Z").seal();
+  assert.equal(original.where(selector).length,1);
+  assert.equal(original.against(selector).length,1);
+  assert.equal(original.cells(selector).length,1);
+  assert.equal(original.readingAt(selector),"stable");
+  // Canonical query admission does not grant authority or mutate the source.
+  assert.equal(original.size,2);
+  assert.equal(Object.getPrototypeOf(selector),null);
+  let invoked=0;
+  const hostile={subject:"research"};
+  Object.defineProperty(hostile,"predicate",{enumerable:true,get(){invoked++;return "forged";}});
+  assert.throws(()=>original.where(hostile),/data property/);
+  assert.throws(()=>original.readingWhere(hostile),/data property/);
+  assert.equal(invoked,0);
+});
