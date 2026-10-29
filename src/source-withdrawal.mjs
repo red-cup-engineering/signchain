@@ -159,13 +159,11 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     propositions.length <= 128,
     "requires at most 128 explicitly nominated proposition coordinates");
   const seen = new Set();
-  let inspectedTellings = 0;
+  let inspectedTellings = 0, inspectedCandidates = 0;
   const changes = [];
-  const evidenceMap = (history, proposition, side) => {
-    const rows = side === "for" ? history.where(proposition) : history.against(proposition);
-    inspectedTellings += rows.length;
-    requireEvidence(inspectedTellings <= 20000,
-      "evidence comparison exceeds the 20000-telling read budget");
+  // These are already bounded ORIGINAL rows returned by TellingLog.boundedAt,
+  // not a second interpretation of raw SEAVT records or an unbounded log query.
+  const evidenceMap = (rows) => {
     const witnesses = new Map(), observations = new Map();
     for (const row of rows) {
       const witnessKey = coincidenceKey(row.witness);
@@ -211,20 +209,32 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     requireEvidence(!seen.has(propositionAddress),
       "the same original proposition cannot be compared twice");
     seen.add(propositionAddress);
-    // Bound the matched source rows BEFORE constructing aggregated cells.
-    // The old order could perform unbounded aggregation ahead of its guard.
-    const priorFor = evidenceMap(previous, proposition, "for");
-    const laterFor = evidenceMap(current, proposition, "for");
-    const priorAgainst = evidenceMap(previous, proposition, "against");
-    const laterAgainst = evidenceMap(current, proposition, "against");
-    const before = previous.cells(proposition)[0] ??
-      cell(proposition.subject, proposition.predicate, proposition.object);
-    const after = current.cells(proposition)[0] ??
-      cell(proposition.subject, proposition.predicate, proposition.object);
+    // Original role-index bucket sizes are checked BEFORE a matched-row
+    // array is constructed. Both snapshots share the same 20k candidate
+    // visit/row-allocation budget, even across 128 nominated propositions.
+    const priorRows = TellingLog.prototype.boundedAt.call(
+      previous, proposition, 20000 - inspectedCandidates);
+    inspectedCandidates += priorRows.candidatesInspected;
+    const laterRows = TellingLog.prototype.boundedAt.call(
+      current, proposition, 20000 - inspectedCandidates);
+    inspectedCandidates += laterRows.candidatesInspected;
+    inspectedTellings += priorRows.matchedTellings + laterRows.matchedTellings;
+    const priorFor = evidenceMap(priorRows.for), laterFor = evidenceMap(laterRows.for);
+    const priorAgainst = evidenceMap(priorRows.against), laterAgainst = evidenceMap(laterRows.against);
+    // Rebuild the measured proposition from the original bounded testimony.
+    // Native SignCell still owns witness coincidence, canonicalization and
+    // the FOUR evidence reading. Never call unbounded cells/readingAt here.
+    const fromRows = rows => cell(proposition.subject, proposition.predicate, proposition.object, {
+      for: rows.for.map(row => row.witness),
+      against: rows.against.map(row => row.witness),
+    });
+    const before = fromRows(priorRows), after = fromRows(laterRows);
     const original = reading(before), revised = reading(after);
-    requireEvidence(original.knowledge === previous.readingAt(proposition) &&
-      revised.knowledge === current.readingAt(proposition),
-      "original log and SignCell/FOUR readings disagree");
+    requireEvidence(original.positiveWitnesses === priorFor.witnesses.size &&
+      original.negativeWitnesses === priorAgainst.witnesses.size &&
+      revised.positiveWitnesses === laterFor.witnesses.size &&
+      revised.negativeWitnesses === laterAgainst.witnesses.size,
+      "bounded source rows and SignCell/FOUR evidence reading disagree");
     const forWitnessChanges = delta(priorFor.witnesses, laterFor.witnesses);
     const againstWitnessChanges = delta(priorAgainst.witnesses, laterAgainst.witnesses);
     const forObservationChanges = observationDelta(priorFor.observations, laterFor.observations);
@@ -252,6 +262,7 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     type: "signchain.originalEvidenceSnapshotComparison.v1",
     monitoredPropositionCount: changes.length,
     inspectedTellings,
+    inspectedCandidates,
     changedPropositionAddresses: Object.freeze(changes
       .filter(x => x.requiresReverification).map(x => x.propositionAddress)),
     readingChangedCount: changes.filter(x => x.readingChanged).length,
@@ -266,6 +277,7 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
       "identical FOUR readings do not mean original witnesses or observed receipt clocks are unchanged",
       "observedAt is caller-supplied source testimony, not independent evidence of when a source became public",
       "only explicitly nominated propositions are inspected; dependent claims require original SignGraph or Work owners",
+      "the 20000 candidate-row bound conservatively refuses large index buckets, even when few rows match all three terms; it does not bound opaque witness byte sizes",
       "this read projection neither withdraws sources nor schedules revalidation or settles Work",
     ]),
   });
