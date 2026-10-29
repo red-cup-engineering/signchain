@@ -352,3 +352,31 @@ test("bounded query refuses on missing coordinates, non-integer limits, and inde
   assert.equal(log.boundedAt(a,1).matchedTellings,1);
   assert.equal(log.boundedAt(cell("unknown","p","none"),0).matchedTellings,0);
 });
+
+
+test("256 dual-proposition FOUR history pairs preserve original indexed readings under the bounded projection",()=>{
+  const a=cell("source-a","asserts","claim-a"), b=cell("source-b","asserts","claim-b");
+  const build=mask=>{
+    const history=new TellingLog();
+    if(mask&1)history.tell(a,"a-for");
+    if(mask&2)history.deny(a,"a-against");
+    if(mask&4)history.tell(b,"b-for");
+    if(mask&8)history.deny(b,"b-against");
+    return history.seal();
+  };
+  const count=mask=>[1,2,4,8].filter(bit=>mask&bit).length;
+  const states=Array.from({length:16},(_,i)=>build(i));
+  for(let old=0;old<16;old++)for(let next=0;next<16;next++){
+    const before=states[old],after=states[next];
+    const result=compareOriginalEvidenceSnapshots(before,after,{propositions:[a,b]});
+    assert.equal(result.inspectedCandidates,count(old)+count(next));
+    assert.equal(result.inspectedTellings,result.inspectedCandidates);
+    for(const [index,coord,bits] of [[0,a,3],[1,b,12]]){
+      const actual=result.comparisons[index];
+      assert.equal(actual.original.knowledge,before.readingAt(coord));
+      assert.equal(actual.revised.knowledge,after.readingAt(coord));
+      assert.equal(actual.requiresReverification,(old&bits)!==(next&bits));
+      assert.equal(actual.witnessesChanged,actual.requiresReverification);
+    }
+  }
+});
