@@ -72,12 +72,33 @@
           "https://docs.temporal.io/encyclopedia/event-history"
         ],
         "selectedCases": [
-          "Resume after acknowledged versus in-flight activities; observe event-history replay and external-effect idempotency",
-          "Measure recovered user outcomes and interventions through existing FeltOS/System owners"
+          "Compare acknowledged vs in-flight external activities against an original durable event history: exact source/occurrence identity, replay order, idempotent duplicate delivery, conflicting same source+id refusal, and actual effect/recipient readback. The SignChain telling projection is NOT the original event history.",
+          "Measure recovered user outcomes and interventions through existing FeltOS/System owners",
+          "SR-MER-14/15 acceptance: given three distinct admitted source occurrences, compare ordered 000→111→000 (weak departure-and-return) with 000→000→111 (no return). Both share W000=2,W111=1 and the complete AB, AC, BC pair count tables [[2,0],[0,1]]; neither their unique histogram nor a deduplicated telling projection may determine the return decision. An authorized downstream history consumer must retain original source+id, observed occurrence order, valid clock cut and no-return refusal, and must report unknown if only unordered counts or deduplicated evidence are available.",
+          "Evidence projection vs history control: same source+id CloudEvent retries or cross-channel forwarding preserve one original event identity and do not duplicate witnesses; two different source+id event occurrences carrying the same witnessed SignCell do not become one event, even though SignChain's TellingLog may deduplicate their evidence witness. Refuse a reused source+id with changed content, invalid/missing original source, contested order, incomplete cuts and unqualified physical port/return claims."
         ],
-        "ownerBoundary": "Temporal is an additional, different workflow engine competitor; do not misclassify its worker/history requirements as LangChain's model/tool middleware."
+        "ownerBoundary": "Temporal is an additional, different workflow engine competitor; do not misclassify its worker/history requirements as LangChain's model/tool middleware.",
+        "sourceHistoryQualification": {
+          "status": "required original peer-receiving oracle; no source-native dependent test or installed consumer qualified",
+          "originalScienceWork": "https://github.com/lenticule-science/science-services-section/issues/215",
+          "existingScienceDraft": "https://github.com/lenticule-science/science-services-section/pull/216",
+          "positiveNegativeSource": "Science §7.58 three-stage equal-histogram return/non-return counterexample; §7.59 three native Holofoam branches differing in source histories despite some equal numeric projections",
+          "existingSuppliers": [
+            "red-cup-engineering/signchain/src/log.mjs blob 79904de8d0148e4aae5cbcad2743462b2f0f5175; appendWitnesses deduplicates cell/side/witness while complete history stays in original source messages",
+            "red-cup-engineering/signchain/test/claim-event-log.test.mjs blob 8493e6c10e0c588165d9457043062b1575c82ef8; reused event identity/changed content refusal and forwarding witness dedup",
+            "red-cup-engineering/signgraph/src/temporal-flow-aliasing.mjs blob 94e483206ccee3a902e2daee88c07c9b2836106d; conditional incidence dimension, NOT observed ordered triple stage sequence",
+            "red-cup-engineering/signgraph/test/meridian-temporal-aliasing.test.mjs blob f27a69c1da5c401c2bcfeeff46a7dd590fff9eae; original standalone 7/7/224 tests passed, independent consumer receiving remains open"
+          ],
+          "peerEvidence": [
+            "CloudEvents v1.0.2 source+id uniqueness and duplicate identity: https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md (current stable release observed 2026-10-29)",
+            "Temporal Event History maintains complete durable ordered workflow event log: https://docs.temporal.io/encyclopedia/event-history (documentation observed 2026-10-29, page publication undated)"
+          ],
+          "classEvidence": "Comuzzi, Ko & Maggi, A Language to Model and Simulate Data Quality Issues in Process Mining, ACM JDIQ 17(2), published 2025-06-28, https://doi.org/10.1145/3743144; source/ground-truth quality challenges are comparison only",
+          "currentBoundary": "Pure SignChain owns source-retained, deduplicated witness projection; an actual durable event/source history, Actor/port effects and replay mechanism belong to their existing original host and consumer owners.",
+          "nextOriginalStage": "Use existing accepted requirement->generated BCP14 specification->architecture->HLD/LLD->normative fabrication method, then exact-source dependency-closed native positive/negative suite; immutable pinned package, operating consumer, independently accepted effect are separate gates."
+        }
       },
-      "actualStatus": "Unmeasured; original meet/beat cells are unchanged and this source repair alone has no external runtime receiving"
+      "actualStatus": "Requirements oracle clarified for exact source-event versus deduplicated testimony; no native generated specification, code, pinned package, selected installed consumer, peer parity or beneficiary receiving established."
     }
   }
 }
