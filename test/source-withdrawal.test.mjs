@@ -142,6 +142,57 @@ test("zero producer attributions never produce vacuous source-independence certi
 });
 
 
+test("original producer withdrawal uses the bounded native role index before any row materialization",()=>{
+  const c=cell("budgeted-original","has-evidence","selected-claim");
+  const unrelated=cell("other-origin","has-evidence","not-selected");
+  class GuardedLog extends TellingLog {
+    where(){throw new Error("original unbounded where called");}
+    against(){throw new Error("original unbounded against called");}
+    cells(){throw new Error("original unbounded cells called");}
+    readingAt(){throw new Error("original unbounded readingAt called");}
+  }
+  const one=new GuardedLog().tell(c,"positive").deny(c,"opposition").seal();
+  const original=assay(one,{proposition:c,attributions:[
+    origin("positive","one"),origin("opposition","two"),
+  ]});
+  assert.equal(original.original.knowledge,"stable");
+  assert.equal(original.original.truth,"both");
+  assert.equal(original.attributedProducerCount,2);
+  assert.deepEqual(original.withdrawals.map(x=>x.remaining.knowledge),
+    ["active","potential"]);
+
+  const large=new GuardedLog();
+  for(let i=0;i<5001;i++)large.tell(c,i);
+  large.seal();
+  assert.throws(()=>assay(large,{proposition:c,attributions:[]}),
+    /budget exceeded before materialization/,
+    "a real >5000 original-telling bucket refuses BEFORE any unbounded source reader");
+  assert.equal(large.size,5001);
+
+  const other=new GuardedLog();
+  for(let i=0;i<5001;i++)other.tell(unrelated,i);
+  other.tell(c,"positive").seal();
+  const selected=assay(other,{proposition:c,attributions:[
+    origin("positive","one"),
+  ]});
+  assert.equal(selected.original.knowledge,"potential",
+    "large unrelated histories need not be fully materialized for one indexed proposition");
+
+  let getterCalls=0;
+  const unsafe={attributions:[origin("positive","one")]};
+  Object.defineProperty(unsafe,"proposition",{
+    enumerable:true,get(){getterCalls++;return c;},
+  });
+  assert.throws(()=>assay(one,unsafe),/data property/);
+  const badAttributions=[origin("positive","one")];
+  Object.defineProperty(badAttributions,"entries",{
+    value(){getterCalls++;return [origin("positive","one")].entries();},
+  });
+  assert.throws(()=>assay(one,{proposition:c,attributions:badAttributions}),
+    /dense undecorated inert array/);
+  assert.equal(getterCalls,0,"source getters and executable array methods are never invoked");
+});
+
 test("snapshot comparison flags changed originals even when FOUR knowledge/truth remain unchanged", () => {
   const c = cell("research", "supported-by", "source-evidence");
   const first = new TellingLog().tell(c, {source:"archive-a"}).tell(c, {source:"archive-b"}).seal();
