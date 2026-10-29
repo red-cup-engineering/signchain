@@ -117,7 +117,13 @@ export class TellingLog {
   // Read and retain a single immutable coordinate snapshot. A query cannot
   // execute a user-defined getter, nor change its predicate between index
   // selection and matching. SignCell still owns canonical nested identities.
-  #pattern(input) { return retainedCarrier(sourcePattern(input)); }
+  #pattern(input) {
+    // sourcePattern intentionally builds a null-prototype inert selector.
+    // Original SCA retainedCarrier accepts ordinary Object.prototype records,
+    // not that guard representation; copy only its already-vetted own role
+    // data into the native carrier without revisiting the untrusted input.
+    return retainedCarrier({ ...sourcePattern(input) });
+  }
 
   /** The rows telling for a triple matching a pattern of any of subject, predicate, object, in order. */
   where(pattern = {}) {
@@ -147,7 +153,9 @@ export class TellingLog {
     const source = sourcePattern(input);
     if (!ROLES.every(role => Object.hasOwn(source, role) && source[role] !== undefined))
       throw new TypeError("signchain log: a FOUR reading requires one complete subject/predicate/object proposition");
-    const selected = retainedCarrier(source);
+    // Match #pattern's guard-to-native admission boundary. The original
+    // source record is frozen null-prototype, not itself an SCA JSON carrier.
+    const selected = retainedCarrier({ ...source });
     const candidates = this.#candidates(selected).filter(row => matches(selected, row));
     return readingOfSides("knowledge",
       candidates.some(row => row.side === "for"),
