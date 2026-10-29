@@ -232,12 +232,27 @@ total byte size of opaque witness payloads, cryptographic encoding effort, or
 real-world scientific uncertainty. Native `where`/`against` remain
 unbounded for other consumers.
 
-Native proposed receiving:
-`node --test test/source-withdrawal.test.mjs` with this repository's
-authentic installed dependencies. Tests cover source replacement and changed reception clocks without
-FOUR change, cross-polarity contradiction, explicit multi-proposition scope,
-duplicate original tellings, empty/forged inputs, all 16 finite
-FOUR-polarity transitions, **all 256 paired two-proposition finite FOUR
-histories**, and a source-index refusal with over 20,000 authentic tellings.
-Merging and installed consumer receiving remain
-separate from source-authored tests.
+Native proposed receiving: this original repository has a **tracked
+`pnpm-lock.yaml`**, a `pnpm-workspace.yaml`, and private-registry coordinates.
+On an authorized Node 24 host with pnpm 10.20.0 and access to the configured
+registry, run these exact **pending** package-installed operations:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec node --test test/source-withdrawal.test.mjs test/log.test.mjs test/telling-source.test.mjs
+pnpm test
+```
+
+These tests cover source replacement and changed receipt clocks without FOUR
+change, cross-polarity contradiction, explicit multi-proposition scope,
+duplicate originals, empty/forged inputs, all 16 finite FOUR-polarity
+transitions, **all 256 paired two-proposition finite FOUR histories**, and
+an authentic >20,000-telling source-index refusal. GitHub's attempted native
+private-repository run
+[40831840673](https://github.com/red-cup-engineering/signchain/actions/runs/40831840673)
+failed with **no job steps** (the Group's known private Actions-usage signal),
+rather than executing or failing a test. The transient new workflow was
+withdrawn from this branch: a quota-exhausted CI lane is not a valid receiving
+mechanism. Do not substitute a public repository's successful CI for private
+SignChain dependency admission. Merge, installation, source chronology and
+the independent scientific consumer remain separately unreceived.
