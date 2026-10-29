@@ -212,12 +212,25 @@ a corrected reception timestamp forces re-verification even when the witness
 identity and FOUR reading agree; neither timestamp is certified by this read. Repeated
 tellings of the same source identity do not manufacture corroboration; opposing
 testimony is not erased. Results are strictly conditional on supplied original
-histories, bounded to 20,000 inspected tellings, deterministic for a fixed
+histories, bounded to 20,000 original indexed candidate-row visits across
 history, and read-only. This is **not** a retraction, evidence authentication,
 source-origin proof, graph traversal, task scheduler, active deployment, or
 publication receipt. In particular, the caller must independently attest that
 the snapshots represent real changes in a lawful chronology and that the
 original source identities and rights are correct.
+
+
+**Budget admission:** `TellingLog.boundedAt(proposition, maxCandidateReads)`
+uses the existing original three-role index and checks the shortest bucket's
+length before constructing any row array. The snapshot comparison shares a
+20,000-candidate limit across all nominated propositions and both histories,
+and rebuilds measured SignCells only from admitted rows. A large index bucket
+may be refused even if most rows would fail another role predicate; this
+conservative false refusal is necessary for the present bounded-reader
+contract. The bound is on candidate-row visits and allocation, **not** the
+total byte size of opaque witness payloads, cryptographic encoding effort, or
+real-world scientific uncertainty. Native `where`/`against` remain
+unbounded for other consumers.
 
 Native proposed receiving:
 `node --test test/source-withdrawal.test.mjs` with this repository's
