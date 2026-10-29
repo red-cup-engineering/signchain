@@ -61,6 +61,29 @@ or authority of its testimony. It does not define L-Space; queries remain
 operations over admitted observations of its points.
 
 
+## Query-pattern admission into native content addresses
+
+`sourcePattern` intentionally returns a frozen null-prototype inert
+selector with only own `subject`, `predicate`, and `object` data
+descriptors; it refuses accessor-backed coordinates without invoking them.
+The current original semiotic-content-address implementation rejects
+null-prototype objects at `retainedCarrier`, however. The original
+`TellingLog` `#pattern` and `readingWhere` boundaries therefore copy
+the already-vetted selector's own fixed role data into an ordinary record
+before authentic SCA admission. Neither method re-reads the untrusted query
+or treats a query selector as evidence. An omitted `readingWhere()` input
+is a missing complete proposition (not a malformed supplied record).
+
+The original `test/log.test.mjs` now exercises the end-to-end
+null-prototype guard→native SCA query admission and hostile accessor
+refusal; `test/telling-source.test.mjs` continues to require the
+original helper's null-prototype return. This addresses the observed
+source-version mismatch without replacing the SCA canonical carrier,
+redefining SignCell identity, relaxing source-field guards, or touching
+the original append-only historical rows. A source-only execution with
+source-pinned original algorithms does not certify installed package
+versions or host consumer receiving.
+
 ## Mark-rooted evidence, two orders and the identification frontier
 
 SignChain consumes generated **SignCell** Mark/Utterance/predication cells.
