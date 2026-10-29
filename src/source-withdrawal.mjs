@@ -40,26 +40,40 @@ function reading(state) {
  * @returns a deterministic conditional leave-one-producer-out sensitivity
  * report, with source NI witness identities and knowledge/truth separately.
  */
-export function assessOriginalSourceWithdrawal(history, {proposition,attributions}={}) {
+export function assessOriginalSourceWithdrawal(history, input={}) {
   requireEvidence(history instanceof TellingLog && history.sealed,
     "requires one sealed original SignChain TellingLog");
+  // Original outer source-field guards must run before a getter-backed
+  // options envelope can fabricate coordinates or a source partition.
+  const proposition=sourceField(input,"proposition");
+  const attributions=sourceField(input,"attributions");
   requireEvidence(isCell(proposition) && measured(proposition) &&
     proposition.for.length===0 && proposition.against.length===0,
     "requires an original unevidenced SignCell proposition coordinate");
-  requireEvidence(Array.isArray(attributions) && attributions.length<=LIMIT,
+  requireEvidence(Array.isArray(attributions) &&
+    Object.getPrototypeOf(attributions)===Array.prototype &&
+    attributions.length<=LIMIT,
     "requires bounded explicit original-producer attributions");
+  const attributionSlots=Object.getOwnPropertyDescriptors(attributions);
+  requireEvidence(Reflect.ownKeys(attributionSlots).length===attributions.length+1 &&
+    Array.from({length:attributions.length},(_,i)=>attributionSlots[String(i)])
+      .every(slot=>slot && slot.enumerable && Object.hasOwn(slot,"value")),
+    "original-producer attributions must be a dense undecorated inert array");
 
-  // Read original history through the indexed source operations, NOT a second
-  // independent parser of source rows or re-created predicate identity.
-  const positive=history.where(proposition).map(row=>row.witness);
-  const negative=history.against(proposition).map(row=>row.witness);
-  requireEvidence(positive.length+negative.length<=LIMIT,
-    "original proposition has too many tellings for a bounded sensitivity assay");
-  const originalCell=history.cells(proposition)[0] ??
-    cell(proposition.subject,proposition.predicate,proposition.object);
+  // The existing smallest-bucket source index enforces the FULL budget
+  // BEFORE materializing rows. The former where/against/cells/readingAt
+  // path checked its 5,000 limit only AFTER unbounded row projection.
+  // This is a conservative candidate-row cap: many irrelevant rows in a
+  // narrow bucket can cause a valid refusal rather than a time/byte bound.
+  const selected=TellingLog.prototype.boundedAt.call(history,proposition,LIMIT);
+  const positive=selected.for.map(row=>row.witness);
+  const negative=selected.against.map(row=>row.witness);
+  // Build the exact ORIGINAL SignCell/FOUR reading from those original
+  // indexed rows; no second verdict algebra or unbounded log reader.
+  const originalCell=cell(proposition.subject,proposition.predicate,proposition.object,{
+    for:positive,against:negative,
+  });
   const original=reading(originalCell);
-  requireEvidence(original.knowledge===history.readingAt(proposition),
-    "original log and SignCell/FOUR reading disagree");
 
   const observed=new Map();
   for(const [side,values] of [["for",positive],["against",negative]]) {
