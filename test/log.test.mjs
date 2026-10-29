@@ -198,3 +198,18 @@ test("indexed bounded source reading checks candidate budget before constructing
   const selector=Object.assign(Object.create(null),{subject:"claim",predicate:"source",object:"research"});
   assert.equal(history.boundedAt(selector,2).matchedTellings,2);
 });
+
+
+test("oversized index intersection conservatively refuses even if exact query matches nothing",()=>{
+  const target=cell("same-subject","same-predicate","same-object");
+  const history=new TellingLog();
+  for(let i=0;i<7;i++){
+    history.tell(cell("same-subject","other-predicate-"+i,"other-object-"+i),i);
+    history.tell(cell("other-subject-"+i,"same-predicate","other-object-"+i),i);
+    history.tell(cell("other-subject-"+i,"other-predicate-"+i,"same-object"),i);
+  }
+  history.seal();
+  assert.equal(history.where(target).length,0);
+  assert.throws(()=>history.boundedAt(target,6),/budget exceeded before materialization/);
+  assert.equal(history.boundedAt(target,7).matchedTellings,0);
+});
