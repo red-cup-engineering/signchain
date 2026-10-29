@@ -96,6 +96,49 @@ export class TellingLog {
     return narrowest === null ? this.#rows : narrowest.map((position) => this.#rows[position]);
   }
 
+  /**
+   * Read one complete original proposition through the EXISTING role index,
+   * with a conservative hard cap on candidate row visits and row allocation.
+   * Unlike where/against/cells, this checks the narrowest role bucket's length
+   * before constructing any selected array or scanning any of its members.
+   *
+   * A large bucket containing mostly other propositions may be refused even
+   * when the actual matches would fit. This intentional conservative refusal
+   * keeps the source inspection bound honest; it cannot prove a time/byte cap
+   * for arbitrary-size opaque evidence terms.
+   */
+  boundedAt(at, maxCandidateReads) {
+    if (!Number.isSafeInteger(maxCandidateReads) || maxCandidateReads < 0 ||
+        maxCandidateReads > 20000)
+      throw new RangeError("signchain log: bounded read requires a candidate limit in [0,20000]");
+    const guarded = sourcePattern(at);
+    if (!ROLES.every(role => Object.hasOwn(guarded, role) && guarded[role] !== undefined))
+      throw new TypeError("signchain log: bounded read requires one complete subject/predicate/object proposition");
+    const selected = retainedCarrier({ ...guarded });
+    let narrowest = null;
+    for (const role of ROLES) {
+      const positions = this.#byRole[role].get(keyOf(selected[role])) ?? [];
+      if (narrowest === null || positions.length < narrowest.length) narrowest = positions;
+    }
+    // The index owns the count; no O(N) #candidates(...).map/filter precedes
+    // this refusal. This cap is shared across queries by the caller.
+    if (narrowest.length > maxCandidateReads)
+      throw new RangeError("signchain log: bounded candidate read budget exceeded before materialization");
+    const positive = [], negative = [];
+    for (const position of narrowest) {
+      const row = this.#rows[position];
+      if (!matches(selected, row)) continue;
+      if (row.side === "for") positive.push(row);
+      else negative.push(row);
+    }
+    return Object.freeze({
+      for: Object.freeze(positive),
+      against: Object.freeze(negative),
+      candidatesInspected: narrowest.length,
+      matchedTellings: positive.length + negative.length,
+    });
+  }
+
   /** Tell a triple for (witness defaults to the row's position). */
   tell(at, witness = this.#rows.length, observedAt = undefined) { this.#assertAppendable(); this.#push(telling(at, witness, "for", observedAt)); return this; }
 
