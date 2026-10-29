@@ -134,3 +134,108 @@ export function assessOriginalSourceWithdrawal(history, {proposition,attribution
     ]),
   });
 }
+
+
+/**
+ * Compare two sealed, original SignChain evidence histories at explicitly
+ * nominated SignCell propositions. The caller supplies the two snapshots;
+ * their temporal order and the authenticity of their witnesses are NOT proved
+ * by this function. This is a read projection, never a second provenance log.
+ *
+ * A change of original source witnesses requires downstream research review
+ * even when the FOUR reading remains exactly the same. Repeated tellings of
+ * one witnessed identity are not independent corroboration. The ordinary
+ * SignCell coincidence/semantic identities, not JSON serialization, own the
+ * witness relation. No permission or task transition is made here.
+ */
+export function compareOriginalEvidenceSnapshots(previous, current, input = {}) {
+  requireEvidence(previous instanceof TellingLog && previous.sealed &&
+    current instanceof TellingLog && current.sealed,
+    "requires two sealed original SignChain TellingLogs");
+  const propositions = sourceField(input, "propositions");
+  requireEvidence(Array.isArray(propositions) &&
+    Object.getPrototypeOf(propositions) === Array.prototype &&
+    propositions.length <= 128,
+    "requires at most 128 explicitly nominated proposition coordinates");
+  const seen = new Set();
+  let inspectedTellings = 0;
+  const changes = [];
+  const witnessMap = (history, proposition, side) => {
+    const rows = side === "for" ? history.where(proposition) : history.against(proposition);
+    inspectedTellings += rows.length;
+    requireEvidence(inspectedTellings <= 20000,
+      "evidence comparison exceeds the 20000-telling read budget");
+    const result = new Map();
+    for (const row of rows) {
+      const key = coincidenceKey(row.witness);
+      if (!result.has(key)) result.set(key, semanticId(row.witness));
+    }
+    return result;
+  };
+  const delta = (before, after) => Object.freeze({
+    added: Object.freeze([...after].filter(([key]) => !before.has(key))
+      .map(([, id]) => id).sort(cmp)),
+    removed: Object.freeze([...before].filter(([key]) => !after.has(key))
+      .map(([, id]) => id).sort(cmp)),
+  });
+  for (let index = 0; index < propositions.length; index++) {
+    const slot = Object.getOwnPropertyDescriptor(propositions, String(index));
+    requireEvidence(slot && slot.enumerable && Object.hasOwn(slot, "value"),
+      "proposition coordinates must be dense inert array entries");
+    const proposition = slot.value;
+    requireEvidence(isCell(proposition) && measured(proposition) &&
+      proposition.for.length === 0 && proposition.against.length === 0,
+      "requires original unevidenced SignCell proposition coordinates");
+    const propositionAddress = address(proposition);
+    requireEvidence(!seen.has(propositionAddress),
+      "the same original proposition cannot be compared twice");
+    seen.add(propositionAddress);
+    const before = previous.cells(proposition)[0] ??
+      cell(proposition.subject, proposition.predicate, proposition.object);
+    const after = current.cells(proposition)[0] ??
+      cell(proposition.subject, proposition.predicate, proposition.object);
+    const original = reading(before), revised = reading(after);
+    requireEvidence(original.knowledge === previous.readingAt(proposition) &&
+      revised.knowledge === current.readingAt(proposition),
+      "original log and SignCell/FOUR readings disagree");
+    const forWitnessChanges = delta(
+      witnessMap(previous, proposition, "for"),
+      witnessMap(current, proposition, "for"));
+    const againstWitnessChanges = delta(
+      witnessMap(previous, proposition, "against"),
+      witnessMap(current, proposition, "against"));
+    const witnessesChanged = [forWitnessChanges, againstWitnessChanges]
+      .some(x => x.added.length > 0 || x.removed.length > 0);
+    const readingChanged = original.knowledge !== revised.knowledge ||
+      original.truth !== revised.truth || original.posture !== revised.posture;
+    changes.push(Object.freeze({
+      propositionAddress, original, revised, forWitnessChanges,
+      againstWitnessChanges, witnessesChanged, readingChanged,
+      requiresReverification: witnessesChanged,
+      evidenceOrders: Object.freeze({
+        knowledgeNondecreasing: knowledgeLeq(before, after),
+        knowledgeNonincreasing: knowledgeLeq(after, before),
+        truthNondecreasing: truthLeq(before, after),
+        truthNonincreasing: truthLeq(after, before),
+      }),
+    }));
+  }
+  return Object.freeze({
+    type: "signchain.originalEvidenceSnapshotComparison.v1",
+    monitoredPropositionCount: changes.length,
+    inspectedTellings,
+    changedPropositionAddresses: Object.freeze(changes
+      .filter(x => x.requiresReverification).map(x => x.propositionAddress)),
+    readingChangedCount: changes.filter(x => x.readingChanged).length,
+    witnessChangedReadingUnchangedCount: changes
+      .filter(x => x.witnessesChanged && !x.readingChanged).length,
+    comparisons: Object.freeze(changes),
+    standing: "conditional read comparison of caller-supplied sealed original histories",
+    boundaries: Object.freeze([
+      "snapshot order, provenance authenticity and source rights are not established",
+      "identical FOUR readings do not mean the original evidence is unchanged",
+      "only explicitly nominated propositions are inspected; dependent claims require original SignGraph or Work owners",
+      "this read projection neither withdraws sources nor schedules revalidation or settles Work",
+    ]),
+  });
+}
