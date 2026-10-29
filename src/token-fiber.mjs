@@ -48,8 +48,12 @@ function inertFiberEntries(values, label) {
     if (!row || typeof row !== "object" || Array.isArray(row) ||
         ![Object.prototype, null].includes(Object.getPrototypeOf(row)))
       throw new TypeError("signchain: " + label + " entries must be plain records");
-    const token = Object.getOwnPropertyDescriptor(row, "token");
-    const reading = Object.getOwnPropertyDescriptor(row, "reading");
+    const fields = Object.getOwnPropertyDescriptors(row);
+    const names = Reflect.ownKeys(fields);
+    if (names.length !== 2 ||
+        names.some(name => name !== "token" && name !== "reading"))
+      throw new TypeError("signchain: " + label + " coordinates must be exactly token and reading");
+    const token = fields.token, reading = fields.reading;
     if (!token || !reading || !token.enumerable || !reading.enumerable ||
         !Object.hasOwn(token, "value") || !Object.hasOwn(reading, "value"))
       throw new TypeError("signchain: " + label + " coordinates must be inert data, not accessors");
