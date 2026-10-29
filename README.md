@@ -174,6 +174,8 @@ claims or guess source identities. It compares source witnesses on each
 polarity using SignCell/SCA coincidence identity, returning separately:
 
 - added and removed **original witness addresses** for each polarity;
+- changed *observedAt* receipt-clock testimony attached to otherwise unchanged
+  original witnesses, including absent vs explicitly present clock coordinates;
 - the earlier and later knowledge/truth/posture readings;
 - evidence-order directions in **both** original FOUR orders;
 - `requiresReverification` whenever the *witness identities* change,
@@ -182,7 +184,9 @@ polarity using SignCell/SCA coincidence identity, returning separately:
   SignGraph/Work consumers to use in their **own** dependency rechecks.
 
 An unchanged `potential` reading after replacing one paper with a different
-paper is thus **not** mistakenly certified as unchanged evidence. Repeated
+paper is thus **not** mistakenly certified as unchanged evidence. Likewise,
+a corrected reception timestamp forces re-verification even when the witness
+identity and FOUR reading agree; neither timestamp is certified by this read. Repeated
 tellings of the same source identity do not manufacture corroboration; opposing
 testimony is not erased. Results are strictly conditional on supplied original
 histories, bounded to 20,000 inspected tellings, deterministic for a fixed
@@ -194,7 +198,7 @@ original source identities and rights are correct.
 
 Native proposed receiving:
 `node --test test/source-withdrawal.test.mjs` with this repository's
-authentic installed dependencies. Tests cover source replacement without
+authentic installed dependencies. Tests cover source replacement and changed reception clocks without
 FOUR change, cross-polarity contradiction, explicit multi-proposition scope,
 duplicate original tellings, empty/forged inputs, and all 16 finite
 FOUR-polarity transitions. Merging and installed consumer receiving remain
