@@ -165,8 +165,8 @@ installed original SignCell/Metrologic/FOUR dependencies; the package
 
 ## Original evidence snapshot comparison (candidate, source-only)
 
-The existing \`./source-withdrawal\` entrypoint now also exports
-\`compareOriginalEvidenceSnapshots(previous, current, {propositions})\` for
+The existing `./source-withdrawal` entrypoint now also exports
+`compareOriginalEvidenceSnapshots(previous, current, {propositions})` for
 research revision intake. Both inputs must be **sealed original SignChain
 TellingLogs**. Callers explicitly nominate up to 128 **unevidenced original
 SignCell propositions**; the operation does not try to discover all dependent
@@ -176,12 +176,12 @@ polarity using SignCell/SCA coincidence identity, returning separately:
 - added and removed **original witness addresses** for each polarity;
 - the earlier and later knowledge/truth/posture readings;
 - evidence-order directions in **both** original FOUR orders;
-- \`requiresReverification\` whenever the *witness identities* change,
+- `requiresReverification` whenever the *witness identities* change,
   even if the FOUR reading is unchanged;
 - the addresses of affected nominated propositions for existing
   SignGraph/Work consumers to use in their **own** dependency rechecks.
 
-An unchanged \`potential\` reading after replacing one paper with a different
+An unchanged `potential` reading after replacing one paper with a different
 paper is thus **not** mistakenly certified as unchanged evidence. Repeated
 tellings of the same source identity do not manufacture corroboration; opposing
 testimony is not erased. Results are strictly conditional on supplied original
@@ -193,7 +193,7 @@ the snapshots represent real changes in a lawful chronology and that the
 original source identities and rights are correct.
 
 Native proposed receiving:
-\`node --test test/source-withdrawal.test.mjs\` with this repository's
+`node --test test/source-withdrawal.test.mjs` with this repository's
 authentic installed dependencies. Tests cover source replacement without
 FOUR change, cross-polarity contradiction, explicit multi-proposition scope,
 duplicate original tellings, empty/forged inputs, and all 16 finite
