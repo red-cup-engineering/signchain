@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { cell, address } from "@red-cup-engineering/signcell/cell";
 import { TellingLog } from "../src/log.mjs";
-import { assessOriginalSourceWithdrawal as assay } from "../src/source-withdrawal.mjs";
+import { assessOriginalSourceWithdrawal as assay, compareOriginalEvidenceSnapshots } from "../src/source-withdrawal.mjs";
 
 const proposition=()=>cell({research:"institutional-adoption"},"reported-by","documentary-evidence");
 const origin=(w,originalProducer)=>({witness:w,originalProducer});
@@ -139,4 +139,109 @@ test("zero producer attributions never produce vacuous source-independence certi
   assert.equal(r.sourceRemovalSupport.evaluatedProducerCount,0);
   assert.equal(r.sourceRemovalSupport.supportSurvivesEverySingleProducerRemoval,null);
   assert.equal(r.sourceRemovalSupport.oppositionSurvivesEverySingleProducerRemoval,null);
+});
+
+
+test("snapshot comparison flags changed originals even when FOUR knowledge/truth remain unchanged", () => {
+  const c = cell("research", "supported-by", "source-evidence");
+  const first = new TellingLog().tell(c, {source:"archive-a"}).tell(c, {source:"archive-b"}).seal();
+  const second = new TellingLog().tell(c, {source:"archive-a"}).tell(c, {source:"archive-c"}).seal();
+  const r = compareOriginalEvidenceSnapshots(first, second, {propositions:[c]});
+  assert.equal(r.monitoredPropositionCount, 1);
+  assert.equal(r.readingChangedCount, 0);
+  assert.equal(r.witnessChangedReadingUnchangedCount, 1);
+  assert.deepEqual(r.changedPropositionAddresses, [address(c)]);
+  assert.equal(r.comparisons[0].requiresReverification, true);
+  assert.equal(r.comparisons[0].original.knowledge, "potential");
+  assert.equal(r.comparisons[0].revised.knowledge, "potential");
+  assert.equal(r.comparisons[0].forWitnessChanges.added.length, 1);
+  assert.equal(r.comparisons[0].forWitnessChanges.removed.length, 1);
+  assert.equal(r.comparisons[0].evidenceOrders.knowledgeNondecreasing, false);
+  assert.equal(r.comparisons[0].evidenceOrders.knowledgeNonincreasing, false);
+  assert.equal(first.size, 2);
+  assert.equal(second.size, 2);
+});
+
+test("snapshot comparison treats repeated tellings of one witness as one original identity", () => {
+  const c = cell("method", "cited", "paper"), witness={doi:"10.abc/a",page:3};
+  const first = new TellingLog().tell(c, witness).tell(c,{page:3,doi:"10.abc/a"}).seal();
+  const second = new TellingLog().tell(c, witness).seal();
+  const r = compareOriginalEvidenceSnapshots(first, second, {propositions:[c]});
+  assert.equal(r.comparisons[0].requiresReverification,false);
+  assert.equal(r.comparisons[0].original.positiveWitnesses,1);
+  assert.equal(r.comparisons[0].revised.positiveWitnesses,1);
+  assert.deepEqual(r.changedPropositionAddresses,[]);
+});
+
+test("snapshot comparison distinguishes newly received opposition from unchanged support", () => {
+  const c=cell("claim","has-status","contested"),w1="origin-support",w2="origin-opposition";
+  const before=new TellingLog().tell(c,w1).seal();
+  const after=new TellingLog().tell(c,w1).deny(c,w2).seal();
+  const r=compareOriginalEvidenceSnapshots(before,after,{propositions:[c]});
+  assert.equal(r.comparisons[0].original.truth,"true");
+  assert.equal(r.comparisons[0].revised.truth,"both");
+  assert.equal(r.comparisons[0].readingChanged,true);
+  assert.equal(r.comparisons[0].againstWitnessChanges.added.length,1);
+  assert.equal(r.comparisons[0].evidenceOrders.knowledgeNondecreasing,true);
+  assert.equal(r.comparisons[0].evidenceOrders.truthNondecreasing,false);
+});
+
+test("snapshot comparison respects explicit scope across multiple propositions", () => {
+  const one=cell("claim-one","asserted-in","paper"), two=cell("claim-two","asserted-in","paper");
+  const before=new TellingLog().tell(one,"source-1").tell(two,"source-2").seal();
+  const after=new TellingLog().tell(one,"source-1").deny(two,"source-3").seal();
+  const r=compareOriginalEvidenceSnapshots(before,after,{propositions:[one,two]});
+  assert.deepEqual(r.changedPropositionAddresses,[address(two)]);
+  assert.equal(r.comparisons[0].requiresReverification,false);
+  assert.equal(r.comparisons[1].requiresReverification,true);
+  assert.equal(r.comparisons[1].original.knowledge,"potential");
+  assert.equal(r.comparisons[1].revised.knowledge,"active");
+  assert.equal(r.readingChangedCount,1);
+});
+
+test("snapshot comparison preserves a no-evidence reading and does not invent a change", () => {
+  const c=cell("unknown","is","unknown");
+  const r=compareOriginalEvidenceSnapshots(new TellingLog().seal(),new TellingLog().seal(),{propositions:[c]});
+  assert.equal(r.comparisons[0].original.knowledge,"absurd");
+  assert.equal(r.comparisons[0].revised.truth,"neither");
+  assert.equal(r.comparisons[0].requiresReverification,false);
+  assert.equal(r.inspectedTellings,0);
+  assert.match(r.standing,/conditional/);
+});
+
+test("snapshot comparison refuses mutable histories, forged coordinates, duplicated claims and executable selectors", () => {
+  const c=cell("s","p","o"),before=new TellingLog().tell(c,"w");
+  const after=new TellingLog().tell(c,"w").seal();
+  const compare=(a,b,coordinates)=>compareOriginalEvidenceSnapshots(a,b,{propositions:coordinates});
+  assert.throws(()=>compare(before,after,[c]),/two sealed original/);
+  before.seal();
+  assert.throws(()=>compare(before,after,[c,c]),/cannot be compared twice/);
+  assert.throws(()=>compare(before,after,[{subject:"s",predicate:"p",object:"o"}]),/original unevidenced SignCell/);
+  assert.throws(()=>compare(before,after,[cell("s","p","o",{for:["w"]})]),/original unevidenced SignCell/);
+  assert.throws(()=>compare(before,after,new Array(1)),/dense inert array/);
+  let called=0;
+  const malicious={get propositions(){called++;return [c];}};
+  assert.throws(()=>compareOriginalEvidenceSnapshots(before,after,malicious),/data property/);
+  assert.equal(called,0);
+  assert.throws(()=>compare(before,after,new Array(129).fill(c)),/at most 128/);
+});
+
+test("all 16 bounded FOUR evidence-polarity transitions preserve witness-level change and separate order directions",()=>{
+  const c=cell("FOUR","under","revision");
+  const snapshot=state=>{
+    const log=new TellingLog();
+    if(state&1)log.tell(c,"positive-original");
+    if(state&2)log.deny(c,"negative-original");
+    return log.seal();
+  };
+  for(let before=0;before<4;before++)for(let after=0;after<4;after++){
+    const r=compareOriginalEvidenceSnapshots(snapshot(before),snapshot(after),{propositions:[c]});
+    const x=r.comparisons[0];
+    assert.equal(x.requiresReverification,before!==after);
+    assert.equal(x.readingChanged,before!==after);
+    assert.equal(x.evidenceOrders.knowledgeNondecreasing,(before&after)===before);
+    assert.equal(x.evidenceOrders.knowledgeNonincreasing,(before&after)===after);
+    assert.equal(x.evidenceOrders.truthNondecreasing,
+      (!(before&1)||Boolean(after&1)) && (!(after&2)||Boolean(before&2)));
+  }
 });
