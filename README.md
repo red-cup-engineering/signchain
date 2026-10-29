@@ -213,7 +213,7 @@ identity and FOUR reading agree; neither timestamp is certified by this read. Re
 tellings of the same source identity do not manufacture corroboration; opposing
 testimony is not erased. Results are strictly conditional on supplied original
 histories, bounded to 20,000 original indexed candidate-row visits across
-history, and read-only. This is **not** a retraction, evidence authentication,
+both histories and all nominated propositions, and read-only. This is **not** a retraction, evidence authentication,
 source-origin proof, graph traversal, task scheduler, active deployment, or
 publication receipt. In particular, the caller must independently attest that
 the snapshots represent real changes in a lawful chronology and that the
