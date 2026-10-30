@@ -47,7 +47,7 @@
   },
   "scripts": {
     "test": "node --test \"test/**/*.test.mjs\" test/receiving/typed-theory-source.check.mjs",
-    "test:foundations:receiving": "node --test test/receiving/typed-theory-source.check.mjs"
+    "test:foundations:receiving": "node --test test/receiving/typed-theory-source.check.mjs test/token-fiber.test.mjs test/source-withdrawal.test.mjs"
   },
   "receivingTests": [
     "test/claim-event-log.test.mjs",
