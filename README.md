@@ -228,6 +228,18 @@ publication receipt. In particular, the caller must independently attest that
 the snapshots represent real changes in a lawful chronology and that the
 original source identities and rights are correct.
 
+**Event-history nonreflection (original consumer boundary):** two sealed
+`TellingLog` inputs can carry identical witnesses and `observedAt` values
+with DIFFERENT row/occurrence order. In that case this comparison correctly
+reports no *evidence-set revision*, but it does **not** report equality of
+actual performed event histories or prove a causal return/non-return.
+The existing `test/source-withdrawal.test.mjs` supplies this positive
+nonreflection control. A durable-event history, authenticated source+id
+deduplication, producer-causal order, retry effects and external recipient
+acknowledgment remain with the original event/Work/Operations consumers.
+Do not promote `requiresReverification: false` into a chronology
+certificate or a settlement receipt.
+
 
 **Budget admission:** `TellingLog.boundedAt(proposition, maxCandidateReads)`
 uses the existing original three-role index and checks the shortest bucket's
