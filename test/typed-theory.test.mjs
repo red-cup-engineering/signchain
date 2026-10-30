@@ -73,6 +73,28 @@ originalSourceTest("source-closed base projects all witnessed generator endpoint
     "the receiving theory retains the original closed object list");
 });
 
+originalSourceTest("typed theory preserves array-valued Mark terms without inventing a base node sort",()=>{
+  const term=token(mark(["work","w1"]));
+  const source=predicationSite([
+    originalTypedCell(),
+    specializationMorphism(["work","w2"],term),
+  ]);
+  const accepted=theoryOfBase(source.base);
+  assert.equal(baseObjectCoincides(term,["work","w1"]),true,
+    "plain array term and its Token-carried Mark have original source coincidence");
+  assert.equal(baseObjectCoincides(["work","w1"],["work","w2"]),false);
+  const originalNode=source.base.converse[0].domain;
+  assert.equal(baseObjectCoincides(["work","w1"],originalNode),false,
+    "a term array cannot impersonate the distinct Token-Predicate-Token node role");
+  assert.equal(accepted.rules.length,4);
+  assert.equal(accepted.rules[0].trace.morphisms[0].kind,
+    "typedTheory.inferenceMorphism.specialization");
+  for(const rule of accepted.rules)
+    for(const endpoint of [rule.domain,rule.codomain])
+      assert.ok(accepted.objects.some(x=>baseObjectCoincides(x,endpoint)),
+        "source-qualified typed theory must retain every original generator endpoint");
+});
+
 originalSourceTest("incomplete original categorical source refuses; cannot invent absent nodes or specialization endpoints",()=>{
   const source=originalBase();
   for(const altered of [
