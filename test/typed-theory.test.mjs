@@ -48,6 +48,11 @@ test("inferenceRules: a cell witness yields three rules (converse, subject- and 
     "typedTheory.inferenceMorphism.subjectProjection",
     "typedTheory.inferenceMorphism.objectProjection",
   ]));
+  const originalNode=signCellPredication.predicationBaseNodeOf(cellOf("s","p","o"));
+  assert.equal(baseObjectCoincides(rules[0].domain,originalNode),true,
+    "generic inference rules still use the original SignCell base-node role");
+  assert.equal(baseObjectCoincides(rules[0].domain,[...originalNode]),false,
+    "an unissued source array cannot impersonate a categorical node");
 });
 
 // The actual source-owned predication site requires a typed Token-Predicate-Token
