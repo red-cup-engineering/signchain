@@ -24,6 +24,7 @@ import {
   derive,
   derivationValidity,
   derivationIdentity,
+  typedTheoryProofCarrier,
 } from "../src/typed-theory.mjs";
 
 test("cellOf builds a (subject, predicate, object) cell", () => {
@@ -136,6 +137,19 @@ test("original typed derivation checker certifies real finite proof paths and id
   assert.equal(checkedIdentity.kind,"typedTheory.derivationCheck:witness");
   assert.equal(checkedIdentity.derivation.length.value,"0");
   assert.equal(derive(theory,"C","A").kind,"typedTheory.derivationSearch-obstruction");
+
+  // Exercise the actual higher-level original consumer: generated typing
+  // judgments are never a completed proof carrier until the same source
+  // checker has independently validated their exact finite path records.
+  const carrier=typedTheoryProofCarrier(theory);
+  assert.equal(carrier.kind,"typedTheory.proof.carrier");
+  assert.equal(carrier.obstructions.length,0);
+  assert.equal(carrier.validations.length,carrier.judgments.length);
+  assert.ok(carrier.validations.every(item=>
+    item.kind==="typedTheory.derivationCheck:witness"));
+  assert.ok(carrier.validations.every(item=>
+    item.derivation.theory===carrier.theory));
+  assert.equal(carrier.rank.kind,"exactNumber.natural");
 });
 
 test("typed derivation validity refuses forged proof claims, executable steps and inconsistent exact lengths",()=>{
