@@ -194,6 +194,24 @@ test("strict installed SignCell site refuses malformed evidence fields rather th
   "actual empty original testimony is distinguishable from a missing or invalid evidence field");
 });
 
+test("strict supplier refuses incomplete source before issuing inferred nodes",()=>{
+  requiresOriginalProducer();
+  const source={subject:"source",predicate:"reports",object:"recipient"};
+  assert.equal(inferenceRules([source]).length,3);
+  for(const malformed of [
+    {...source,subject:undefined},
+    {...source,predicate:undefined},
+    {...source,object:undefined},
+    {...source,for:undefined},
+    {...source,against:undefined},
+    {...source,value:undefined},
+    {...source,for:[]},
+    {...source,against:[]},
+    {...source,for:[],against:[],value:undefined},
+  ])assert.throws(()=>inferenceRules([malformed]),
+    /complete original Cell source/,
+    "source omission or partial evidence must never generate an inference node");
+});
 test("transported lookalike category cannot manufacture an admitted proof theory",()=>{
   requiresOriginalProducer();
   const original=predicationSite([originalTypedPredication()]).base;
