@@ -21,6 +21,9 @@ import {
   inferenceMorphismIdentity,
   inferenceRules,
   theoryOfBase,
+  derive,
+  derivationValidity,
+  derivationIdentity,
 } from "../src/typed-theory.mjs";
 
 test("cellOf builds a (subject, predicate, object) cell", () => {
@@ -98,6 +101,104 @@ originalSourceTest("inferenceRules inherits one inert source list and SignCell-i
     "proof source projections come from the immutable original SignCell base node");
   assert.deepEqual(derived[2].codomain,{id:"target"});
   assert.equal(Object.isFrozen(derived[1].codomain),true);
+});
+
+test("original typed derivation checker certifies real finite proof paths and identity only",()=>{
+  // SignCell owns specialization direction and equality. SignChain owns
+  // the proof path, its ExactNumber length and the certificate of validity.
+  // This test intentionally has NO SKIP: it runs even when the older pinned
+  // SignCell supplier has not shipped the new heterogeneous base-node API.
+  const rules=inferenceRules([
+    specializationMorphism("B","A"),
+    specializationMorphism("C","B"),
+  ]);
+  const theory=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(["A","B","C"]),
+    rules:Object.freeze(rules),
+  });
+  const result=derive(theory,"A","C");
+  assert.equal(result.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(result.derivation.steps.length,2);
+  const certified=derivationValidity(theory,result.derivation);
+  assert.equal(certified.kind,"typedTheory.derivationCheck:witness");
+  assert.equal(Object.isFrozen(certified.derivation),true);
+  assert.equal(Object.isFrozen(certified.derivation.steps),true);
+  assert.equal(certified.derivation.length.value,"2");
+  assert.equal(derivationIdentity(certified.derivation,result.derivation).kind,
+    "typedTheory.derivationIdentity:witness",
+    "the verified source cut is intensionally the same original rule path");
+
+  const identity=derive(theory,"B","B");
+  assert.equal(identity.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(identity.derivation.steps.length,0);
+  const checkedIdentity=derivationValidity(theory,identity.derivation);
+  assert.equal(checkedIdentity.kind,"typedTheory.derivationCheck:witness");
+  assert.equal(checkedIdentity.derivation.length.value,"0");
+  assert.equal(derive(theory,"C","A").kind,"typedTheory.derivationSearch-obstruction");
+});
+
+test("typed derivation validity refuses forged proof claims, executable steps and inconsistent exact lengths",()=>{
+  const rule=inferenceRules([specializationMorphism("B","A")])[0];
+  const theory=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(["A","B"]),
+    rules:Object.freeze([rule]),
+  });
+  const proved=derive(theory,"A","B").derivation;
+  const refused=(source,label)=>{
+    assert.equal(derivationValidity(theory,source).kind,
+      "typedTheory.derivation-obstruction",label);
+  };
+  for(const [name,source] of [
+    ["foreign carrier",{...proved,kind:"forged.derivation"}],
+    ["foreign theorem theory",{...proved,theory:{...theory}}],
+    ["counterfeit natural length",{...proved,length:{...proved.length,value:"999"}}],
+    ["missing length",Object.fromEntries(Object.entries(proved).filter(([k])=>k!=="length"))],
+    ["invented authority",{...proved,adminAuthority:"fabricated"}],
+    ["wrong proof conclusion",{...proved,conclusion:"A"}],
+    ["unadmitted proof object",{...proved,premise:"unknown"}],
+    ["wrong source step kind",{...proved,steps:[{...proved.steps[0],kind:"foreign.step"}]}],
+    ["added source step privilege",{...proved,steps:[{...proved.steps[0],authority:"granted"}]}],
+    ["lookalike rule outside original theory",{...proved,steps:[{...proved.steps[0],rule:{...rule}}]}],
+    ["wrong step codomain",{...proved,steps:[{...proved.steps[0],conclusion:"A"}]}],
+    ["sparse declared proof steps",{...proved,steps:new Array(1)}],
+    ["unissued extra proof step",{...proved,steps:[...proved.steps,proved.steps[0]]}],
+  ])refused(source,name);
+
+  let executed=0;
+  const externalSteps=[proved.steps[0]];
+  Object.defineProperty(externalSteps,Symbol.iterator,{value(){
+    executed++;return [][Symbol.iterator]();
+  }});
+  refused({...proved,steps:externalSteps},"caller iterator cannot hide declared steps");
+  const mutableProof={...proved};
+  Object.defineProperty(mutableProof,"steps",{enumerable:true,get(){
+    executed++;return [];
+  }});
+  refused(mutableProof,"proof fields must be inert own source data");
+  const maliciousStep={...proved.steps[0]};
+  Object.defineProperty(maliciousStep,"rule",{enumerable:true,get(){
+    executed++;return rule;
+  }});
+  refused({...proved,steps:[maliciousStep]},"step rule must be inert own source data");
+  const maliciousLength={...proved.length};
+  Object.defineProperty(maliciousLength,"value",{enumerable:true,get(){
+    executed++;return "1";
+  }});
+  refused({...proved,length:maliciousLength},"ExactNumber length must be inert data");
+  assert.equal(executed,0,"no source getter or iterator is executed by the proof checker");
+
+  // The validated result must not alias a mutable proof's source steps:
+  // receiving a later mutation may change the external record, not the proof.
+  const mutable={...proved,steps:[{...proved.steps[0]}]};
+  mutable.steps[0].rule=rule;
+  const checked=derivationValidity(theory,mutable);
+  assert.equal(checked.kind,"typedTheory.derivationCheck:witness");
+  const prior=checked.derivation.steps[0].conclusion;
+  mutable.steps[0].conclusion="forged-after-admission";
+  assert.equal(checked.derivation.steps[0].conclusion,prior);
+  assert.equal(Object.isFrozen(checked.derivation.steps[0]),true);
 });
 
 // The actual source-owned predication site requires a typed Token-Predicate-Token
