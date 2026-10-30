@@ -192,6 +192,67 @@ test("FOUR valuation uses one original SignCell-owned frame cut, never a second 
   assert.equal(invoked, 0, "no caller-supplied getter or iterator ran");
 });
 
+test("all FOUR modal operators and truth nuclei use one received frame revision", () => {
+  const specialized = told("child", "parent");
+  const original = tokenFrame([
+    specialized,
+    cell("parent", "reports", "observed", { for: ["author"] }),
+    cell("child", "reports", "observed", { against: ["counterevidence"] }),
+  ]);
+  const frame = { kind: original.kind, predicate: original.predicate, cells: [...original.cells] };
+  const poleA = [{token:"child",reading:"absurd"},{token:"parent",reading:"potential"}];
+  const poleB = [{token:"child",reading:"active"},{token:"parent",reading:"absurd"}];
+  const read = () => {
+    const valuation = valuationOf(frame, "reports", "observed");
+    return {
+      valuation,
+      possible: possibilizeIn(frame, valuation, "knowledge"),
+      necessary: necessitateIn(frame, valuation, "knowledge"),
+      truthPossible: possibilizeIn(frame, valuation, "truth"),
+      truthNecessary: necessitateIn(frame, valuation, "truth"),
+      closure: truthPoleClosure(frame, poleA, valuation),
+      quartet: truthNuclearQuartet(frame, poleA, poleB, valuation),
+    };
+  };
+  const before = read();
+  assert.equal(readingAt(before.possible,"child"),"stable");
+  assert.equal(readingAt(before.valuation,"parent"),"potential");
+  assert.equal(readingAt(before.valuation,"child"),"active");
+  assert.deepEqual(before.quartet.first,before.closure);
+  assert.deepEqual(before.quartet.both,
+    truthPoleClosure(frame,poleB,truthPoleClosure(frame,poleA,before.valuation)),
+    "two finite truth nuclei still commute over the original source cut");
+
+  // Same source locations, revised original witness sides. Do not treat the
+  // old derived FOUR result as mutable or retain a stale transported reading.
+  const at = frame.cells.findIndex(value => value.predicate==="reports" && value.subject==="parent");
+  assert.notEqual(at,-1);
+  frame.cells[at] = cell("parent","reports","observed",{ against:["new-source"] });
+  const after = read();
+  assert.equal(readingAt(after.possible,"child"),"active");
+  assert.equal(readingAt(after.valuation,"parent"),"active");
+  assert.equal(readingAt(before.possible,"child"),"stable");
+  assert.deepEqual(before.valuation, [
+    ...before.valuation
+  ],"previous source-cut result remains unchanged");
+
+  let called=0;
+  const hostile={...frame};
+  Object.defineProperty(hostile,"cells",{enumerable:true,get(){called++;return frame.cells;}});
+  const sample=before.valuation;
+  const operations=[
+    ()=>pointwise(hostile,x=>x,sample),
+    ()=>knowledgeWithin(hostile,sample,sample),
+    ()=>truthWithin(hostile,sample,sample),
+    ()=>possibilizeIn(hostile,sample,"knowledge"),
+    ()=>necessitateIn(hostile,sample,"truth"),
+    ()=>truthPoleClosure(hostile,poleA,sample),
+    ()=>truthNuclearQuartet(hostile,poleA,poleB,sample),
+  ];
+  for(const operation of operations)assert.throws(operation,/must be source data, not a getter/);
+  assert.equal(called,0,"source accessor cannot affect any mathematical FOUR fiber reader");
+});
+
 test("transported claim tellings preserve both evidence sides in either wire order", () => {
   const positive = cell("token", "reports", { value: "source" }, { for: ["observer"] });
   const negative = cell("token", "reports", { value: "source" }, { against: ["challenger"] });
