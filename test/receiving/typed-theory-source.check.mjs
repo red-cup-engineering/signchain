@@ -73,6 +73,28 @@ test("a pinned original SignCell producer constructs the source-closed theory co
   }
 });
 
+test("the strict installed supplier preserves array-valued Term identities across heterogeneous generators",()=>{
+  requiresOriginalProducer();
+  const left=utterance(["work","w1"],"declares");
+  const right=utterance(["work","w2"],"responds");
+  const source=predicationSite([
+    signCell.cell(left.token,signCell.predicateOfClaim(left.claim),right.token),
+    specializationMorphism(["work","w2"],["work","w1"]),
+  ]);
+  const base=source.base;
+  assert.equal(signCell.baseObjectCoincides(left.token,["work","w1"]),true,
+    "a Token-carried array Mark and its original data term MUST coincide");
+  assert.equal(signCell.baseObjectCoincides(["work","w1"],["work","w2"]),false);
+  assert.equal(signCell.baseObjectCoincides(["work","w1"],base.converse[0].domain),false,
+    "an array Term cannot be misidentified as a predication-node generator");
+  const theory=theoryOfBase(base);
+  assert.equal(theory.rules.length,4);
+  for(const edge of theory.rules)
+    for(const endpoint of [edge.domain,edge.codomain])
+      assert.ok(theory.objects.some(object=>signCell.baseObjectCoincides(object,endpoint)),
+        "every original source endpoint remains in the typed proof carrier");
+});
+
 test("original specialization without predications retains both typed endpoint objects",()=>{
   requiresOriginalProducer();
   const base = predicationSite([specializationMorphism("specific","general")]).base;
