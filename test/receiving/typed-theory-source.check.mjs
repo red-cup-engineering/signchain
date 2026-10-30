@@ -91,6 +91,15 @@ test("the strict installed supplier preserves array-valued Term identities acros
   assert.equal(signCell.baseObjectCoincides(["work","w1"],["work","w2"]),false);
   assert.equal(signCell.baseObjectCoincides(["work","w1"],base.converse[0].domain),false,
     "an array Term cannot be misidentified as a predication-node generator");
+  const rawCopy=Object.freeze([...base.converse[0].domain]);
+  assert.deepEqual(rawCopy,base.converse[0].domain);
+  assert.equal(signCell.baseObjectCoincides(rawCopy,base.converse[0].domain),false,
+    "even a JSON-identical three-role Mark value is NOT source-issued as a node");
+  assert.equal(signCell.baseObjectCoincides(
+    signCell.predicationBaseNodeOf({
+      subject:left.token,predicate:signCell.predicateOfClaim(left.claim),object:right.token,
+    }),base.converse[0].domain),true,
+    "a separately source-issued presentation of the original triple is coincident");
   const theory=theoryOfBase(base);
   assert.equal(theory.rules.length,4);
   for(const edge of theory.rules)
