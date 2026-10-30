@@ -178,12 +178,16 @@ control begins at \`stable\` and yields \`active\` or \`potential\` when differe
 originals are withheld. Those are conditional finite evidence computations,
 not evidence that the source was actually withdrawn, an institution adopted
 a practice, or a scientific proposition is false. Neither attribution labels
-nor source-reported claims are authenticated by the operation. New Work, rights
-approval, proofs, publication and market settlement remain downstream.
+nor source-reported claims are authenticated by the operation. The report's
+producer identities, counterfactual list, removed witness addresses, and
+conditional support summary now remain immutable after issuance; a consumer
+cannot rewrite the read-only evidence receipt by mutating a nested array.
+New Work, rights approval, proofs, publication and market settlement remain
+downstream.
 
 Native receiving: \`node --test test/source-withdrawal.test.mjs\` against
 installed original SignCell/Metrologic/FOUR dependencies; the package
-\`receivingTests\` includes the ten positive and negative cases.
+\`receivingTests\` includes the original positive, contradiction, bounded-index, inert-source and nested-immutability cases. The pinned dependency-installed suite and independent research receiver must run before any native or publication qualification.
 
 
 ## Original evidence snapshot comparison (candidate, source-only)
