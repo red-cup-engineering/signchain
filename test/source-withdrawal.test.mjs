@@ -371,6 +371,31 @@ test("same witness and changed observation clock needs research re-verification 
   assert.equal(r.observationChangedWitnessesUnchangedCount,1);
 });
 
+test("same source-witness snapshot does not certify equal performed-event chronology",()=>{
+  // The new original mainline Temporal/Science requirement distinguishes
+  // event-occurrence order from evidence sets. This source projection is
+  // intentionally incapable of deciding return/non-return histories.
+  const c=cell("history","has-evidence","same-source-snapshot");
+  const first=new TellingLog()
+    .tell(c,"source:alpha","2026-10-29T10:00:00Z")
+    .deny(c,"source:beta","2026-10-29T10:01:00Z").seal();
+  const second=new TellingLog()
+    .deny(c,"source:beta","2026-10-29T10:01:00Z")
+    .tell(c,"source:alpha","2026-10-29T10:00:00Z").seal();
+  assert.notDeepEqual(first.rows.map(row=>row.side),
+    second.rows.map(row=>row.side),
+    "the original ordered telling histories are different");
+  const result=compareOriginalEvidenceSnapshots(first,second,{propositions:[c]});
+  assert.equal(result.comparisons[0].witnessesChanged,false);
+  assert.equal(result.comparisons[0].observationsChanged,false);
+  assert.equal(result.comparisons[0].readingChanged,false);
+  assert.equal(result.comparisons[0].requiresReverification,false);
+  assert.deepEqual(result.changedPropositionAddresses,[]);
+  assert.match(result.boundaries.join(" "),/snapshot order|not established/,
+    "the projection MUST disclose that unchanged FOUR evidence is not an event-history equivalence certificate");
+  assert.equal(result.standing.includes("conditional"),true);
+});
+
 test("replayed identical source and observation time is not fabricated independence or revision",()=>{
   const c=cell("claim","repeated","citation");
   const old=new TellingLog().tell(c,"one","2026-10-27T23:00:00Z").seal();
