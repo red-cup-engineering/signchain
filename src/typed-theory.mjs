@@ -182,14 +182,74 @@ export function composeInferenceRules(rules) {
     return Object.freeze(out);
 }
 const sameGeneratedRuleSet = (left, right) => left.length === right.length && left.every((rule) => right.some((other) => sameGeneratedRule(rule, other)));
+const proofSourceRecord = (value, names) => {
+    if (value === null || typeof value !== "object" || Array.isArray(value) ||
+        ![Object.prototype, null].includes(Object.getPrototypeOf(value)))
+        return null;
+    const fields = Object.getOwnPropertyDescriptors(value);
+    const keys = Reflect.ownKeys(fields);
+    if (keys.length !== names.length ||
+        keys.some(key => typeof key !== "string" || !names.includes(key)) ||
+        names.some(key => !fields[key] || !fields[key].enumerable ||
+            !Object.hasOwn(fields[key], "value")))
+        return null;
+    return Object.freeze(Object.fromEntries(names.map(name => [name, fields[name].value])));
+};
+/** A single original finite theory check for BFS, proof validation and
+ * closure. In a generated category every source/target of each rule must
+ * belong to its declared object carrier; a foreign intermediary is not a
+ * valid morphism even when its path eventually returns to a known object.
+ * SignCell alone owns actual base object equality and issued-node roles.
+ */
+function admittedTheory(theory) {
+    const rejected = reason => Object.freeze({ ok: false, reason });
+    const source = proofSourceRecord(theory, ["kind", "objects", "rules"]);
+    if (!source || source.kind !== "typedTheory.carrier")
+        return rejected("invalid-theory-source");
+    let objects, rules;
+    try {
+        objects = finiteSourceArray(source.objects, "theory objects");
+        rules = finiteSourceArray(source.rules, "theory rules");
+    } catch { return rejected("invalid-theory-sequence"); }
+    const morphismKinds = [
+        "typedTheory.inferenceMorphism.specialization",
+        "typedTheory.inferenceMorphism.converse",
+        "typedTheory.inferenceMorphism.subjectProjection",
+        "typedTheory.inferenceMorphism.objectProjection",
+    ];
+    const contains = value => objects.some(known => baseObjectCoincides(known, value));
+    try {
+        for (const rule of rules) {
+            const sourceRule = proofSourceRecord(rule, ["kind", "domain", "trace", "codomain"]);
+            if (!sourceRule || sourceRule.kind !== "typedTheory.inferenceRule")
+                return rejected("invalid-theory-rule");
+            const trace = proofSourceRecord(sourceRule.trace, ["kind", "morphisms"]);
+            if (!trace || trace.kind !== "typedTheory.inferenceTrace")
+                return rejected("invalid-theory-trace");
+            let morphisms;
+            try { morphisms = finiteSourceArray(trace.morphisms, "rule trace"); }
+            catch { return rejected("invalid-theory-trace"); }
+            if (morphisms.length < 1 || morphisms.some(m => {
+                const sourceMorphism = proofSourceRecord(m, ["kind"]);
+                return !sourceMorphism || !morphismKinds.includes(sourceMorphism.kind);
+            })) return rejected("invalid-theory-morphism");
+            if (!contains(sourceRule.domain) || !contains(sourceRule.codomain))
+                return rejected("undeclared-rule-endpoint");
+        }
+    } catch { return rejected("invalid-theory-object"); }
+    return Object.freeze({ ok: true, objects, rules });
+}
+
 /** The composition closure of a theory's rules (to a fixed point). */
 export function derivationClosure(theory) {
-    let rules = Object.freeze([...theory.rules]);
+    const source = admittedTheory(theory);
+    if (!source.ok) throw new TypeError("typed theory: cannot close " + source.reason);
+    let rules = source.rules;
     for (;;) {
         const next = composeInferenceRules(rules);
         if (sameGeneratedRuleSet(next, rules)) {
             const closedTheory = Object.freeze({ ...theory, rules });
-            const residual = Object.freeze(rules.filter((rule) => !theory.rules.some((original) => sameGeneratedRule(original, rule))));
+            const residual = Object.freeze(rules.filter((rule) => !source.rules.some((original) => sameGeneratedRule(original, rule))));
             return Object.freeze({
                 kind: "typedTheory.derivationClosure",
                 theory: closedTheory,
@@ -207,12 +267,14 @@ const derivationSearchObstruction = (theory, premise, conclusion, explored) => O
 /** Objects must be admitted to this exact theory before its identity
  * morphisms or proofs can exist. An arbitrary matching pair of JSON values
  * is not an object of an otherwise unrelated finite category. */
-const admittedObject = (theory, object) => Array.isArray(theory?.objects)
-    && theory.objects.some((known) => baseObjectCoincides(known, object));
+const admittedObject = (objects, object) =>
+    objects.some(known => baseObjectCoincides(known, object));
 
 /** Breadth-first search for a derivation from premise to conclusion. */
 export function derive(theory, premise, conclusion) {
-    if (!admittedObject(theory, premise) || !admittedObject(theory, conclusion))
+    const source = admittedTheory(theory);
+    if (!source.ok || !admittedObject(source.objects, premise) ||
+        !admittedObject(source.objects, conclusion))
         return derivationSearchObstruction(theory, premise, conclusion, []);
     if (baseObjectCoincides(premise, conclusion)) {
         const derivation = Object.freeze({ kind: "typedTheory.derivation", theory, premise, conclusion, steps: Object.freeze([]), length: natZero });
@@ -222,7 +284,7 @@ export function derive(theory, premise, conclusion) {
     const seen = [premise];
     for (let index = 0; index < queue.length; index += 1) {
         const current = queue[index];
-        for (const rule of theory.rules.filter((candidate) => baseObjectCoincides(candidate.domain, current.object))) {
+        for (const rule of source.rules.filter((candidate) => baseObjectCoincides(candidate.domain, current.object))) {
             if (seen.some((object) => baseObjectCoincides(object, rule.codomain)))
                 continue;
             const step = Object.freeze({ kind: "typedTheory.derivationStep", premise: current.object, rule, conclusion: rule.codomain });
@@ -259,76 +321,34 @@ export function derivationValidity(theory, derivation) {
     const refusal = (reason) => Object.freeze({
         kind: "typedTheory.derivation-obstruction", theory, reason, derivation,
     });
-    // The existing finiteSourceArray gate handles the actual step positions.
-    // Its source-record counterpart inspects only own data descriptors,
-    // never reads a caller's property getter to decide a proof judgment.
-    const sourceRecord = (value, names) => {
-        if (value === null || typeof value !== "object" || Array.isArray(value) ||
-            ![Object.prototype, null].includes(Object.getPrototypeOf(value)))
-            return null;
-        const fields = Object.getOwnPropertyDescriptors(value);
-        const keys = Reflect.ownKeys(fields);
-        if (keys.length !== names.length ||
-            keys.some(key => typeof key !== "string" || !names.includes(key)) ||
-            names.some(key => !fields[key] || !fields[key].enumerable ||
-                !Object.hasOwn(fields[key], "value")))
-            return null;
-        return Object.freeze(Object.fromEntries(names.map(name => [name, fields[name].value])));
-    };
-    const ownedTheory = sourceRecord(theory, ["kind", "objects", "rules"]);
-    const original = sourceRecord(derivation,
+    // Use the SAME category-source gate as derivation search and closure.
+    // A zero-step identity cannot conceal a rule with undeclared endpoints.
+    const source = admittedTheory(theory);
+    if (!source.ok) return refusal(source.reason);
+    const original = proofSourceRecord(derivation,
         ["kind", "theory", "premise", "conclusion", "steps", "length"]);
-    if (!ownedTheory || ownedTheory.kind !== "typedTheory.carrier" ||
-        !original || original.kind !== "typedTheory.derivation" ||
+    if (!original || original.kind !== "typedTheory.derivation" ||
         original.theory !== theory)
         return refusal("invalid-proof-source");
-    let objects, rules, steps;
-    try {
-        objects = finiteSourceArray(ownedTheory.objects, "theory objects");
-        rules = finiteSourceArray(ownedTheory.rules, "theory rules");
-        steps = finiteSourceArray(original.steps, "derivation steps");
-    } catch { return refusal("invalid-proof-sequence"); }
-    // A zero-step identity is still a judgment UNDER a theory, not an
-    // authorization to ignore malformed rules in that theory. The source
-    // uses exactly the original four inference-morphism constructors;
-    // their traces and slots must be inert before any proof is certified.
-    const morphismKinds = [
-        "typedTheory.inferenceMorphism.specialization",
-        "typedTheory.inferenceMorphism.converse",
-        "typedTheory.inferenceMorphism.subjectProjection",
-        "typedTheory.inferenceMorphism.objectProjection",
-    ];
-    for (const rule of rules) {
-        const declared = sourceRecord(rule,
-            ["kind", "domain", "trace", "codomain"]);
-        if (!declared || declared.kind !== "typedTheory.inferenceRule")
-            return refusal("invalid-theory-rule");
-        const trace = sourceRecord(declared.trace, ["kind", "morphisms"]);
-        if (!trace || trace.kind !== "typedTheory.inferenceTrace")
-            return refusal("invalid-theory-trace");
-        let morphisms;
-        try { morphisms = finiteSourceArray(trace.morphisms, "rule trace"); }
-        catch { return refusal("invalid-theory-trace"); }
-        if (morphisms.length < 1 || morphisms.some(morphism => {
-            const presented = sourceRecord(morphism, ["kind"]);
-            return !presented || !morphismKinds.includes(presented.kind);
-        })) return refusal("invalid-theory-morphism");
-    }
+    const objects = source.objects, rules = source.rules;
+    let steps;
+    try { steps = finiteSourceArray(original.steps, "derivation steps"); }
+    catch { return refusal("invalid-proof-sequence"); }
     // ExactNumber owns natural-number meaning. Compare the actual issued
     // count's two canonical data coordinates, rather than coercing a
     // caller-provided claimed length to a number.
     const issuedLength = count(steps);
-    const length = sourceRecord(original.length, ["kind", "value"]);
+    const length = proofSourceRecord(original.length, ["kind", "value"]);
     if (!length || length.kind !== issuedLength.kind ||
         length.value !== issuedLength.value)
         return refusal("incorrect-proof-length");
-    const isObject = (object) => objects.some(known => baseObjectCoincides(known, object));
+    const isObject = (object) => admittedObject(objects, object);
     if (!isObject(original.premise) || !isObject(original.conclusion))
         return refusal("unadmitted-object");
     let current = original.premise;
     const verifiedSteps = [];
     for (const step of steps) {
-        const at = sourceRecord(step, ["kind", "premise", "rule", "conclusion"]);
+        const at = proofSourceRecord(step, ["kind", "premise", "rule", "conclusion"]);
         if (!at || at.kind !== "typedTheory.derivationStep")
             return refusal("invalid-proof-step");
         // A lookalike rule with matching words has not been issued by this
