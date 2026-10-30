@@ -29,7 +29,8 @@ export function sourcePattern(source) {
   if (source === null || typeof source !== "object" || Array.isArray(source) ||
       ![Object.prototype, null].includes(Object.getPrototypeOf(source)))
     throw new TypeError("signchain log: a query pattern must be a plain record");
-  const selected = Object.create(null);
+  // A plain record: SignCell retains only ordinary data records, and only these three names are defined.
+  const selected = {};
   for (const name of ["subject", "predicate", "object"]) {
     const field = Object.getOwnPropertyDescriptor(source, name);
     if (field === undefined) continue;
