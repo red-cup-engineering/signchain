@@ -35,10 +35,12 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   It sits between the frame (SignCell's Heyting algebra of tokens) and the
   token sheaf SignGraph glues from it.
 
-The `token-fiber` claim valuation now takes one readmitted, immutable
-`admitTokenFrame` source cut from SignCell and reads both tokens and
-original joined evidence from it. This removes separate raw-wire reads of
-mutable `frame.cells` without replacing FOUR or the source index.
+The `token-fiber` claim valuation, order comparisons, pointwise operations,
+possibility/necessity, truth nuclei and nuclear quartets now take one
+readmitted immutable `admitTokenFrame` source cut from SignCell per operation.
+All source tokens, covers and joined original evidence are read from that
+single cut. This removes separate raw-wire reads of mutable `frame.cells`
+without replacing FOUR, the original rule interpretation or the source index.
 Its canonical API and receiving conditions live in the original
 [SignCell contract](https://github.com/red-cup-engineering/signcell/blob/30803c6363505197a5aafffb6d3f08b13e6a9e9c/src/README.md#portable-token-frame-source-boundary);
 the proposed import needs a qualified immutable SignCell edition and
