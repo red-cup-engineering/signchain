@@ -248,25 +248,89 @@ export function typing(theory, premise, conclusion) {
         ? Object.freeze({ kind: "typedTheory.typing:witness", theory, premise, conclusion, derivation: search.derivation })
         : Object.freeze({ kind: "typedTheory.typing-obstruction", theory, premise, conclusion, search });
 }
-/** Check each theory rule and that the justified path reaches the declared conclusion. */
+/** Validate a derivation as one finite, source-qualified proof carrier.
+ * An admitted theory's objects/rules are its original source, not a JSON
+ * lookalike or an executable iterator. A proof is a finite path of EXACT
+ * source-issued rules in that SAME theory, with a canonical ExactNumber
+ * length. This checks mathematical incidence, not witnesses' external truth
+ * or an independent scientific theorem.
+ */
 export function derivationValidity(theory, derivation) {
-    if (!admittedObject(theory, derivation?.premise) ||
-        !admittedObject(theory, derivation?.conclusion))
-        return Object.freeze({kind:"typedTheory.derivation-obstruction",
-            theory, reason:"unadmitted-object", derivation});
-    let current = derivation.premise;
-    for (const step of derivation.steps) {
-        const generated = theory.rules.some((rule) => inferenceRulesCoincide(rule, step.rule)
-            && baseObjectCoincides(step.premise, current)
-            && baseObjectCoincides(rule.domain, current)
-            && baseObjectCoincides(rule.codomain, step.conclusion));
-        if (!generated)
-            return Object.freeze({ kind: "typedTheory.derivation-obstruction", theory, at: current, step });
-        current = step.conclusion;
+    const refusal = (reason) => Object.freeze({
+        kind: "typedTheory.derivation-obstruction", theory, reason, derivation,
+    });
+    // The existing finiteSourceArray gate handles the actual step positions.
+    // Its source-record counterpart inspects only own data descriptors,
+    // never reads a caller's property getter to decide a proof judgment.
+    const sourceRecord = (value, names) => {
+        if (value === null || typeof value !== "object" || Array.isArray(value) ||
+            ![Object.prototype, null].includes(Object.getPrototypeOf(value)))
+            return null;
+        const fields = Object.getOwnPropertyDescriptors(value);
+        const keys = Reflect.ownKeys(fields);
+        if (keys.length !== names.length ||
+            keys.some(key => typeof key !== "string" || !names.includes(key)) ||
+            names.some(key => !fields[key] || !fields[key].enumerable ||
+                !Object.hasOwn(fields[key], "value")))
+            return null;
+        return Object.freeze(Object.fromEntries(names.map(name => [name, fields[name].value])));
+    };
+    const ownedTheory = sourceRecord(theory, ["kind", "objects", "rules"]);
+    const original = sourceRecord(derivation,
+        ["kind", "theory", "premise", "conclusion", "steps", "length"]);
+    if (!ownedTheory || ownedTheory.kind !== "typedTheory.carrier" ||
+        !original || original.kind !== "typedTheory.derivation" ||
+        original.theory !== theory)
+        return refusal("invalid-proof-source");
+    let objects, rules, steps;
+    try {
+        objects = finiteSourceArray(ownedTheory.objects, "theory objects");
+        rules = finiteSourceArray(ownedTheory.rules, "theory rules");
+        steps = finiteSourceArray(original.steps, "derivation steps");
+    } catch { return refusal("invalid-proof-sequence"); }
+    // ExactNumber owns natural-number meaning. Compare the actual issued
+    // count's two canonical data coordinates, rather than coercing a
+    // caller-provided claimed length to a number.
+    const issuedLength = count(steps);
+    const length = sourceRecord(original.length, ["kind", "value"]);
+    if (!length || length.kind !== issuedLength.kind ||
+        length.value !== issuedLength.value)
+        return refusal("incorrect-proof-length");
+    const isObject = (object) => objects.some(known => baseObjectCoincides(known, object));
+    if (!isObject(original.premise) || !isObject(original.conclusion))
+        return refusal("unadmitted-object");
+    let current = original.premise;
+    const verifiedSteps = [];
+    for (const step of steps) {
+        const at = sourceRecord(step, ["kind", "premise", "rule", "conclusion"]);
+        if (!at || at.kind !== "typedTheory.derivationStep")
+            return refusal("invalid-proof-step");
+        // A lookalike rule with matching words has not been issued by this
+        // theory. A step can only cite one of its ACTUAL inference rules.
+        const rule = rules.find(candidate => candidate === at.rule);
+        if (!rule)
+            return refusal("unissued-proof-rule");
+        if (!baseObjectCoincides(at.premise, current) ||
+            !baseObjectCoincides(rule.domain, current) ||
+            !baseObjectCoincides(rule.codomain, at.conclusion))
+            return refusal("broken-proof-path");
+        verifiedSteps.push(Object.freeze({
+            kind: "typedTheory.derivationStep",
+            premise: current, rule, conclusion: rule.codomain,
+        }));
+        current = rule.codomain;
     }
-    if (!baseObjectCoincides(current, derivation.conclusion))
-        return Object.freeze({ kind: "typedTheory.derivation-obstruction", theory, at: current, conclusion: derivation.conclusion });
-    return Object.freeze({ kind: "typedTheory.derivationCheck:witness", theory, derivation });
+    if (!baseObjectCoincides(current, original.conclusion))
+        return refusal("wrong-proof-conclusion");
+    // Return a new immutable verified carrier. In particular, a mutable
+    // foreign source cannot rewrite the steps of an already issued check.
+    const certified = Object.freeze({
+        kind: "typedTheory.derivation", theory,
+        premise: original.premise, conclusion: original.conclusion,
+        steps: Object.freeze(verifiedSteps), length: issuedLength,
+    });
+    return Object.freeze({ kind: "typedTheory.derivationCheck:witness",
+        theory, derivation: certified });
 }
 /** Compare two derivations. */
 export function derivationIdentity(left, right) {
