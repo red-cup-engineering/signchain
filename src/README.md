@@ -32,6 +32,21 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   SignCell into `predicationSite`. Generic `inferenceRules` also consumes
   SignCell's original `predicationBaseNodeOf`: a source-issued node and a
   JSON-identical unissued array Term cannot become the same object sort.
+  Generic inference now reuses the **same** dense, undecorated, ordinary
+  source-array guard already used by `theoryOfBase`. It cannot execute
+  a caller's custom iterator to create purported proof positions.
+  Converse and endpoint-projection rules derive their endpoints from
+  the **one immutable SignCell-issued base node**, not by rereading raw
+  Cell coordinates after admission; specialization retains its original
+  authored direction. Set, subclassed-array and decorated/iterable
+  inputs now refuse, so legitimate callers must materialize an ordinary
+  source-ordered data array. This is a versioned input-compatibility
+  restriction, not source authentication or a second category.
+  The original generic negative test and **non-skipping** installed
+  receiving test check executable-generator refusal and agreement of
+  original direct-versus-base source endpoints respectively. The latter
+  requires a genuinely pinned supplier; authored tests alone do not
+  establish an installed result.
   The strict `test/receiving/typed-theory-source.check.mjs` refuses the
   absence of that installed supplier; the broad compatibility test skips
   its source-dependent cases with an explicit reason. SignCell owns
