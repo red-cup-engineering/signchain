@@ -7,7 +7,8 @@ import {token,claim} from "@red-cup-engineering/signcell/utterance";
 const isAdmittedPredicationBase = signCellPredication.isAdmittedPredicationBase;
 // Do NOT call unqualified tests "passed" when the pinned source package lacks
 // its constructor-origin guard; explicitly report those receiving cases skipped.
-const hasAdmission = typeof isAdmittedPredicationBase === "function";
+const hasBaseNodes = typeof signCellPredication.predicationBaseNodeOf === "function";
+const hasAdmission = typeof isAdmittedPredicationBase === "function" && hasBaseNodes;
 const originalSourceTest = (name, fn) => test(name, {
   skip: hasAdmission ? false :
     "installed SignCell predication producer lacks original base construction admission",
@@ -37,7 +38,9 @@ test("inferenceMorphismIdentity: distinct morphism kinds are not identical", () 
   assert.equal(judgment.kind, "typedTheory.inferenceMorphismIdentity-obstruction");
 });
 
-test("inferenceRules: a cell witness yields three rules (converse, subject- and object-projection)", () => {
+test("inferenceRules: a cell witness yields three rules (converse, subject- and object-projection)", {
+  skip:hasBaseNodes ? false : "pinned SignCell lacks source-owned predication-base nodes",
+}, () => {
   const rules = inferenceRules([cellOf("s", "p", "o")]);
   assert.equal(rules.length, 3);
   assert.deepEqual(new Set(rules.map((rule) => rule.trace.morphisms[0].kind)), new Set([
@@ -146,8 +149,11 @@ test("unqualified installed SignCell source refuses typed base construction inst
     const valid=predicationSite([originalTypedCell()]).base;
     assert.equal(isAdmittedPredicationBase(valid),true);
     assert.equal(theoryOfBase(valid).kind,"typedTheory.carrier");
-  } else {
+  } else if (typeof isAdmittedPredicationBase !== "function") {
     assert.throws(()=>theoryOfBase({kind:"predication.base"}),
       /source owner lacks predication-base construction admission/u);
+  } else {
+    assert.throws(()=>inferenceRules([cellOf("s","p","o")]),
+      /pinned SignCell lacks source-owned base-node construction/u);
   }
 });
