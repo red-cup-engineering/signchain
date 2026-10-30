@@ -96,6 +96,41 @@ A valid identity proof is a zero-step derivation at an **admitted**
 object, with a canonical natural-zero length; it does not license
 an ill-formed ambient theory.
 
+**Object-closed generated categories are a prerequisite, not merely a
+postcondition of proof search.** The original SignCell predication base
+already requires every generator endpoint to belong to its declared
+object carrier. The same necessary law now applies at the shared
+SignChain typed-theory boundary: for every rule `r`,
+`r.domain ∈ objects` **and** `r.codomain ∈ objects`, as determined
+solely by original SignCell `baseObjectCoincides`. A rule may not
+transport a derivation through an undeclared intermediary, even if the
+path returns to an admitted object. Previously `A → Z → B` was
+accepted in a theory declaring only `A, B`; even the apparent identity
+at `A` could be certified under those malformed rules.
+
+One private, finite `admittedTheory` source check now serves the
+existing `derive`, `typing`, `derivationValidity` and
+`derivationClosure` operations, reusing their original inert
+source-record/array admission and four original inference-morphism
+kinds. In an object-incomplete theory, search and typing return their
+original obstruction types, proof checking refuses with
+`undeclared-rule-endpoint`, and closure refuses rather than returning
+a misleading fixed point. A discrete theory with no generators still
+admits identities at its declared objects. This does not add a fifth
+generator, a new mathematical universe, a SignCell node representation
+or authorization over evidence.
+
+The original `test/typed-theory.test.mjs` includes non-skipping
+positive/negative categorical-closure tests. The existing strict
+`test/receiving/typed-theory-source.check.mjs` separately removes
+an endpoint from a real source-issued SignCell
+`predicationSite → theoryOfBase` and requires **all four** downstream
+judgments (search, typing, validity and closure) to refuse the
+incomplete original source. Neither source tests nor an internal
+finite graph calculation are evidence of a native installed producer,
+a Lean theorem, a previously qualified immutable package, or an
+independently received operational consequence.
+
 For a positive result, the checker issues its own immutable
 `typedTheory.derivationCheck:witness` containing a reconstituted
 frozen derivation and source-issued rule references. This is an
