@@ -128,6 +128,37 @@ test("original specialization without predications retains both typed endpoint o
   assert.equal(theoryOfBase(base).rules.length,1);
 });
 
+test("strict installed source coincidence refuses executable hand roles before SignChain proof comparison",()=>{
+  requiresOriginalProducer();
+  const original=originalTypedPredication();
+  const admitted=predicationSite([original]).base;
+  const consumer=theoryOfBase(admitted);
+  assert.equal(consumer.rules.length,3,
+    "real SignChain theory must still receive the original typed generator");
+  const term=original.subject;
+  const claim=original.predicate.claim;
+  assert.equal(signCell.baseObjectCoincides(term,JSON.parse(JSON.stringify(term.mark.value))),true,
+    "the source-owned Token may coincide with its ordinary datum");
+  assert.equal(signCell.predicateCoincides(original.predicate,claim),true,
+    "source-owned Predicate and Claim have one original Mark value");
+  let executed=0;
+  const hostile=(input,field)=>{
+    const received={...input};
+    Object.defineProperty(received,field,{enumerable:true,get(){
+      executed++;return input[field];
+    }});
+    return received;
+  };
+  assert.throws(()=>signCell.baseObjectCoincides(hostile(term,"kind"),term));
+  assert.throws(()=>signCell.predicateCoincides(hostile(claim,"kind"),claim));
+  assert.throws(()=>signCell.baseObjectCoincides(hostile(original.predicate,"kind"),original.predicate));
+  assert.throws(()=>signCell.predicateCoincides(
+    {...original.predicate,mark:original.subject.mark},claim),
+    "a predicate cannot claim a second, noncoincident Mark");
+  assert.equal(executed,0,
+    "the original supplier's source-role equality cannot run callers' getters");
+});
+
 test("transported lookalike category cannot manufacture an admitted proof theory",()=>{
   requiresOriginalProducer();
   const original=predicationSite([originalTypedPredication()]).base;
