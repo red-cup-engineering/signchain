@@ -71,6 +71,68 @@ Its canonical API and receiving conditions live in the original
 the proposed import needs a qualified immutable SignCell edition and
 pinned downstream native tests before integration.
 
+## Finite typed derivation admission — proof checker, not a proof oracle
+
+The original `./typed-theory#derivationValidity` checks a
+**finite derivation under one actual supplied typed theory**. The old
+implementation accepted fabricated derivation objects with a wrong
+`kind`, wrong theory, unearned ExactNumber length, or custom
+`Symbol.iterator` that suppressed the recorded steps. In particular,
+a self-identity path could be pronounced a valid certificate even
+under a theory containing malformed rule records. A successful
+breadth-first `derive` search alone is not a source-qualified proof
+check.
+
+The repaired checker first admits an ordinary inert **own-data** source
+record for the theory and its proposed proof; requires the same source
+theory object and its original finite dense arrays; checks **all**
+ambient inference rules and traces against the existing four
+source-declared morphism kinds (specialization, converse, subject and
+object projection); verifies the proof's ExactNumber `count(steps)`
+representation without coercing caller input; and requires each
+recorded step to cite an actual rule **object present in that theory**.
+It then verifies source/target incidence and the declared conclusion.
+A valid identity proof is a zero-step derivation at an **admitted**
+object, with a canonical natural-zero length; it does not license
+an ill-formed ambient theory.
+
+For a positive result, the checker issues its own immutable
+`typedTheory.derivationCheck:witness` containing a reconstituted
+frozen derivation and source-issued rule references. This is an
+**in-process, same-theory source check**, not a credential, a remote
+authority, a transport signature, witness testimony, an EAVT event
+history or an independent mathematical theorem. JSON-copied rules are
+not treated as the exact original rule occurrence; a legitimate
+transported proof requires independently qualified reconstruction
+through its owning source rather than implicit aliasing.
+
+The original `typedTheoryProofCarrier` now uses **that same checker**
+on every successful generated typing judgment and reports explicit
+`validations` alongside any `obstructions`. It does not convert
+unverified search results into a settled proof. Original
+`test/typed-theory.test.mjs` contains **non-skipping** finite
+positive/negative controls for path continuity, exact length, identity,
+foreign proofs, executable iterators, malformed ambient theories and
+source mutation. Its strict installed
+`test/receiving/typed-theory-source.check.mjs` separately exercises
+the actual SignCell base generator through this checker.
+
+Professional comparison: [Lean's proof-validation reference](https://lean-lang.org/doc/reference/latest/ValidatingProofs/)
+requires the kernel to check a proof term against its theorem statement
+and distinguishes this from confidence in the meaning of that
+statement. [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-validation)
+describes validation of original instance properties; this cannot
+replace preflight of executable JavaScript getters.
+[W3C PROV-O](https://www.w3.org/TR/prov-o/) separately describes
+provenance sources/activities/agents, none of which is inferred by an
+in-process syntactic derivation. The new source and public checker
+semantics need **new immutable package issuance** after the original
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html) publication
+and original locked native receiving gates. A bounded V8 assay or
+authored test does **not** certify the private native Node>=24.2
+execution, a Lean/Obsmetrologia theorem, a released artifact or an
+installed consumer effect.
+
 ## Bounded predicate-word paths: finite proof without false saturation
 
 `composePredicateWords` retains the historical **single pairwise round**
