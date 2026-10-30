@@ -16,6 +16,8 @@ const requiresOriginalProducer = () => {
   assert.equal(typeof specializationMorphism, "function", "installed SignCell lacks specializationMorphism");
   assert.equal(typeof isAdmittedPredicationBase, "function",
     "installed SignCell lacks source-constructed predication-base admission; this receiving test MUST NOT skip");
+  assert.equal(typeof signCell.predicationBaseNodeOf, "function",
+    "installed SignCell lacks original predication base-node issuance; a raw tuple is not source custody");
 };
 
 // SignCell's ordinary Cell admits plain data, but predicationSite only
@@ -51,10 +53,12 @@ test("a pinned original SignCell producer constructs the source-closed theory co
   assert.equal(Object.isFrozen(theory.objects),true);
   // Neither "three rules" nor the generated kind alone proves preservation
   // of the source predicate projections. Refuse reversed/swapped endpoints.
-  const originalNode = [generator.subject, generator.predicate, generator.object];
+  const originalNode = signCell.predicationBaseNodeOf(generator);
   const expected = [
     ["typedTheory.inferenceMorphism.converse", originalNode,
-      [generator.object, generator.predicate, generator.subject]],
+      signCell.predicationBaseNodeOf({
+        subject:generator.object,predicate:generator.predicate,object:generator.subject,
+      })],
     ["typedTheory.inferenceMorphism.subjectProjection", originalNode, generator.subject],
     ["typedTheory.inferenceMorphism.objectProjection", originalNode, generator.object],
   ];
