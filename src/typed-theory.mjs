@@ -345,12 +345,24 @@ export function derivationIdentity(left, right) {
         ? Object.freeze({ kind: "typedTheory.derivationIdentity:witness", left, right })
         : Object.freeze({ kind: "typedTheory.derivationIdentity-obstruction", left, right });
 }
-/** Build a proof carrier for a theory (typing judgment for every generated rule). */
+/** Build a finite proof carrier from original rule incidence.
+ * A positive typing search result is NOT itself a checked proof: the same
+ * original derivationValidity must verify its context, exact step count and
+ * source-issued rule positions. Keep failures visible as obstructions rather
+ * than minting an unconditional proof certificate or a Lean theorem. */
 export function typedTheoryProofCarrier(theory) {
     const closure = derivationClosure(theory);
     const judgments = Object.freeze(closure.generated.map((rule) => typing(closure.theory, rule.domain, rule.codomain)));
-    const obstructions = Object.freeze(judgments.filter((item) => item.kind === "typedTheory.typing-obstruction"));
-    return Object.freeze({ kind: "typedTheory.proof.carrier", theory: closure.theory, closure, judgments, obstructions, rank: count(judgments) });
+    const validations = Object.freeze(judgments
+        .filter((item) => item.kind === "typedTheory.typing:witness")
+        .map((item) => derivationValidity(closure.theory, item.derivation)));
+    const obstructions = Object.freeze([
+        ...judgments.filter((item) => item.kind === "typedTheory.typing-obstruction"),
+        ...validations.filter((item) => item.kind !== "typedTheory.derivationCheck:witness"),
+    ]);
+    return Object.freeze({ kind: "typedTheory.proof.carrier",
+        theory: closure.theory, closure, judgments, validations,
+        obstructions, rank: count(judgments) });
 }
 /** A predicate word arrow with a single-predicate word. */
 export function predicateWordArrow(subject, predicate, object) {
