@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import * as signCell from "@red-cup-engineering/signcell/predication";
 import { cell } from "@red-cup-engineering/signcell/cell";
 import { utterance } from "@red-cup-engineering/signcell/utterance";
-import { theoryOfBase, inferenceRules, derive, derivationValidity, typedTheoryProofCarrier } from "../../src/typed-theory.mjs";
+import { theoryOfBase, inferenceRules, derive, typing, derivationClosure, derivationValidity, typedTheoryProofCarrier } from "../../src/typed-theory.mjs";
 
 const { predicationSite, specializationMorphism, isAdmittedPredicationBase } = signCell;
 const requiresOriginalProducer = () => {
@@ -119,6 +119,46 @@ test("strict installed SignCell source yields actual checked SignChain proof car
   // This is a finite in-process proof of category-generator incidence.
   // It does not assert external witness, science kernel acceptance or
   // Graph/host operational receiving.
+});
+
+test("strict SignCell source category refuses proof across an unissued object",()=>{
+  requiresOriginalProducer();
+  const admitted=predicationSite([originalTypedPredication()]).base;
+  const complete=theoryOfBase(admitted);
+  const first=complete.rules[0];
+  const observed=derive(complete,first.domain,first.codomain);
+  assert.equal(observed.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(derivationValidity(complete,observed.derivation).kind,
+    "typedTheory.derivationCheck:witness");
+
+  // Remove ONE original source-issued endpoint from the declared carrier,
+  // while keeping its actual incumbent generator. A syntactically valid
+  // rule cannot authorize a path outside the declared object category.
+  const missing=first.codomain;
+  const incomplete=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(complete.objects.filter(object=>
+      !signCell.baseObjectCoincides(object,missing))),
+    rules:complete.rules,
+  });
+  assert.equal(incomplete.objects.some(object=>
+    signCell.baseObjectCoincides(object,missing)),false);
+  assert.equal(derive(incomplete,first.domain,first.domain).kind,
+    "typedTheory.derivationSearch-obstruction",
+    "identity cannot certify a category whose original generator has no target");
+  assert.equal(typing(incomplete,first.domain,first.codomain).kind,
+    "typedTheory.typing-obstruction");
+  const fakeIdentity=Object.freeze({
+    kind:"typedTheory.derivation",theory:incomplete,
+    premise:first.domain,conclusion:first.domain,
+    steps:Object.freeze([]),
+    length:Object.freeze({kind:"exactNumber.natural",value:"0"}),
+  });
+  const verdict=derivationValidity(incomplete,fakeIdentity);
+  assert.equal(verdict.kind,"typedTheory.derivation-obstruction");
+  assert.equal(verdict.reason,"undeclared-rule-endpoint");
+  assert.throws(()=>derivationClosure(incomplete),/undeclared-rule-endpoint/);
+  assert.throws(()=>typedTheoryProofCarrier(incomplete),/undeclared-rule-endpoint/);
 });
 
 test("the strict installed supplier preserves array-valued Term identities across heterogeneous generators",()=>{
