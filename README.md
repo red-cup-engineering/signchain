@@ -192,8 +192,11 @@ The existing `./source-withdrawal` entrypoint now also exports
 `compareOriginalEvidenceSnapshots(previous, current, {propositions})` for
 research revision intake. Both inputs must be **sealed original SignChain
 TellingLogs**. Callers explicitly nominate up to 128 **unevidenced original
-SignCell propositions**; the operation does not try to discover all dependent
-claims or guess source identities. It compares source witnesses on each
+SignCell propositions** in one ordinary dense, undecorated Array of source
+coordinate values; sparse entries, custom iterators, hidden metadata and
+accessor-backed entries refuse before reading either history. The operation
+does not try to discover all dependent claims or guess source identities.
+It compares source witnesses on each
 polarity using SignCell/SCA coincidence identity, returning separately:
 
 - added and removed **original witness addresses** for each polarity;
