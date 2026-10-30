@@ -44,7 +44,7 @@ test("sourcePattern refuses query accessors before executing them",()=>{
  const selected=sourcePattern({subject:term,object:0,irrelevant:1});
  assert.strictEqual(selected.subject,term);
  assert.deepEqual(Object.keys(selected),["subject","object"]);
- assert.equal(Object.getPrototypeOf(selected),null);
+ assert.equal(Object.getPrototypeOf(selected),Object.prototype); // SignCell retains only ordinary records
  assert.equal(Object.isFrozen(selected),true);
 });
 test("sourcePattern uses only own fields and refuses nonplain query envelopes",()=>{
