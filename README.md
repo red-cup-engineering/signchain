@@ -240,9 +240,21 @@ real-world scientific uncertainty. Native `where`/`against` remain
 unbounded for other consumers.
 
 Native proposed receiving: this original repository has a **tracked
-`pnpm-lock.yaml`**, a `pnpm-workspace.yaml`, and private-registry coordinates.
-On an authorized Node 24 host with pnpm 10.20.0 and access to the configured
-registry, run these exact **pending** package-installed operations:
+`pnpm-lock.yaml`**, a `pnpm-workspace.yaml`, and the same
+[Bare Cedar Fog original .npmrc](https://github.com/561-group/bare-cedar-fog/blob/main/.npmrc)
+(source blob `673e8e048fe1d1560c09e80f94b25557bc686de7`).
+Public unscoped packages resolve directly to npmjs; **all 13 named house scopes
+remain at `registry.561.group`**, with the existing locked package versions
+and SHA-512 source receipts unchanged. This replaces the earlier single
+all-house `registry=` route; it does not grant public access to house packages
+or attest that *this SignChain dependency closure* was successfully installed.
+The earlier public [JSNode locked native receiving](https://github.com/red-cup-engineering/jsnode-package-engineering-services-section/actions/runs/40982085365)
+and [PROV-O original native receiving](https://github.com/red-cup-engineering/prov-o-provenance-service/actions/runs/40975761353)
+show the shared scoped-provider route can serve selected consumers, **not**
+that this private SignChain runner or its independent Science/Graph receiver
+was ever executed. On an authorized Node 24 host with pnpm 10.20.0 and
+access to the original registry, run these exact **pending** package-installed
+operations:
 
 ```sh
 pnpm install --frozen-lockfile
