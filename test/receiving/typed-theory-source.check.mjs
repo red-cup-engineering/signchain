@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import * as signCell from "@red-cup-engineering/signcell/predication";
 import { cell } from "@red-cup-engineering/signcell/cell";
 import { utterance } from "@red-cup-engineering/signcell/utterance";
-import { theoryOfBase } from "../../src/typed-theory.mjs";
+import { theoryOfBase, inferenceRules } from "../../src/typed-theory.mjs";
 
 const { predicationSite, specializationMorphism, isAdmittedPredicationBase } = signCell;
 const requiresOriginalProducer = () => {
@@ -51,6 +51,18 @@ test("a pinned original SignCell producer constructs the source-closed theory co
     "typedTheory.inferenceMorphism.objectProjection",
   ]);
   assert.equal(Object.isFrozen(theory.objects),true);
+  // Original direct generic inference and declared-base inference must agree
+  // on every source-issued generator endpoint, not only on three kind labels.
+  const direct = inferenceRules([generator]);
+  assert.equal(direct.length,theory.rules.length);
+  for(let i=0;i<direct.length;i++){
+    assert.equal(direct[i].trace.morphisms[0].kind,
+      theory.rules[i].trace.morphisms[0].kind);
+    assert.equal(signCell.baseObjectCoincides(direct[i].domain,theory.rules[i].domain),true,
+      "generic inference source and original base must have coincident domains");
+    assert.equal(signCell.baseObjectCoincides(direct[i].codomain,theory.rules[i].codomain),true,
+      "generic inference source and original base must have coincident codomains");
+  }
   // Neither "three rules" nor the generated kind alone proves preservation
   // of the source predicate projections. Refuse reversed/swapped endpoints.
   const originalNode = signCell.predicationBaseNodeOf(generator);
