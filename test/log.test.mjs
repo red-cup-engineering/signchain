@@ -161,7 +161,7 @@ test("readingWhere evaluates one original complete source-pattern snapshot",()=>
  assert.equal(log.against({subject:"w"}).length,1);
 });
 
-test("null-prototype source selectors cross the original SCA admission boundary without losing guards",()=>{
+test("ordinary source-pattern reader receives null-prototype caller data without a second codec",()=>{
   const c=cell("research","has-source","dated-report");
   const selector=Object.create(null);
   selector.subject="research";
@@ -194,7 +194,8 @@ test("indexed bounded source reading checks candidate budget before constructing
   assert.deepEqual(result.against,history.against(c));
   assert.equal(Object.isFrozen(result.for),true);
   assert.throws(()=>history.boundedAt(c,1),/budget exceeded before materialization/);
-  // The helper retains the previous null-prototype query admission path.
+  // The original helper now returns an ordinary inert source record; the
+ // caller may still supply a null-prototype coordinate envelope.
   const selector=Object.assign(Object.create(null),{subject:"claim",predicate:"source",object:"research"});
   assert.equal(history.boundedAt(selector,2).matchedTellings,2);
 });
