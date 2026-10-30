@@ -139,6 +139,43 @@ test("both distinct modal adjoint pairs satisfy S4 laws over all finite two-toke
   }
 });
 
+test("transported source frames preserve both modal adjunctions over every two-token FOUR valuation", () => {
+  const source = tokenFrame([
+    told("specific", "general"),
+    cell("general", "reports", "claim", {for:["source"],against:["challenger"]}),
+  ]);
+  // The wire may lie about displayed tokens and identification, but its
+  // original source Cells and declared specialization law determine the math.
+  const wire = {kind:source.kind,predicate:source.predicate,cells:[...source.cells],
+    tokens:["invented"],identified:[["specific","general"]]};
+  const readings = readingFamilies.knowledge;
+  const states = readings.flatMap(a => readings.map(b => [
+    {token:"specific",reading:a},{token:"general",reading:b},
+  ]));
+  let checked = 0;
+  for(const order of ["knowledge","truth"]){
+    const within = order === "knowledge" ? knowledgeWithin : truthWithin;
+    for(const v of states){
+      const possible = possibilizeIn(wire,v,order);
+      const necessary = necessitateIn(wire,v,order);
+      assert.deepEqual(possible,possibilizeIn(source,v,order),
+        "transported frames must reproduce source-owned existential readings");
+      assert.deepEqual(necessary,necessitateIn(source,v,order),
+        "transported frames must reproduce source-owned universal readings");
+      assert.deepEqual(possibilizeIn(wire,possible,order),possible,
+        "source-indexed existential is idempotent");
+      assert.deepEqual(necessitateIn(wire,necessary,order),necessary,
+        "source-indexed universal is idempotent");
+      for(const w of states){
+        assert.equal(within(wire,possible,w),within(wire,v,necessitateIn(wire,w,order)),
+          "the original finite adjunction survives source transport");
+        checked++;
+      }
+    }
+  }
+  assert.equal(checked,512,"16 × 16 finite two-token valuations in both FOUR orders");
+});
+
 test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", () => {
   const original = { beta: [2, 1], alpha: { z: "last", a: "first" } };
   const equivalent = { alpha: { a: "first", z: "last" }, beta: [2, 1] };
