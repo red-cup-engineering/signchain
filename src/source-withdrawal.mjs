@@ -100,26 +100,26 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
   }
   requireEvidence(claimed.size===observed.size,
     "missing original-producer attribution for a witnessed source");
-  const origins=[...new Set(claimed.values())].sort(cmp);
+  const origins=Object.freeze([...new Set(claimed.values())].sort(cmp));
   requireEvidence(origins.length<=LIMIT,
     "too many original-producer assignments");
   const remove=(xs,origin)=>xs.filter(w=>claimed.get(coincidenceKey(w))!==origin);
-  const withdrawals=origins.map(originalProducer=>{
+  const withdrawals=Object.freeze(origins.map(originalProducer=>{
     const retained=cell(proposition.subject,proposition.predicate,proposition.object,{
       for:remove(positive,originalProducer), against:remove(negative,originalProducer),
     });
     const after=reading(retained);
     return Object.freeze({
       originalProducer,
-      removedWitnessAddresses:[...observed].filter(([k])=>claimed.get(k)===originalProducer)
-        .map(([,v])=>semanticId(v.witness)).sort(cmp),
+      removedWitnessAddresses:Object.freeze([...observed].filter(([k])=>claimed.get(k)===originalProducer)
+        .map(([,v])=>semanticId(v.witness)).sort(cmp)),
       remaining:after,
       originalKnowledgeAboveRestricted:knowledgeLeq(retained,originalCell),
       restrictedTruthBelowOriginal:truthLeq(retained,originalCell),
       originalTruthBelowRestricted:truthLeq(originalCell,retained),
       intervention:"counterfactual-withholding-not-an-observed-source-retraction",
     });
-  });
+  }));
   return Object.freeze({
     type:"signchain.originalSourceWithdrawal.v1",
     propositionAddress:address(originalCell),
@@ -131,14 +131,14 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
     // Universal quantification is over the supplied COMPLETE attribution partition,
     // not a certificate of independent, authentic or independently located sources.
     // Zero-producer cases are explicitly unknown, not vacuous corroboration.
-    sourceRemovalSupport:{
+    sourceRemovalSupport:Object.freeze({
       evaluatedProducerCount:origins.length,
       supportSurvivesEverySingleProducerRemoval:origins.length===0 ? null :
         withdrawals.every(w=>w.remaining.positiveWitnesses>0),
       oppositionSurvivesEverySingleProducerRemoval:origins.length===0 ? null :
         withdrawals.every(w=>w.remaining.negativeWitnesses>0),
       standing:"conditional on the supplied original-producer partition, not an independent-source certificate",
-    },
+    }),
     epistemicStanding:"conditional finite FOUR evidence restriction over source-declared origin partitions",
     boundaries:Object.freeze([
       "original source and institution identity must be independently verified",
