@@ -159,6 +159,41 @@ test("strict installed source coincidence refuses executable hand roles before S
     "the original supplier's source-role equality cannot run callers' getters");
 });
 
+test("strict installed SignCell site refuses malformed evidence fields rather than reclassifying a triple",()=>{
+  requiresOriginalProducer();
+  const generator=originalTypedPredication();
+  const bare={
+    subject:generator.subject,
+    predicate:generator.predicate,
+    object:generator.object,
+  };
+  const good=predicationSite([bare]);
+  const issued=theoryOfBase(good.base);
+  assert.equal(issued.rules.length,3,
+    "the original bare source triple still yields its three generator arrows");
+  assert.equal(good.cells.cells.length,1);
+  // A canonical identity projection may discard an undefined property.
+  // The source admission must NOT use that reduction to erase an invalid
+  // evidence role and then treat the malformed record as a bare triple.
+  for(const input of [
+    {...bare,for:undefined},
+    {...bare,against:undefined},
+    {...bare,value:undefined},
+    {...bare,for:[],against:undefined},
+    {...bare,for:undefined,against:[]},
+    {...bare,for:[],against:[],value:undefined},
+  ]) {
+    assert.equal(signCell.isCell(input),false);
+    assert.throws(()=>predicationSite([input]),
+      /unsupported or malformed source generator/,
+      "an invalid source-present evidence coordinate cannot become a proof edge");
+  }
+  assert.equal(theoryOfBase(predicationSite([{
+    ...bare,for:[],against:[],
+  }]).base).rules.length,3,
+  "actual empty original testimony is distinguishable from a missing or invalid evidence field");
+});
+
 test("transported lookalike category cannot manufacture an admitted proof theory",()=>{
   requiresOriginalProducer();
   const original=predicationSite([originalTypedPredication()]).base;
