@@ -256,6 +256,46 @@ test("even a zero-step identity refuses a malformed theory's rules and traces",(
   assert.equal(called,0,"unadmitted theory callbacks must never run");
 });
 
+test("finite directed incidence: every and only reachable typed judgment has a checked proof",()=>{
+  // Exhaust the eight subgraphs of the original three generators A→B,
+  // B→C, A→C. The expected reachability is computed independently
+  // from the original BFS implementation (including identity arrows).
+  const edges=[["A","B"],["B","C"],["A","C"]];
+  const objects=["A","B","C"];
+  let candidates=0,checked=0;
+  for(let bits=0;bits<8;bits++){
+    const active=edges.filter((_,index)=>(bits&(1<<index))!==0);
+    const input=active.map(([domain,codomain])=>
+      specializationMorphism(codomain,domain));
+    const theory=Object.freeze({
+      kind:"typedTheory.carrier",
+      objects:Object.freeze([...objects]),
+      rules:Object.freeze(inferenceRules(input)),
+    });
+    for(const premise of objects)for(const conclusion of objects){
+      candidates++;
+      const direct=active.some(([a,b])=>a===premise&&b===conclusion);
+      const composite=premise==="A"&&conclusion==="C"&&
+        active.some(([a,b])=>a==="A"&&b==="B")&&
+        active.some(([a,b])=>a==="B"&&b==="C");
+      const expected=premise===conclusion||direct||composite;
+      const result=derive(theory,premise,conclusion);
+      assert.equal(result.kind==="typedTheory.derivationSearch:witness",
+        expected,`incorrect reachability for source graph ${bits}, ${premise}→${conclusion}`);
+      if(expected){
+        const verdict=derivationValidity(theory,result.derivation);
+        assert.equal(verdict.kind,"typedTheory.derivationCheck:witness",
+          `declared path must be a valid source proof in graph ${bits}`);
+        assert.equal(verdict.derivation.length.value,
+          String(result.derivation.steps.length));
+        checked++;
+      }
+    }
+  }
+  assert.equal(candidates,72);
+  assert.equal(checked,37);
+});
+
 // The actual source-owned predication site requires a typed Token-Predicate-Token
 // Cell. Bare string SignCells are valid for the generic cell algebra but do NOT
 // constitute a typed predication generator. Receive the real source type.
