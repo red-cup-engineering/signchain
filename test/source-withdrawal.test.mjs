@@ -277,6 +277,34 @@ test("snapshot comparison refuses mutable histories, forged coordinates, duplica
   assert.throws(()=>compare(before,after,new Array(129).fill(c)),/at most 128/);
 });
 
+test("snapshot comparison admits only a dense undecorated original proposition scope",()=>{
+  const c=cell("source","declares","proposition");
+  const before=new TellingLog().tell(c,"original").seal();
+  const after=new TellingLog().deny(c,"challenge").seal();
+  const compare=propositions=>compareOriginalEvidenceSnapshots(before,after,{propositions});
+  assert.equal(compare([c]).monitoredPropositionCount,1);
+  let called=0;
+  const hidden=[c];
+  Object.defineProperty(hidden,"unearnedAuthority",{value:"claim",enumerable:false});
+  assert.throws(()=>compare(hidden),/dense undecorated inert array/);
+  const symbol=[c];
+  Object.defineProperty(symbol,Symbol("forged-source"),{value:"claim"});
+  assert.throws(()=>compare(symbol),/dense undecorated inert array/);
+  const iterable=[c];
+  Object.defineProperty(iterable,Symbol.iterator,{
+    configurable:true,get(){called++;return [c][Symbol.iterator];},
+  });
+  assert.throws(()=>compare(iterable),/dense undecorated inert array/);
+  const accessor=[c];
+  Object.defineProperty(accessor,"0",{
+    enumerable:true,get(){called++;return c;},
+  });
+  assert.throws(()=>compare(accessor),/dense inert array entries/);
+  assert.equal(called,0,"source admission never executes an accessor or delegated iterator");
+  assert.equal(before.size,1);
+  assert.equal(after.size,1);
+});
+
 test("all 16 bounded FOUR evidence-polarity transitions preserve witness-level change and separate order directions",()=>{
   const c=cell("FOUR","under","revision");
   const snapshot=state=>{
