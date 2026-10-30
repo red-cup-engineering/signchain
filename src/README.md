@@ -40,7 +40,7 @@ The `token-fiber` claim valuation now takes one readmitted, immutable
 original joined evidence from it. This removes separate raw-wire reads of
 mutable `frame.cells` without replacing FOUR or the source index.
 Its canonical API and receiving conditions live in the original
-[SignCell contract](https://github.com/red-cup-engineering/signcell/blob/8b5d9ce5c28d5ac9d000633c11780814f44319fd/src/README.md#portable-token-frame-source-boundary);
+[SignCell contract](https://github.com/red-cup-engineering/signcell/blob/30803c6363505197a5aafffb6d3f08b13e6a9e9c/src/README.md#portable-token-frame-source-boundary);
 the proposed import needs a qualified immutable SignCell edition and
 pinned downstream native tests before integration.
 
