@@ -55,6 +55,51 @@ test("inferenceRules: a cell witness yields three rules (converse, subject- and 
     "an unissued source array cannot impersonate a categorical node");
 });
 
+originalSourceTest("inferenceRules inherits one inert source list and SignCell-issued endpoints without executing caller source",()=>{
+  const original=cellOf("alice","knows","bob");
+  const rules=inferenceRules([original]);
+  assert.equal(rules.length,3);
+  assert.equal(rules[0].trace.morphisms[0].kind,
+    "typedTheory.inferenceMorphism.converse");
+  const produced=signCellPredication.predicationBaseNodeOf(original);
+  for(const rule of rules)assert.equal(baseObjectCoincides(rule.domain,produced),true);
+  assert.equal(baseObjectCoincides(rules[1].codomain,"alice"),true);
+  assert.equal(baseObjectCoincides(rules[2].codomain,"bob"),true);
+
+  let executed=0;
+  const iterator=[original];
+  Object.defineProperty(iterator,Symbol.iterator,{value(){
+    executed++; return [original][Symbol.iterator]();
+  }});
+  assert.throws(()=>inferenceRules(iterator),/witnesses must be a dense unadorned array/);
+  const accessor=[original];
+  Object.defineProperty(accessor,"0",{enumerable:true,get(){
+    executed++;return original;
+  }});
+  assert.throws(()=>inferenceRules(accessor),/witnesses entries must be own source data/);
+  const sparse=new Array(2);
+  sparse[0]=original;
+  assert.throws(()=>inferenceRules(sparse),/witnesses must be a dense unadorned array/);
+  class ForeignList extends Array {}
+  assert.throws(()=>inferenceRules(new ForeignList(original)),/witnesses must be a finite source array/);
+  assert.throws(()=>inferenceRules(new Set([original])),/witnesses must be a finite source array/);
+  const hostile={...original};
+  Object.defineProperty(hostile,"subject",{enumerable:true,get(){
+    executed++;return original.subject;
+  }});
+  assert.throws(()=>inferenceRules([hostile]),/inert own Cell coordinates/);
+  assert.equal(executed,0,"no caller-controlled iterator or getter may issue proof endpoints");
+
+  const mutable={subject:{id:"before"},predicate:"observes",object:{id:"target"}};
+  const derived=inferenceRules([mutable]);
+  mutable.subject.id="edited";
+  mutable.object.id="edited";
+  assert.deepEqual(derived[1].codomain,{id:"before"},
+    "proof source projections come from the immutable original SignCell base node");
+  assert.deepEqual(derived[2].codomain,{id:"target"});
+  assert.equal(Object.isFrozen(derived[1].codomain),true);
+});
+
 // The actual source-owned predication site requires a typed Token-Predicate-Token
 // Cell. Bare string SignCells are valid for the generic cell algebra but do NOT
 // constitute a typed predication generator. Receive the real source type.
