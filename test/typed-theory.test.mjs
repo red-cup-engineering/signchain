@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as signCellPredication from "@red-cup-engineering/signcell/predication";
-const { predicationSite, specializationMorphism } = signCellPredication;
+const { predicationSite, specializationMorphism, predicateOfClaim, baseObjectCoincides } = signCellPredication;
+import {mark} from "@red-cup-engineering/signcell/mark";
+import {token,claim} from "@red-cup-engineering/signcell/utterance";
 const isAdmittedPredicationBase = signCellPredication.isAdmittedPredicationBase;
 // Do NOT call unqualified tests "passed" when the pinned source package lacks
 // its constructor-origin guard; explicitly report those receiving cases skipped.
@@ -45,7 +47,12 @@ test("inferenceRules: a cell witness yields three rules (converse, subject- and 
   ]));
 });
 
-const originalBase = () => predicationSite([cell("alice","likes","bob")]).base;
+// The actual source-owned predication site requires a typed Token-Predicate-Token
+// Cell. Bare string SignCells are valid for the generic cell algebra but do NOT
+// constitute a typed predication generator. Receive the real source type.
+const originalTypedCell = () => cell(token(mark("alice")),
+  predicateOfClaim(claim(mark("likes"))),token(mark("bob")));
+const originalBase = () => predicationSite([originalTypedCell()]).base;
 
 originalSourceTest("source-closed base projects all witnessed generator endpoints into one typed theory",()=>{
   const base=originalBase();
@@ -75,7 +82,7 @@ originalSourceTest("incomplete original categorical source refuses; cannot inven
     {...source,kind:"foreign.category"},
   ])assert.throws(()=>theoryOfBase(altered),/source|undeclared/u);
   const repaired=predicationSite([
-    cell("alice","likes","bob"),
+    originalTypedCell(),
     specializationMorphism("specific","general")
   ]).base;
   const accepted=theoryOfBase(repaired);
@@ -114,7 +121,7 @@ originalSourceTest("a syntactically closed forged base cannot enter an authentic
 
 test("unqualified installed SignCell source refuses typed base construction instead of guessing",()=>{
   if (hasAdmission) {
-    const valid=predicationSite([cell("alice","likes","bob")]).base;
+    const valid=predicationSite([originalTypedCell()]).base;
     assert.equal(isAdmittedPredicationBase(valid),true);
     assert.equal(theoryOfBase(valid).kind,"typedTheory.carrier");
   } else {
