@@ -158,6 +158,38 @@ test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", (
   assert.notEqual(claimCoordinate(original, "holds"), claimCoordinate("holds", original));
 });
 
+test("FOUR valuation uses one original SignCell-owned frame cut, never a second foreign source read", () => {
+  const original = tokenFrame([
+    told("child", "parent"),
+    cell("parent", "supports", "version", { for: ["source:first"] }),
+  ]);
+  const wire = { kind: original.kind, predicate: original.predicate, cells: [...original.cells] };
+  const first = valuationOf(wire, "supports", "version");
+  assert.equal(readingAt(first, "parent"), "potential");
+  wire.cells[1] = cell("parent", "supports", "version", {
+    against: ["source:contrary"],
+  });
+  const second = valuationOf(wire, "supports", "version");
+  assert.equal(readingAt(second, "parent"), "active");
+  assert.equal(readingAt(first, "parent"), "potential",
+    "a prior FOUR projection cannot be changed by a later wire revision");
+
+  let invoked = 0;
+  const getter = { ...wire };
+  Object.defineProperty(getter, "cells", {
+    enumerable: true, get() { invoked++; return wire.cells; },
+  });
+  assert.throws(() => valuationOf(getter, "supports", "version"),
+    /must be source data, not a getter/);
+  const special = [...wire.cells];
+  Object.defineProperty(special, Symbol.iterator, {
+    value() { invoked++; return wire.cells[Symbol.iterator](); },
+  });
+  assert.throws(() => valuationOf({ ...wire, cells: special }, "supports", "version"),
+    /dense undecorated data array/);
+  assert.equal(invoked, 0, "no caller-supplied getter or iterator ran");
+});
+
 test("transported claim tellings preserve both evidence sides in either wire order", () => {
   const positive = cell("token", "reports", { value: "source" }, { for: ["observer"] });
   const negative = cell("token", "reports", { value: "source" }, { against: ["challenger"] });
