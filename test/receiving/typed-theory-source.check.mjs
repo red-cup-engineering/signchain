@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import * as signCell from "@red-cup-engineering/signcell/predication";
 import { cell } from "@red-cup-engineering/signcell/cell";
 import { utterance } from "@red-cup-engineering/signcell/utterance";
-import { theoryOfBase, inferenceRules } from "../../src/typed-theory.mjs";
+import { theoryOfBase, inferenceRules, derive, derivationValidity, typedTheoryProofCarrier } from "../../src/typed-theory.mjs";
 
 const { predicationSite, specializationMorphism, isAdmittedPredicationBase } = signCell;
 const requiresOriginalProducer = () => {
@@ -87,6 +87,38 @@ test("a pinned original SignCell producer constructs the source-closed theory co
     assert.equal(signCell.baseObjectCoincides(rule.codomain,codomain),true,
       "each rule must retain its actual source-generated codomain");
   }
+});
+
+test("strict installed SignCell source yields actual checked SignChain proof carrier",()=>{
+  requiresOriginalProducer();
+  const produced=predicationSite([originalTypedPredication()]);
+  assert.equal(isAdmittedPredicationBase(produced.base),true);
+  const theory=theoryOfBase(produced.base);
+  const actualRule=theory.rules[0];
+  const proof=derive(theory,actualRule.domain,actualRule.codomain);
+  assert.equal(proof.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(derivationValidity(theory,proof.derivation).kind,
+    "typedTheory.derivationCheck:witness",
+    "only the exact installed SignCell rule positions license this finite path");
+  const carrier=typedTheoryProofCarrier(theory);
+  assert.equal(carrier.kind,"typedTheory.proof.carrier");
+  assert.equal(carrier.obstructions.length,0);
+  assert.equal(carrier.validations.length,carrier.judgments.length);
+  assert.ok(carrier.validations.every(verdict=>
+    verdict.kind==="typedTheory.derivationCheck:witness"));
+  for(const verdict of carrier.validations){
+    const proof=verdict.derivation;
+    assert.equal(proof.theory,carrier.theory);
+    assert.equal(Object.isFrozen(proof.steps),true);
+    for(const step of proof.steps){
+      assert.ok(carrier.theory.rules.includes(step.rule),
+        "each validated step retains the source-issued installed rule");
+      assert.equal(step.kind,"typedTheory.derivationStep");
+    }
+  }
+  // This is a finite in-process proof of category-generator incidence.
+  // It does not assert external witness, science kernel acceptance or
+  // Graph/host operational receiving.
 });
 
 test("the strict installed supplier preserves array-valued Term identities across heterogeneous generators",()=>{
