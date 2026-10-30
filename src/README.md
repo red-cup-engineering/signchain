@@ -35,6 +35,15 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   It sits between the frame (SignCell's Heyting algebra of tokens) and the
   token sheaf SignGraph glues from it.
 
+The `token-fiber` claim valuation now takes one readmitted, immutable
+`admitTokenFrame` source cut from SignCell and reads both tokens and
+original joined evidence from it. This removes separate raw-wire reads of
+mutable `frame.cells` without replacing FOUR or the source index.
+Its canonical API and receiving conditions live in the original
+[SignCell contract](https://github.com/red-cup-engineering/signcell/blob/main/src/README.md#portable-token-frame-source-boundary);
+the proposed import needs a qualified immutable SignCell edition and
+pinned downstream native tests before integration.
+
 ## Bounded predicate-word paths: finite proof without false saturation
 
 `composePredicateWords` retains the historical **single pairwise round**
