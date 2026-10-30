@@ -22,6 +22,8 @@ import {
   inferenceRules,
   theoryOfBase,
   derive,
+  typing,
+  derivationClosure,
   derivationValidity,
   derivationIdentity,
   typedTheoryProofCarrier,
@@ -294,6 +296,99 @@ test("finite directed incidence: every and only reachable typed judgment has a c
   }
   assert.equal(candidates,72);
   assert.equal(checked,37);
+});
+
+test("typed theory generators cannot prove through an undeclared intermediate object",()=>{
+  // SignCell owns endpoint coincidence and directional specialization;
+  // SignChain owns the original complete object carrier and proof judgment.
+  // A -> Z -> B is NOT an arrow in the category declaring only A and B.
+  const rules=inferenceRules([
+    specializationMorphism("Z","A"),
+    specializationMorphism("B","Z"),
+  ]);
+  const invalid=Object.freeze({
+    kind:"typedTheory.carrier",objects:Object.freeze(["A","B"]),
+    rules:Object.freeze(rules),
+  });
+  assert.equal(derive(invalid,"A","B").kind,
+    "typedTheory.derivationSearch-obstruction");
+  assert.equal(typing(invalid,"A","B").kind,
+    "typedTheory.typing-obstruction");
+  assert.equal(derive(invalid,"A","A").kind,
+    "typedTheory.derivationSearch-obstruction",
+    "even identity proof requires a well-formed ambient theory");
+
+  const identity=Object.freeze({
+    kind:"typedTheory.derivation",theory:invalid,premise:"A",
+    conclusion:"A",steps:Object.freeze([]),
+    length:Object.freeze({kind:"exactNumber.natural",value:"0"}),
+  });
+  const forgedPath=Object.freeze({
+    kind:"typedTheory.derivation",theory:invalid,premise:"A",
+    conclusion:"B",steps:Object.freeze([
+      Object.freeze({kind:"typedTheory.derivationStep",
+        premise:"A",rule:rules[0],conclusion:"Z"}),
+      Object.freeze({kind:"typedTheory.derivationStep",
+        premise:"Z",rule:rules[1],conclusion:"B"}),
+    ]),length:Object.freeze({kind:"exactNumber.natural",value:"2"}),
+  });
+  for(const candidate of [identity,forgedPath]){
+    const verdict=derivationValidity(invalid,candidate);
+    assert.equal(verdict.kind,"typedTheory.derivation-obstruction");
+    assert.equal(verdict.reason,"undeclared-rule-endpoint");
+  }
+  assert.throws(()=>derivationClosure(invalid),/undeclared-rule-endpoint/);
+  assert.throws(()=>typedTheoryProofCarrier(invalid),/undeclared-rule-endpoint/);
+
+  // Declaring the actual intermediate Z repairs the SAME original graph;
+  // no edge or witness is introduced by the checker.
+  const complete=Object.freeze({
+    kind:"typedTheory.carrier",objects:Object.freeze(["A","Z","B"]),
+    rules:Object.freeze(rules),
+  });
+  const received=derive(complete,"A","B");
+  assert.equal(received.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(received.derivation.steps.length,2);
+  assert.equal(derivationValidity(complete,received.derivation).kind,
+    "typedTheory.derivationCheck:witness");
+  const carrier=typedTheoryProofCarrier(complete);
+  assert.equal(carrier.obstructions.length,0);
+  assert.ok(carrier.validations.every(item=>
+    item.kind==="typedTheory.derivationCheck:witness"));
+});
+
+test("an ill-formed theory cannot certify identity by hiding executable rule endpoints",()=>{
+  const valid=inferenceRules([specializationMorphism("B","A")])[0];
+  let executed=0;
+  const hostile={...valid};
+  Object.defineProperty(hostile,"domain",{enumerable:true,get(){
+    executed++;return "A";
+  }});
+  const source=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(["A","B"]),
+    rules:Object.freeze([hostile]),
+  });
+  assert.equal(derive(source,"A","A").kind,
+    "typedTheory.derivationSearch-obstruction");
+  const identity=Object.freeze({
+    kind:"typedTheory.derivation",theory:source,premise:"A",
+    conclusion:"A",steps:Object.freeze([]),
+    length:Object.freeze({kind:"exactNumber.natural",value:"0"}),
+  });
+  assert.equal(derivationValidity(source,identity).kind,
+    "typedTheory.derivation-obstruction");
+  assert.throws(()=>derivationClosure(source),/invalid-theory-rule/);
+  assert.equal(executed,0,
+    "neither identity search nor proof checking may execute source getters");
+
+  const empty=Object.freeze({kind:"typedTheory.carrier",
+    objects:Object.freeze(["A"]),rules:Object.freeze([])});
+  const accepted=derive(empty,"A","A");
+  assert.equal(accepted.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(derivationValidity(empty,accepted.derivation).kind,
+    "typedTheory.derivationCheck:witness",
+    "a genuine discrete category still has its identity");
 });
 
 // The actual source-owned predication site requires a typed Token-Predicate-Token
