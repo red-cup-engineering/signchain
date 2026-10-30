@@ -121,6 +121,32 @@ test("results do not certify authority, source independence, source withdrawal, 
   assert.equal(r.withdrawals.length,0);
 });
 
+test("original source-withdrawal receipts preserve every nested evidence and producer reading",()=>{
+  const c=cell("s","p","o"),positive="source:affirm",negative="source:challenge";
+  const history=new TellingLog().tell(c,positive).deny(c,negative).seal();
+  const receipt=assay(history,{proposition:c,attributions:[
+    origin(positive,"producer-a"),origin(negative,"producer-b"),
+  ]});
+  assert.equal(receipt.original.knowledge,"stable");
+  assert.equal(receipt.attributedProducerCount,2);
+  assert.ok(Object.isFrozen(receipt),"outer evidence report is immutable");
+  assert.ok(Object.isFrozen(receipt.attributedProducers),"producer identities are retained as immutable evidence");
+  assert.ok(Object.isFrozen(receipt.withdrawals),"no caller may replace the independent counterfactual reports");
+  assert.ok(Object.isFrozen(receipt.withdrawals[0]),"per-producer reading is immutable");
+  assert.ok(Object.isFrozen(receipt.withdrawals[0].removedWitnessAddresses),
+    "removed source witness identities are immutable");
+  assert.ok(Object.isFrozen(receipt.withdrawals[0].remaining),"FOUR reading is immutable");
+  assert.ok(Object.isFrozen(receipt.sourceRemovalSupport),"conditional producer conclusion is immutable");
+  assert.throws(()=>receipt.attributedProducers.push("forged"),TypeError);
+  assert.throws(()=>receipt.withdrawals.splice(0,1),TypeError);
+  assert.throws(()=>receipt.withdrawals[0].removedWitnessAddresses.push("forged"),TypeError);
+  assert.throws(()=>{receipt.sourceRemovalSupport.evaluatedProducerCount=9000;},TypeError);
+  assert.equal(receipt.attributedProducerCount,2);
+  assert.deepEqual(receipt.withdrawals.map(x=>x.originalProducer),["producer-a","producer-b"]);
+  assert.equal(history.readingAt(c),"stable",
+    "defending receipt custody leaves the original sealed history untouched");
+});
+
 test("conditional all-producer removal support distinguishes independent attributions from repeated documents",()=>{
   const c=cell("s","p","o"),a="report-a",b="report-b";
   const log=new TellingLog().tell(c,a).tell(c,b).seal();
