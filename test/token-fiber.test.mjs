@@ -232,9 +232,8 @@ test("all FOUR modal operators and truth nuclei use one received frame revision"
   assert.equal(readingAt(after.possible,"child"),"active");
   assert.equal(readingAt(after.valuation,"parent"),"active");
   assert.equal(readingAt(before.possible,"child"),"stable");
-  assert.deepEqual(before.valuation, [
-    ...before.valuation
-  ],"previous source-cut result remains unchanged");
+  assert.equal(readingAt(before.valuation,"parent"),"potential",
+    "source revision cannot mutate an earlier evidence valuation");
 
   let called=0;
   const hostile={...frame};
