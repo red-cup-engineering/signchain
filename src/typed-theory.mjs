@@ -288,6 +288,32 @@ export function derivationValidity(theory, derivation) {
         rules = finiteSourceArray(ownedTheory.rules, "theory rules");
         steps = finiteSourceArray(original.steps, "derivation steps");
     } catch { return refusal("invalid-proof-sequence"); }
+    // A zero-step identity is still a judgment UNDER a theory, not an
+    // authorization to ignore malformed rules in that theory. The source
+    // uses exactly the original four inference-morphism constructors;
+    // their traces and slots must be inert before any proof is certified.
+    const morphismKinds = [
+        "typedTheory.inferenceMorphism.specialization",
+        "typedTheory.inferenceMorphism.converse",
+        "typedTheory.inferenceMorphism.subjectProjection",
+        "typedTheory.inferenceMorphism.objectProjection",
+    ];
+    for (const rule of rules) {
+        const declared = sourceRecord(rule,
+            ["kind", "domain", "trace", "codomain"]);
+        if (!declared || declared.kind !== "typedTheory.inferenceRule")
+            return refusal("invalid-theory-rule");
+        const trace = sourceRecord(declared.trace, ["kind", "morphisms"]);
+        if (!trace || trace.kind !== "typedTheory.inferenceTrace")
+            return refusal("invalid-theory-trace");
+        let morphisms;
+        try { morphisms = finiteSourceArray(trace.morphisms, "rule trace"); }
+        catch { return refusal("invalid-theory-trace"); }
+        if (morphisms.length < 1 || morphisms.some(morphism => {
+            const presented = sourceRecord(morphism, ["kind"]);
+            return !presented || !morphismKinds.includes(presented.kind);
+        })) return refusal("invalid-theory-morphism");
+    }
     // ExactNumber owns natural-number meaning. Compare the actual issued
     // count's two canonical data coordinates, rather than coercing a
     // caller-provided claimed length to a number.
