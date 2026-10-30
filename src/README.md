@@ -27,7 +27,13 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   inference morphisms (specialization, converse, subject/object
   projection), inference rules and their composition closure,
   breadth-first derivation search, typing judgments, derivation validity
-  checking, and predicate words.
+  checking, and predicate words. Its source receiving now constructs a real
+  Token–Predicate–Token Cell rather than feeding an unqualified plain
+  SignCell into `predicationSite`; the same original receiving suite
+  distinguishes array-valued Mark *terms* from actual typed generator nodes.
+  The corrected `baseObjectCoincides` remains a SignCell supplier contract.
+  This test requires a separately qualified immutable SignCell edition;
+  neither a draft branch nor source syntax counts as installed receiving.
 
 - `token-fiber` — the fiber algebra over SignCell's token frame: a claim
   read at every token in FOUR (FOUR^T, each order's meet residuated by its
