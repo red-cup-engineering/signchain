@@ -215,6 +215,47 @@ test("typed derivation validity refuses forged proof claims, executable steps an
   assert.equal(Object.isFrozen(checked.derivation.steps[0]),true);
 });
 
+test("even a zero-step identity refuses a malformed theory's rules and traces",()=>{
+  const issued=inferenceRules([specializationMorphism("B","A")])[0];
+  const objects=Object.freeze(["A","B"]);
+  let called=0;
+  const accessor=(source,key)=>{
+    const altered={...source};
+    Object.defineProperty(altered,key,{enumerable:true,get(){
+      called++;return source[key];
+    }});
+    return altered;
+  };
+  const brokenTrace=[...issued.trace.morphisms];
+  Object.defineProperty(brokenTrace,Symbol.iterator,{value(){
+    called++;return [][Symbol.iterator]();
+  }});
+  const cases=[
+    accessor(issued,"domain"),
+    {...issued,extraInstitutionalRight:true},
+    {...issued,kind:"foreign.rule"},
+    {...issued,trace:accessor(issued.trace,"morphisms")},
+    {...issued,trace:{...issued.trace,morphisms:brokenTrace}},
+    {...issued,trace:{...issued.trace,morphisms:[accessor(issued.trace.morphisms[0],"kind")]}},
+    {...issued,trace:{...issued.trace,morphisms:[{kind:"typedTheory.inferenceMorphism.unissued"}]}},
+    {...issued,trace:{...issued.trace,morphisms:[]}},
+  ];
+  for(const badRule of cases){
+    const badTheory=Object.freeze({
+      kind:"typedTheory.carrier",objects,rules:Object.freeze([badRule]),
+    });
+    // derive() need not inspect rules to construct the identity at A. The
+    // original derivation checker must nevertheless refuse an invalid
+    // ambient theory instead of certifying a proof under it.
+    const identity=derive(badTheory,"A","A");
+    assert.equal(identity.kind,"typedTheory.derivationSearch:witness");
+    assert.equal(identity.derivation.steps.length,0);
+    assert.equal(derivationValidity(badTheory,identity.derivation).kind,
+      "typedTheory.derivation-obstruction");
+  }
+  assert.equal(called,0,"unadmitted theory callbacks must never run");
+});
+
 // The actual source-owned predication site requires a typed Token-Predicate-Token
 // Cell. Bare string SignCells are valid for the generic cell algebra but do NOT
 // constitute a typed predication generator. Receive the real source type.
