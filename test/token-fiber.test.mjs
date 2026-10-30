@@ -166,7 +166,9 @@ test("FOUR valuation uses one original SignCell-owned frame cut, never a second 
   const wire = { kind: original.kind, predicate: original.predicate, cells: [...original.cells] };
   const first = valuationOf(wire, "supports", "version");
   assert.equal(readingAt(first, "parent"), "potential");
-  wire.cells[1] = cell("parent", "supports", "version", {
+  const claimIndex = wire.cells.findIndex(at => at.predicate === "supports");
+  assert.notEqual(claimIndex, -1);
+  wire.cells[claimIndex] = cell("parent", "supports", "version", {
     against: ["source:contrary"],
   });
   const second = valuationOf(wire, "supports", "version");
