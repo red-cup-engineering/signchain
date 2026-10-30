@@ -10,6 +10,15 @@
  */
 import * as signCellPredication from "@red-cup-engineering/signcell/predication";
 const { baseObjectCoincides, predicateCoincides, termCoincides, isSpecializationMorphism } = signCellPredication;
+// The heterogeneous categorical source-node sort belongs to SignCell. A
+// 3-element array can itself be the value of a Mark, so this consumer must
+// NEVER independently mint source-node arrays by shape alone.
+const nodeOfOriginalCell = (at) => {
+    const sourceConstructor = signCellPredication.predicationBaseNodeOf;
+    if (typeof sourceConstructor !== "function")
+        throw new TypeError("typed theory: pinned SignCell lacks source-owned base-node construction");
+    return sourceConstructor(at);
+};
 import { count, natZero } from "@red-cup-engineering/exact-number-data-service/exact-number";
 /** Build a cell from subject, predicate, object. */
 export const cellOf = (subject, predicate, object) => ({ subject, predicate, object });
@@ -34,8 +43,11 @@ export function inferenceRules(witnesses) {
             out.push(inferenceRule(specializationInferenceMorphism, witness.domain, witness.codomain));
         else {
             const cell = witness;
-            const node = Object.freeze([cell.subject, cell.predicate, cell.object]);
-            out.push(inferenceRule(converseInferenceMorphism, node, Object.freeze([cell.object, cell.predicate, cell.subject])));
+            const node = nodeOfOriginalCell(cell);
+            const converse = nodeOfOriginalCell({
+                subject: cell.object, predicate: cell.predicate, object: cell.subject,
+            });
+            out.push(inferenceRule(converseInferenceMorphism, node, converse));
             out.push(inferenceRule(subjectProjectionInferenceMorphism, node, cell.subject));
             out.push(inferenceRule(objectProjectionInferenceMorphism, node, cell.object));
         }
