@@ -63,26 +63,28 @@ operations over admitted observations of its points.
 
 ## Query-pattern admission into native content addresses
 
-`sourcePattern` intentionally returns a frozen null-prototype inert
-selector with only own `subject`, `predicate`, and `object` data
-descriptors; it refuses accessor-backed coordinates without invoking them.
-The current original semiotic-content-address implementation rejects
-null-prototype objects at `retainedCarrier`, however. The original
-`TellingLog` `#pattern` and `readingWhere` boundaries therefore copy
-the already-vetted selector's own fixed role data into an ordinary record
-before authentic SCA admission. Neither method re-reads the untrusted query
-or treats a query selector as evidence. An omitted `readingWhere()` input
-is a missing complete proposition (not a malformed supplied record).
+The original `sourcePattern` in the current mainline SignChain
+producer returns a frozen **ordinary inert source record** with only
+own `subject`, `predicate`, and `object` data descriptors.
+It refuses getter-backed coordinates without invoking them, and accepts
+ordinary or null-prototype caller inputs. The fixed original SCA
+`retainedCarrier` boundary can receive this record directly;
+`TellingLog.boundedAt`, `#pattern` and `readingWhere` no longer need
+an additional spread-copy conversion left over from the earlier
+null-prototype source mismatch. This change preserves one material
+query-source cut rather than producing redundant intermediary carriers.
+An omitted `readingWhere()` coordinate still refuses as an incomplete
+proposition, without fabricating source evidence.
 
-The original `test/log.test.mjs` now exercises the end-to-end
-null-prototype guard→native SCA query admission and hostile accessor
-refusal; `test/telling-source.test.mjs` continues to require the
-original helper's null-prototype return. This addresses the observed
-source-version mismatch without replacing the SCA canonical carrier,
-redefining SignCell identity, relaxing source-field guards, or touching
-the original append-only historical rows. A source-only execution with
-source-pinned original algorithms does not certify installed package
-versions or host consumer receiving.
+The branch now contains **byte-identical** versions of the current main
+`src/telling-source.mjs` and `test/telling-source.test.mjs`,
+including the explicit ordinary-record expectation. The existing
+`test/log.test.mjs` retains null-prototype caller admission,
+complete-query checks and hostile-accessor refusals. The historical
+source-only SCA mismatch was fixed by its original producer, not by a
+second SignChain codec or a replacement source logger. Installed
+frozen-lockfile tests and independent research/Work receiving remain
+unexecuted and are not inferred from source parity.
 
 ## Mark-rooted evidence, two orders and the identification frontier
 
