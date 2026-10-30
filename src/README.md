@@ -29,11 +29,15 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   breadth-first derivation search, typing judgments, derivation validity
   checking, and predicate words. Its source receiving now constructs a real
   Token–Predicate–Token Cell rather than feeding an unqualified plain
-  SignCell into `predicationSite`; the same original receiving suite
-  distinguishes array-valued Mark *terms* from actual typed generator nodes.
-  The corrected `baseObjectCoincides` remains a SignCell supplier contract.
-  This test requires a separately qualified immutable SignCell edition;
-  neither a draft branch nor source syntax counts as installed receiving.
+  SignCell into `predicationSite`. Generic `inferenceRules` also consumes
+  SignCell's original `predicationBaseNodeOf`: a source-issued node and a
+  JSON-identical unissued array Term cannot become the same object sort.
+  The strict `test/receiving/typed-theory-source.check.mjs` refuses the
+  absence of that installed supplier; the broad compatibility test skips
+  its source-dependent cases with an explicit reason. SignCell owns
+  `baseObjectCoincides`, node issuance and coincidence, not SignChain.
+  A distinct immutable SignCell edition and the complete native tests
+  are still necessary before integration.
 
 - `token-fiber` — the fiber algebra over SignCell's token frame: a claim
   read at every token in FOUR (FOUR^T, each order's meet residuated by its
