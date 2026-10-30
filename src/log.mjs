@@ -114,7 +114,7 @@ export class TellingLog {
     const guarded = sourcePattern(at);
     if (!ROLES.every(role => Object.hasOwn(guarded, role) && guarded[role] !== undefined))
       throw new TypeError("signchain log: bounded read requires one complete subject/predicate/object proposition");
-    const selected = retainedCarrier({ ...guarded });
+    const selected = retainedCarrier(guarded);
     let narrowest = null;
     for (const role of ROLES) {
       const positions = this.#byRole[role].get(keyOf(selected[role])) ?? [];
@@ -161,11 +161,10 @@ export class TellingLog {
   // execute a user-defined getter, nor change its predicate between index
   // selection and matching. SignCell still owns canonical nested identities.
   #pattern(input) {
-    // sourcePattern intentionally builds a null-prototype inert selector.
-    // Original SCA retainedCarrier accepts ordinary Object.prototype records,
-    // not that guard representation; copy only its already-vetted own role
-    // data into the native carrier without revisiting the untrusted input.
-    return retainedCarrier({ ...sourcePattern(input) });
+    // Current original sourcePattern already returns an inert ordinary
+    // record, so the original SignCell/SCA source owner can retain it directly.
+    // Do not add an extra synthetic spread / intermediate source carrier.
+    return retainedCarrier(sourcePattern(input));
   }
 
   /** The rows telling for a triple matching a pattern of any of subject, predicate, object, in order. */
@@ -196,9 +195,9 @@ export class TellingLog {
     const source = sourcePattern(input);
     if (!ROLES.every(role => Object.hasOwn(source, role) && source[role] !== undefined))
       throw new TypeError("signchain log: a FOUR reading requires one complete subject/predicate/object proposition");
-    // Match #pattern's guard-to-native admission boundary. The original
-    // source record is frozen null-prototype, not itself an SCA JSON carrier.
-    const selected = retainedCarrier({ ...source });
+    // The same original sourcePattern record enters the source-owned SCA
+    // without an obsolete null-prototype conversion.
+    const selected = retainedCarrier(source);
     const candidates = this.#candidates(selected).filter(row => matches(selected, row));
     return readingOfSides("knowledge",
       candidates.some(row => row.side === "for"),
