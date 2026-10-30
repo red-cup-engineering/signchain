@@ -172,6 +172,17 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     Object.getPrototypeOf(propositions) === Array.prototype &&
     propositions.length <= 128,
     "requires at most 128 explicitly nominated proposition coordinates");
+  // A coordinate family is finite source DATA, not an arbitrary iterator or
+  // a carrier for concealed authorities. Reject decorated/sparse/accessor
+  // arrays BEFORE the original indexed histories are touched.
+  const propositionSlots = Object.getOwnPropertyDescriptors(propositions);
+  requireEvidence(Reflect.ownKeys(propositionSlots).length === propositions.length + 1,
+    "proposition coordinates must be a dense undecorated inert array");
+  for (let index = 0; index < propositions.length; index++) {
+    const slot = propositionSlots[String(index)];
+    requireEvidence(slot && slot.enumerable && Object.hasOwn(slot, "value"),
+      "proposition coordinates must be dense inert array entries");
+  }
   const seen = new Set();
   let inspectedTellings = 0, inspectedCandidates = 0;
   const changes = [];
@@ -212,10 +223,7 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
       .sort(([a], [b]) => cmp(a, b)).map(([, value]) => value)),
   });
   for (let index = 0; index < propositions.length; index++) {
-    const slot = Object.getOwnPropertyDescriptor(propositions, String(index));
-    requireEvidence(slot && slot.enumerable && Object.hasOwn(slot, "value"),
-      "proposition coordinates must be dense inert array entries");
-    const proposition = slot.value;
+    const proposition = propositionSlots[String(index)].value;
     requireEvidence(isCell(proposition) && measured(proposition) &&
       proposition.for.length === 0 && proposition.against.length === 0,
       "requires original unevidenced SignCell proposition coordinates");
