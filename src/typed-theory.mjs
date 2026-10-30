@@ -35,21 +35,43 @@ export const objectProjectionInferenceMorphism = Object.freeze({ kind: "typedThe
 export function inferenceTrace(morphisms) {
     return Object.freeze({ kind: "typedTheory.inferenceTrace", morphisms: Object.freeze([...morphisms]) });
 }
-/** Derive inference rules from predication data. */
+/** One bounded, inert source-array admission for the two original
+ * theory-producing readers. It does NOT qualify a Cell's witness, actor or
+ * predicate; SignCell remains the source owner for those representations.
+ * A caller iterator must not manufacture inference-rule positions. */
+function finiteSourceArray(items, role) {
+    if (!Array.isArray(items) || Object.getPrototypeOf(items) !== Array.prototype)
+        throw new TypeError("typed theory: " + role + " must be a finite source array");
+    const descriptor = Object.getOwnPropertyDescriptors(items);
+    if (Reflect.ownKeys(descriptor).length !== items.length + 1)
+        throw new TypeError("typed theory: " + role + " must be a dense unadorned array");
+    return Object.freeze(Array.from({ length: items.length }, (_, index) => {
+        const entry = descriptor[String(index)];
+        if (!entry || !entry.enumerable || !Object.hasOwn(entry, "value"))
+            throw new TypeError("typed theory: " + role + " entries must be own source data");
+        return entry.value;
+    }));
+}
+/** Derive inference rules from bounded original predication sources.
+ * A Cell is first made a SOURCE-ISSUED SignCell node; its two projection
+ * endpoints come from THAT immutable node, never a second raw caller read. */
 export function inferenceRules(witnesses) {
     const out = [];
-    for (const witness of witnesses) {
-        if (isSpecializationMorphism(witness))
-            out.push(inferenceRule(specializationInferenceMorphism, witness.domain, witness.codomain));
-        else {
-            const cell = witness;
-            const node = nodeOfOriginalCell(cell);
+    for (const witness of finiteSourceArray(witnesses, "witnesses")) {
+        if (isSpecializationMorphism(witness)) {
+            // SignCell's original structural guard has already required
+            // inert own domain/codomain fields; read their descriptors once.
+            const domain = Object.getOwnPropertyDescriptor(witness, "domain").value;
+            const codomain = Object.getOwnPropertyDescriptor(witness, "codomain").value;
+            out.push(inferenceRule(specializationInferenceMorphism, domain, codomain));
+        } else {
+            const node = nodeOfOriginalCell(witness);
             const converse = nodeOfOriginalCell({
-                subject: cell.object, predicate: cell.predicate, object: cell.subject,
+                subject: node[2], predicate: node[1], object: node[0],
             });
             out.push(inferenceRule(converseInferenceMorphism, node, converse));
-            out.push(inferenceRule(subjectProjectionInferenceMorphism, node, cell.subject));
-            out.push(inferenceRule(objectProjectionInferenceMorphism, node, cell.object));
+            out.push(inferenceRule(subjectProjectionInferenceMorphism, node, node[0]));
+            out.push(inferenceRule(objectProjectionInferenceMorphism, node, node[2]));
         }
     }
     return Object.freeze(out);
@@ -83,22 +105,9 @@ export function theoryOfBase(base) {
             throw new TypeError("typed theory: source " + name + " must be an own data property");
         return descriptor.value;
     };
-    const finite = (items, role) => {
-        if (!Array.isArray(items) || Object.getPrototypeOf(items) !== Array.prototype)
-            throw new TypeError("typed theory: " + role + " must be a finite source array");
-        const descriptor = Object.getOwnPropertyDescriptors(items);
-        if (Reflect.ownKeys(descriptor).length !== items.length + 1)
-            throw new TypeError("typed theory: " + role + " must be a dense unadorned array");
-        return Object.freeze(Array.from({ length: items.length }, (_, index) => {
-            const entry = descriptor[String(index)];
-            if (!entry || !entry.enumerable || !Object.hasOwn(entry, "value"))
-                throw new TypeError("typed theory: " + role + " entries must be own source data");
-            return entry.value;
-        }));
-    };
     if (own(base, "kind") !== "predication.base")
         throw new TypeError("typed theory: source must be the original SignCell predication.base");
-    const objects = finite(own(base, "objects"), "objects");
+    const objects = finiteSourceArray(own(base, "objects"), "objects");
     const categories = [
         ["specialization", specializationInferenceMorphism],
         ["converse", converseInferenceMorphism],
@@ -107,7 +116,7 @@ export function theoryOfBase(base) {
     ];
     const rules = [];
     for (const [name, morphism] of categories) {
-        for (const edge of finite(own(base, name), name)) {
+        for (const edge of finiteSourceArray(own(base, name), name)) {
             const domain = own(edge, "domain"), codomain = own(edge, "codomain");
             for (const endpoint of [domain, codomain]) {
                 if (!objects.some(object => baseObjectCoincides(object, endpoint)))
