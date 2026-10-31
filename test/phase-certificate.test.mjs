@@ -4,7 +4,7 @@ import {
   phaseEvidence, phaseEvidenceRegime, phaseEvidenced,
   aperiodicOrderPhase, transfiniteClosurePhase, strictFinitePhase, scottStreamPhase,
 } from "@red-cup-engineering/signchain/contracts/phase";
-import { aheadCertificate, closeByCertificate } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/certificate";
+import { aheadCertificate, inspectCertificate } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/certificate";
 
 const declaration = "Obsmetrologia.residue_germ_ahead";
 // Raw records exercise the public readers, which also receive decoded evidence.
@@ -98,9 +98,14 @@ test("finite process agreement remains insufficient for universal certificate co
   const certificate = aheadCertificate("Obsmetrologia.omega_ahead");
   const process = { lattice: { eq: certificate.eq }, endomorphism: point =>
     point.pos === null ? certificate.orbit(0) : point.pos >= 16 ? point : certificate.step(point) };
-  assert.equal(closeByCertificate(certificate, { process, stages: 16 }).kind, "ordinal.closure.carrier");
-  const later = closeByCertificate(certificate, { process, stages: 17 });
-  assert.equal(later.reason, "process-disagrees-with-certificate");
+  const observed = inspectCertificate(certificate, { step: process.endomorphism, stages: 16 });
+  assert.equal(observed.kind, "ordinal.closure.certificateInspection:witness");
+  assert.equal(observed.binding.kind, "prefix-agrees");
+  assert.equal(observed.prefix.length, 16);
+  assert.equal("regime" in observed, false, "a sampled prefix does not infer a process regime");
+  assert.equal("completion" in observed, false, "a sampled prefix does not issue an ordinary closure");
+  const later = inspectCertificate(certificate, { step: process.endomorphism, stages: 17 });
+  assert.equal(later.reason, "step-disagrees-with-certificate");
   assert.equal(later.stage, 16);
   assert.notDeepEqual(process.endomorphism(certificate.limit), certificate.limit);
   // Neither the sampled pass nor SignChain's catalog regime proves this process.
