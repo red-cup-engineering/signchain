@@ -139,7 +139,18 @@ const zeroSeed = () => record(0, 0);
  * is strict, and an unsettled orbit is Scott when the phase is Scott-continuous. */
 export function phaseEvidenceRegime(phase, evidence) {
   if (evidence.certificate !== undefined) {
-    const certificate = certificateOf(evidence.certificate.declaration, { residue: evidence.certificate.residue, seed: zeroSeed });
+    // Receive only the parameters this source actually declares. The upstream
+    // catalog owns the family and its exact parameter admission; missing or
+    // malformed source cannot acquire a regime through an invented parameter.
+    let certificate;
+    try {
+      certificate = evidence.certificate.residue === undefined
+        ? certificateOf(evidence.certificate.declaration)
+        : certificateOf(evidence.certificate.declaration, { residue: evidence.certificate.residue, seed: zeroSeed });
+    } catch (error) {
+      if (error instanceof TypeError || error instanceof RangeError) return null;
+      throw error;
+    }
     return certificate.kind.endsWith("-obstruction") ? null : closureRegimeName(certificate.regime);
   }
   // An observed finite/countable orbit cannot evidence uncountable cofinality.
@@ -147,8 +158,8 @@ export function phaseEvidenceRegime(phase, evidence) {
   // reports its documented absence of a regime without attempting the claim.
   if (phase.closure.countableCofinality === false) return null;
   const ordinal = evidence.settledAt === undefined ? omegaOrdinal() : ofNat(evidence.settledAt);
-  const regime = closureRegimeName(regimeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality));
-  return regimeRank(regime) < 2 ? regime : null;
+  const regime = regimeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality);
+  return regimeRank(regime) < 2 ? closureRegimeName(regime) : null;
 }
 
 /** Whether some piece of evidence for this phase witnesses the phase's own regime. */

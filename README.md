@@ -289,3 +289,22 @@ withdrawn from this branch: a quota-exhausted CI lane is not a valid receiving
 mechanism. Do not substitute a public repository's successful CI for private
 SignChain dependency admission. Merge, installation, source chronology and
 the independent scientific consumer remain separately unreceived.
+
+## Current admitted Cell and mathematical carriers
+
+This candidate receives SignCell `0.14.1-dev.0` and Metrologic `0.16.0`.
+The original Cell owner's native articulation and scoped predication comparison
+are retained. SignChain passes canonical regime carriers to mathematical readers
+and projects names only at its presentation boundary. Certificate parameters
+come from the declared evidence; malformed or absent parameters retain the
+existing `null` evidence result instead of receiving invented residue or seed
+fields for a different certificate family.
+
+Metrologic replaced `closeByCertificate` with `inspectCertificate` in its
+intentional temporal API correction. The original finite-prefix disagreement
+control now receives an immutable bounded inspection: agreement through sixteen
+transitions does not supply a closure, process regime or completion, and the
+seventeenth transition still exposes the same disagreement. A declaration's
+catalog regime remains distinct from correspondence with an arbitrary runtime
+process. The existing negative, unsafe, coercible and uncountable-cofinality
+controls remain enrolled.
