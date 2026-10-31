@@ -27,8 +27,8 @@ importers:
         specifier: 0.3.2
         version: 0.3.2
       '@red-cup-engineering/signcell':
-        specifier: 0.13.3-dev.225
-        version: 0.13.3-dev.225
+        specifier: 0.13.4-dev.0
+        version: 0.13.4-dev.0
 
 packages:
 
@@ -163,9 +163,9 @@ packages:
   '@red-cup-engineering/signcell@0.11.1':
     resolution: {integrity: sha512-s1XoNDluDGVtQvWIsIlHjNVHOv2xzVJwK2i+Pf8mGQ60m3Llxpo/RQZvDXb3pAUWk9fkxOTobWtG8bOyqDlZQQ==}
 
-  '@red-cup-engineering/signcell@0.13.3-dev.225':
-    resolution: {integrity: sha512-OJXiGSs5HYIwGmXqBke5SzHCw1EeAeke1xrZ3Ygo0cSLsFa0S0jjLRXV7G+bi00xAPiJbmGJnQVDnFt+kLhKcw==}
-    engines: {node: '>=22.12.0'}
+  '@red-cup-engineering/signcell@0.13.4-dev.0':
+    resolution: {integrity: sha512-RC/R5kknxj64GPdCr9GuDA6hdc8uKXNNR2ZU22qXzgdKex79eLVgWmopHUeWxyuR+kAPlYhAOJWGDDOpKaBqvw==}
+    engines: {node: '>=24.2.0'}
 
   '@red-cup-engineering/signcell@0.4.0':
     resolution: {integrity: sha512-VfGyU46S1y0QDlcgYLSYnKZgVbL7Ocn8oWDf2Gw3iYTI8Qgvm2IF2X+oTLu7iOJyWrwlLXnfdXqMROO1Ll4h/Q==}
@@ -437,7 +437,7 @@ snapshots:
       '@red-cup-engineering/metrologic': 0.13.0
       '@red-cup-engineering/semiotic-content-address': 0.1.1
 
-  '@red-cup-engineering/signcell@0.13.3-dev.225':
+  '@red-cup-engineering/signcell@0.13.4-dev.0':
     dependencies:
       '@red-cup-engineering/cbor-services-section': 0.1.1
       '@red-cup-engineering/computer-data-engineering-services-section': 0.7.1

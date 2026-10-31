@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { sourceField, sourcePattern } from "../src/telling-source.mjs";
+import { cell, semanticId } from "@red-cup-engineering/signcell/cell";
 
 test("outer source admission never invokes role, side or observation accessors",()=>{
  let calls=0;
@@ -54,4 +55,18 @@ test("sourcePattern uses only own fields and refuses nonplain query envelopes",(
  assert.deepEqual(Object.keys(sourcePattern({})),[]);
  for(const input of [null,17,[],new Date(),Object.create({subject:"borrowed"})])
    assert.throws(()=>sourcePattern(input),/plain record/u);
+});
+
+test("source readers inherit the Cell owner's defensive byte coordinates",()=>{
+ const bytes=new Uint8Array([0,128,255]);
+ const source=cell(bytes,"has",9007199254740993n,{for:[{bytes}]});
+ const identity=semanticId(source);
+ const subject=sourceField(source,"subject");
+ const pattern=sourcePattern(source);
+ assert.deepEqual([...subject],[0,128,255]);
+ assert.deepEqual([...pattern.subject],[0,128,255]);
+ assert.equal(pattern.object,9007199254740993n);
+ subject.fill(7);bytes.fill(8);
+ assert.equal(semanticId(source),identity,"reading a retained byte coordinate cannot mutate its Cell");
+ assert.deepEqual([...sourceField(source,"subject")],[0,128,255]);
 });
