@@ -295,7 +295,7 @@ test("snapshot comparison refuses mutable histories, forged coordinates, duplica
   assert.throws(()=>compare(before,after,[c,c]),/cannot be compared twice/);
   assert.throws(()=>compare(before,after,[{subject:"s",predicate:"p",object:"o"}]),/original unevidenced SignCell/);
   assert.throws(()=>compare(before,after,[cell("s","p","o",{for:["w"]})]),/original unevidenced SignCell/);
-  assert.throws(()=>compare(before,after,new Array(1)),/dense inert array/);
+  assert.throws(()=>compare(before,after,new Array(1)),/dense undecorated inert array/);
   let called=0;
   const malicious={get propositions(){called++;return [c];}};
   assert.throws(()=>compareOriginalEvidenceSnapshots(before,after,malicious),/data property/);

@@ -9,6 +9,7 @@
  * over predication coincidence and the exact `count`/`natZero`.
  */
 import * as signCellPredication from "@red-cup-engineering/signcell/predication";
+import { readSourceArray, readSourceRecord } from "@red-cup-engineering/signcell/cell";
 const { baseObjectCoincides, predicateCoincides, termCoincides, isSpecializationMorphism } = signCellPredication;
 // The heterogeneous categorical source-node sort belongs to SignCell. A
 // 3-element array can itself be the value of a Mark, so this consumer must
@@ -40,17 +41,7 @@ export function inferenceTrace(morphisms) {
  * predicate; SignCell remains the source owner for those representations.
  * A caller iterator must not manufacture inference-rule positions. */
 function finiteSourceArray(items, role) {
-    if (!Array.isArray(items) || Object.getPrototypeOf(items) !== Array.prototype)
-        throw new TypeError("typed theory: " + role + " must be a finite source array");
-    const descriptor = Object.getOwnPropertyDescriptors(items);
-    if (Reflect.ownKeys(descriptor).length !== items.length + 1)
-        throw new TypeError("typed theory: " + role + " must be a dense unadorned array");
-    return Object.freeze(Array.from({ length: items.length }, (_, index) => {
-        const entry = descriptor[String(index)];
-        if (!entry || !entry.enumerable || !Object.hasOwn(entry, "value"))
-            throw new TypeError("typed theory: " + role + " entries must be own source data");
-        return entry.value;
-    }));
+    return readSourceArray(items, "typed theory: " + role);
 }
 /** Derive inference rules from bounded original predication sources.
  * A Cell is first made a SOURCE-ISSUED SignCell node; its two projection
@@ -183,17 +174,14 @@ export function composeInferenceRules(rules) {
 }
 const sameGeneratedRuleSet = (left, right) => left.length === right.length && left.every((rule) => right.some((other) => sameGeneratedRule(rule, other)));
 const proofSourceRecord = (value, names) => {
-    if (value === null || typeof value !== "object" || Array.isArray(value) ||
-        ![Object.prototype, null].includes(Object.getPrototypeOf(value)))
-        return null;
-    const fields = Object.getOwnPropertyDescriptors(value);
-    const keys = Reflect.ownKeys(fields);
+    let source;
+    try { source = readSourceRecord(value, "typed theory: proof source"); }
+    catch { return null; }
+    const keys = Object.keys(source);
     if (keys.length !== names.length ||
-        keys.some(key => typeof key !== "string" || !names.includes(key)) ||
-        names.some(key => !fields[key] || !fields[key].enumerable ||
-            !Object.hasOwn(fields[key], "value")))
+        keys.some(key => !names.includes(key)))
         return null;
-    return Object.freeze(Object.fromEntries(names.map(name => [name, fields[name].value])));
+    return source;
 };
 /** A single original finite theory check for BFS, proof validation and
  * closure. In a generated category every source/target of each rule must
@@ -318,8 +306,9 @@ export function typing(theory, premise, conclusion) {
  * or an independent scientific theorem.
  */
 export function derivationValidity(theory, derivation) {
-    const refusal = (reason) => Object.freeze({
+    const refusal = (reason, evidence = {}) => Object.freeze({
         kind: "typedTheory.derivation-obstruction", theory, reason, derivation,
+        ...evidence,
     });
     // Use the SAME category-source gate as derivation search and closure.
     // A zero-step identity cannot conceal a rule with undeclared endpoints.
@@ -359,7 +348,7 @@ export function derivationValidity(theory, derivation) {
         if (!baseObjectCoincides(at.premise, current) ||
             !baseObjectCoincides(rule.domain, current) ||
             !baseObjectCoincides(rule.codomain, at.conclusion))
-            return refusal("broken-proof-path");
+            return refusal("broken-proof-path", { at: current, step });
         verifiedSteps.push(Object.freeze({
             kind: "typedTheory.derivationStep",
             premise: current, rule, conclusion: rule.codomain,
@@ -367,7 +356,7 @@ export function derivationValidity(theory, derivation) {
         current = rule.codomain;
     }
     if (!baseObjectCoincides(current, original.conclusion))
-        return refusal("wrong-proof-conclusion");
+        return refusal("wrong-proof-conclusion", { at: current, conclusion: original.conclusion });
     // Return a new immutable verified carrier. In particular, a mutable
     // foreign source cannot rewrite the steps of an already issued check.
     const certified = Object.freeze({

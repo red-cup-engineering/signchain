@@ -15,6 +15,34 @@ test('program and expression accessors refuse without invocation',()=>{
     assert.equal(calls,0);
   }
 });
+test('frame source and display accessors refuse without invocation',()=>{
+  for (const location of ['kind','cells','predicate','tokens','identified','contested']) {
+    let calls=0;
+    const received={...frame};
+    Object.defineProperty(received,location,{enumerable:true,get(){calls++;return frame[location];}});
+    assert.throws(()=>executeFiberProgram(received,wrap(read())),TypeError);
+    assert.equal(calls,0,location+' must remain inert source data');
+  }
+  let calls=0;
+  const cells=[frame.cells[0]];
+  Object.defineProperty(cells,'0',{enumerable:true,get(){calls++;return frame.cells[0];}});
+  assert.throws(()=>executeFiberProgram({...frame,cells},wrap(read())),TypeError);
+  assert.equal(calls,0,'an ordered source incidence must not execute a getter');
+});
+test('transported frames use the upstream source owner and preserve display consistency',()=>{
+  const received=structuredClone(frame);
+  const first=executeFiberProgram(received,wrap(read()));
+  assert.deepEqual(first,executeFiberProgram(frame,wrap(read())));
+  assert.throws(()=>executeFiberProgram({...received,tokens:[]},wrap(read())),/differs from its source-generated/u);
+  received.cells[0].against.push('opposing-source');
+  assert.equal(executeFiberProgram(received,wrap(read())).valuation[0].reading,'stable');
+  assert.equal(first.valuation[0].reading,'potential','the prior source cut must not change');
+  received.cells[0].subject='other-source';
+  assert.throws(()=>executeFiberProgram(received,wrap(read())),/differs from its source-generated/u);
+  const revised=tokenFrame(received.cells);
+  assert.equal(executeFiberProgram(revised,wrap(read())).valuation[0].reading,'stable');
+  assert.equal(executeFiberProgram(frame,wrap(read())).valuation[0].reading,'potential');
+});
 test('cyclic syntax and executable or sparse families refuse before evaluation',()=>{
   const cyclic={op:'linear-not'};cyclic.of=cyclic;
   assert.throws(()=>executeFiberProgram(frame,wrap(cyclic)),/cyclic/u);

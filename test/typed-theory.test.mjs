@@ -77,18 +77,18 @@ originalSourceTest("inferenceRules inherits one inert source list and SignCell-i
   Object.defineProperty(iterator,Symbol.iterator,{value(){
     executed++; return [original][Symbol.iterator]();
   }});
-  assert.throws(()=>inferenceRules(iterator),/witnesses must be a dense unadorned array/);
+  assert.throws(()=>inferenceRules(iterator),/witnesses must be dense and undecorated/);
   const accessor=[original];
   Object.defineProperty(accessor,"0",{enumerable:true,get(){
     executed++;return original;
   }});
-  assert.throws(()=>inferenceRules(accessor),/witnesses entries must be own source data/);
+  assert.throws(()=>inferenceRules(accessor),/witnesses must contain inert own data/);
   const sparse=new Array(2);
   sparse[0]=original;
-  assert.throws(()=>inferenceRules(sparse),/witnesses must be a dense unadorned array/);
+  assert.throws(()=>inferenceRules(sparse),/witnesses must be dense and undecorated/);
   class ForeignList extends Array {}
-  assert.throws(()=>inferenceRules(new ForeignList(original)),/witnesses must be a finite source array/);
-  assert.throws(()=>inferenceRules(new Set([original])),/witnesses must be a finite source array/);
+  assert.throws(()=>inferenceRules(new ForeignList(original)),/witnesses must be a bounded plain source array/);
+  assert.throws(()=>inferenceRules(new Set([original])),/witnesses must be a bounded plain source array/);
   const hostile={...original};
   Object.defineProperty(hostile,"subject",{enumerable:true,get(){
     executed++;return original.subject;
@@ -220,6 +220,10 @@ test("typed derivation validity refuses forged proof claims, executable steps an
 test("even a zero-step identity refuses a malformed theory's rules and traces",()=>{
   const issued=inferenceRules([specializationMorphism("B","A")])[0];
   const objects=Object.freeze(["A","B"]);
+  const admitted=Object.freeze({kind:"typedTheory.carrier",objects,rules:Object.freeze([issued])});
+  const identity=derive(admitted,"A","A");
+  assert.equal(identity.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(identity.derivation.steps.length,0);
   let called=0;
   const accessor=(source,key)=>{
     const altered={...source};
@@ -246,13 +250,10 @@ test("even a zero-step identity refuses a malformed theory's rules and traces",(
     const badTheory=Object.freeze({
       kind:"typedTheory.carrier",objects,rules:Object.freeze([badRule]),
     });
-    // derive() need not inspect rules to construct the identity at A. The
-    // original derivation checker must nevertheless refuse an invalid
-    // ambient theory instead of certifying a proof under it.
-    const identity=derive(badTheory,"A","A");
-    assert.equal(identity.kind,"typedTheory.derivationSearch:witness");
-    assert.equal(identity.derivation.steps.length,0);
-    assert.equal(derivationValidity(badTheory,identity.derivation).kind,
+    // Search and validation share the source-category gate. Even an empty
+    // identity cannot make an invalid ambient theory admissible.
+    assert.equal(derive(badTheory,"A","A").kind,"typedTheory.derivationSearch-obstruction");
+    assert.equal(derivationValidity(badTheory,{...identity.derivation,theory:badTheory}).kind,
       "typedTheory.derivation-obstruction");
   }
   assert.equal(called,0,"unadmitted theory callbacks must never run");
