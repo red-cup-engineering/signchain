@@ -18,7 +18,7 @@
     "pnpm": "11.25.0"
   },
   "dependencies": {
-    "method": "original frozen lock, actual house registry packages, lifecycle scripts disabled",
+    "method": "original frozen lock, actual group registry packages, lifecycle scripts disabled",
     "lockSha256": "b21d5f448edc548a06ed451bde27bf111d412ee4f96ff7792c704ed5e6873889",
     "signcell": "0.13.1-dev.212"
   },
