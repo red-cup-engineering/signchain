@@ -18,7 +18,7 @@
  * completion (`omega_ahead`, `residue_germ_ahead`), checked for its decidable
  * hypotheses by metrologic's `settling/certificate`.
  *
- * Contradiction is not a phase coordinate: the house is paraconsistent and a
+ * Contradiction is not a phase coordinate: the Group is paraconsistent and a
  * cell holds both sides witnessed in every regime. Observability is the lens's,
  * not the phase's.
  */
