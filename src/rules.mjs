@@ -16,7 +16,7 @@
  * witness again, which the evidence sets absorb, so iterating T on finitely many
  * rules reaches its least fixed point above the seed.
  */
-import { address, cell, cellSet, knowledgeReading, merge, mergeCellSets, semanticId, triple } from "@red-cup-engineering/signcell/cell";
+import { address, admitTriple, cell, cellSet, knowledgeReading, merge, mergeCellSets, readSourceArray, semanticId } from "@red-cup-engineering/signcell/cell";
 import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { sourceField } from "./telling-source.mjs";
 
@@ -45,33 +45,15 @@ const validateDerivationVersion = (version) => {
 // construction custody, not a signed source certificate or permission grant.
 const admittedRules = new WeakSet();
 
-/** Read one source triple through original SignCell retained-carrier custody.
- * SourceField is a descriptor guard, not a competing schema or content hash.
+/** Receive a coordinate through its SignCell owner. Any supplied witness
+ * lanes must be complete and valid before a rule projects them away.
  */
-const ruleTriple = source => triple({
-  subject: sourceField(source, "subject"),
-  predicate: sourceField(source, "predicate"),
-  object: sourceField(source, "object"),
-});
+const ruleTriple = source => admitTriple(source);
 
 /** A finite rule antecedent is an inert, dense data array. The outer
- * positional guards run BEFORE invoking any source predicate or Cell encoder.
+ * positional admission belongs to SignCell, preserving repeated occurrences.
  */
-const ruleConditions = value => {
-  if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype)
-    throw new TypeError("signchain rule: antecedent needs a finite plain array");
-  const descriptors = Object.getOwnPropertyDescriptors(value);
-  if (Reflect.ownKeys(descriptors).length !== value.length + 1)
-    throw new TypeError("signchain rule: antecedent cannot be sparse or decorated");
-  const out = [];
-  for (let index = 0; index < value.length; index++) {
-    const descriptor = descriptors[String(index)];
-    if (!descriptor || !descriptor.enumerable || !Object.hasOwn(descriptor, "value"))
-      throw new TypeError("signchain rule: antecedent entries must be inert data");
-    out.push(descriptor.value);
-  }
-  return out;
-};
+const ruleConditions = value => readSourceArray(value, "signchain rule: antecedent");
 
 /** One original source-qualified positive rule. Each condition's cell and
  * reading is captured once, then the immutable SignCell triple is admitted.

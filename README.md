@@ -61,6 +61,31 @@ or authority of its testimony. It does not define L-Space; queries remain
 operations over admitted observations of its points.
 
 
+## Query-pattern admission into native content addresses
+
+The original `sourcePattern` in the current mainline SignChain
+producer returns a frozen **ordinary inert source record** with only
+own `subject`, `predicate`, and `object` data descriptors.
+It refuses getter-backed coordinates without invoking them, and accepts
+ordinary or null-prototype caller inputs. The fixed original SCA
+`retainedCarrier` boundary can receive this record directly;
+`TellingLog.boundedAt`, `#pattern` and `readingWhere` no longer need
+an additional spread-copy conversion left over from the earlier
+null-prototype source mismatch. This change preserves one material
+query-source cut rather than producing redundant intermediary carriers.
+An omitted `readingWhere()` coordinate still refuses as an incomplete
+proposition, without fabricating source evidence.
+
+The branch now contains **byte-identical** versions of the current main
+`src/telling-source.mjs` and `test/telling-source.test.mjs`,
+including the explicit ordinary-record expectation. The existing
+`test/log.test.mjs` retains null-prototype caller admission,
+complete-query checks and hostile-accessor refusals. The historical
+source-only SCA mismatch was fixed by its original producer, not by a
+second SignChain codec or a replacement source logger. Installed
+frozen-lockfile tests and independent research/Work receiving remain
+unexecuted and are not inferred from source parity.
+
 ## Mark-rooted evidence, two orders and the identification frontier
 
 SignChain consumes generated **SignCell** Mark/Utterance/predication cells.
@@ -155,9 +180,112 @@ control begins at \`stable\` and yields \`active\` or \`potential\` when differe
 originals are withheld. Those are conditional finite evidence computations,
 not evidence that the source was actually withdrawn, an institution adopted
 a practice, or a scientific proposition is false. Neither attribution labels
-nor source-reported claims are authenticated by the operation. New Work, rights
-approval, proofs, publication and market settlement remain downstream.
+nor source-reported claims are authenticated by the operation. The report's
+producer identities, counterfactual list, removed witness addresses, and
+conditional support summary now remain immutable after issuance; a consumer
+cannot rewrite the read-only evidence receipt by mutating a nested array.
+New Work, rights approval, proofs, publication and market settlement remain
+downstream.
 
 Native receiving: \`node --test test/source-withdrawal.test.mjs\` against
 installed original SignCell/Metrologic/FOUR dependencies; the package
-\`receivingTests\` includes the ten positive and negative cases.
+\`receivingTests\` includes the original positive, contradiction, bounded-index, inert-source and nested-immutability cases. The pinned dependency-installed suite and independent research receiver must run before any native or publication qualification.
+
+
+## Original evidence snapshot comparison (candidate, source-only)
+
+The existing `./source-withdrawal` entrypoint now also exports
+`compareOriginalEvidenceSnapshots(previous, current, {propositions})` for
+research revision intake. Both inputs must be **sealed original SignChain
+TellingLogs**. Callers explicitly nominate up to 128 **unevidenced original
+SignCell propositions** in one ordinary dense, undecorated Array of source
+coordinate values; sparse entries, custom iterators, hidden metadata and
+accessor-backed entries refuse before reading either history. The operation
+does not try to discover all dependent claims or guess source identities.
+It compares source witnesses on each
+polarity using SignCell/SCA coincidence identity, returning separately:
+
+- added and removed **original witness addresses** for each polarity;
+- changed *observedAt* receipt-clock testimony attached to otherwise unchanged
+  original witnesses, including absent vs explicitly present clock coordinates;
+- the earlier and later knowledge/truth/posture readings;
+- evidence-order directions in **both** original FOUR orders;
+- `requiresReverification` whenever the *witness identities* change,
+  even if the FOUR reading is unchanged;
+- the addresses of affected nominated propositions for existing
+  SignGraph/Work consumers to use in their **own** dependency rechecks.
+
+An unchanged `potential` reading after replacing one paper with a different
+paper is thus **not** mistakenly certified as unchanged evidence. Likewise,
+a corrected reception timestamp forces re-verification even when the witness
+identity and FOUR reading agree; neither timestamp is certified by this read. Repeated
+tellings of the same source identity do not manufacture corroboration; opposing
+testimony is not erased. Results are strictly conditional on supplied original
+histories, bounded to 20,000 original indexed candidate-row visits across
+both histories and all nominated propositions, and read-only. This is **not** a retraction, evidence authentication,
+source-origin proof, graph traversal, task scheduler, active deployment, or
+publication receipt. In particular, the caller must independently attest that
+the snapshots represent real changes in a lawful chronology and that the
+original source identities and rights are correct.
+
+**Event-history nonreflection (original consumer boundary):** two sealed
+`TellingLog` inputs can carry identical witnesses and `observedAt` values
+with DIFFERENT row/occurrence order. In that case this comparison correctly
+reports no *evidence-set revision*, but it does **not** report equality of
+actual performed event histories or prove a causal return/non-return.
+The existing `test/source-withdrawal.test.mjs` supplies this positive
+nonreflection control. A durable-event history, authenticated source+id
+deduplication, producer-causal order, retry effects and external recipient
+acknowledgment remain with the original event/Work/Operations consumers.
+Do not promote `requiresReverification: false` into a chronology
+certificate or a settlement receipt.
+
+
+**Budget admission:** `TellingLog.boundedAt(proposition, maxCandidateReads)`
+uses the existing original three-role index and checks the shortest bucket's
+length before constructing any row array. The snapshot comparison shares a
+20,000-candidate limit across all nominated propositions and both histories,
+and rebuilds measured SignCells only from admitted rows. A large index bucket
+may be refused even if most rows would fail another role predicate; this
+conservative false refusal is necessary for the present bounded-reader
+contract. The bound is on candidate-row visits and allocation, **not** the
+total byte size of opaque witness payloads, cryptographic encoding effort, or
+real-world scientific uncertainty. Native `where`/`against` remain
+unbounded for other consumers.
+
+Native proposed receiving: this original repository has a **tracked
+`pnpm-lock.yaml`**, a `pnpm-workspace.yaml`, and the same
+[Bare Cedar Fog original .npmrc](https://github.com/561-group/bare-cedar-fog/blob/main/.npmrc)
+(source blob `673e8e048fe1d1560c09e80f94b25557bc686de7`).
+Public unscoped packages resolve directly to npmjs; **all 13 named house scopes
+remain at `registry.561.group`**, with the existing locked package versions
+and SHA-512 source receipts unchanged. This replaces the earlier single
+all-house `registry=` route; it does not grant public access to house packages
+or attest that *this SignChain dependency closure* was successfully installed.
+The earlier public [JSNode locked native receiving](https://github.com/red-cup-engineering/jsnode-package-engineering-services-section/actions/runs/40982085365)
+and [PROV-O original native receiving](https://github.com/red-cup-engineering/prov-o-provenance-service/actions/runs/40975761353)
+show the shared scoped-provider route can serve selected consumers, **not**
+that this private SignChain runner or its independent Science/Graph receiver
+was ever executed. On an authorized Node 24 host with pnpm 10.20.0 and
+access to the original registry, run these exact **pending** package-installed
+operations:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec node --test test/source-withdrawal.test.mjs test/log.test.mjs test/telling-source.test.mjs
+pnpm test
+```
+
+These tests cover source replacement and changed receipt clocks without FOUR
+change, cross-polarity contradiction, explicit multi-proposition scope,
+duplicate originals, empty/forged inputs, all 16 finite FOUR-polarity
+transitions, **all 256 paired two-proposition finite FOUR histories**, and
+an authentic >20,000-telling source-index refusal. GitHub's attempted native
+private-repository run
+[40831840673](https://github.com/red-cup-engineering/signchain/actions/runs/40831840673)
+failed with **no job steps** (the Group's known private Actions-usage signal),
+rather than executing or failing a test. The transient new workflow was
+withdrawn from this branch: a quota-exhausted CI lane is not a valid receiving
+mechanism. Do not substitute a public repository's successful CI for private
+SignChain dependency admission. Merge, installation, source chronology and
+the independent scientific consumer remain separately unreceived.

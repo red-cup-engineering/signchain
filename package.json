@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/signchain",
-  "version": "0.4.2-dev.1",
+  "version": "0.4.3-dev.0",
   "type": "module",
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
@@ -41,13 +41,13 @@
     "@red-cup-engineering/computer-data-engineering-services-section": "0.3.1",
     "@red-cup-engineering/exact-number-data-service": "0.1.1",
     "@red-cup-engineering/semiotic-eavt-services-section": "0.3.2",
-    "@red-cup-engineering/signcell": "0.13.3-dev.225",
+    "@red-cup-engineering/signcell": "0.13.4-dev.0",
     "@red-cup-engineering/semiotic-content-address": "0.1.2-dev.31",
     "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
   "scripts": {
     "test": "node --test \"test/**/*.test.mjs\" test/receiving/typed-theory-source.check.mjs",
-    "test:foundations:receiving": "node --test test/receiving/typed-theory-source.check.mjs"
+    "test:foundations:receiving": "node --test test/receiving/typed-theory-source.check.mjs test/typed-theory.test.mjs test/token-fiber.test.mjs test/source-withdrawal.test.mjs"
   },
   "receivingTests": [
     "test/claim-event-log.test.mjs",
@@ -76,5 +76,8 @@
     "type": "git",
     "url": "git+https://github.com/red-cup-engineering/signchain.git"
   },
-  "private": false
+  "private": false,
+  "engines": {
+    "node": ">=24.2.0"
+  }
 }

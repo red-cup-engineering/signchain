@@ -19,8 +19,8 @@
  *
  * Gluing fibers into sections over covers is the layer above this one: SignGraph's token sheaf.
  */
-import { cellSet, claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
-import { extent, generalizations, top } from "@red-cup-engineering/signcell/token-frame";
+import { claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
+import { admitTokenFrame, extent, generalizations, top } from "@red-cup-engineering/signcell/token-frame";
 import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthJoinReading, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const frozen = (values) => Object.freeze([...values]);
@@ -87,15 +87,15 @@ const over = (tokens, readingAt) => frozen(tokens.map((token) => Object.freeze({
 /** The valuation of one claim (predicate, object): each frame token's FOUR reading of what is told
  *  directly of (token, predicate, object) in the frame's cells, in the frame's token order. */
 export function valuationOf(frame, predicate, object) {
-  // `tokens` on a transported frame is a display projection, not admission.
-  // The owning SignCell reader re-derives its carrier from original cells.
-  const tokens = top(frame);
+  // Admit ONE original source snapshot and use both its token order and its
+  // canonical merged cells. Reading top(frame) before a second raw frame.cells
+  // access could combine different wire revisions or execute a source getter.
+  // Original SignCell owns all Cell coincidence, witness joins and topology.
+  const source = admitTokenFrame(frame);
+  const tokens = top(source);
   const target = claimCoordinate(predicate, object);
   const told = new Map();
-  // Transported frames may carry separate source tellings of one cell. Read
-  // their upstream knowledge join, exactly as the native frame constructor
-  // does, instead of letting the last wire row erase contrary evidence.
-  for (const at of cellSet(frame.cells)) if (claimCoordinate(at.predicate, at.object) === target) told.set(coincidenceKey(at.subject), at);
+  for (const at of source.cells) if (claimCoordinate(at.predicate, at.object) === target) told.set(coincidenceKey(at.subject), at);
   return over(tokens, (token) => {
     const at = told.get(coincidenceKey(token));
     return at === undefined ? "absurd" : readingOfSides("knowledge", ...sidesOf(at));
@@ -105,13 +105,15 @@ export function valuationOf(frame, predicate, object) {
 /** A FOUR operation taken pointwise over the frame: `operation` applied, token by token, to the
  *  readings of the given valuations (negation to one, a join, meet or implication to two). */
 export function pointwise(frame, operation, ...valuations) {
-  const tokens = top(frame);
+  const source = admitTokenFrame(frame);
+  const tokens = top(source);
   const reads = valuations.map((valuation) => readingsOf(tokens, valuation));
   return over(tokens, (token) => readingAs("knowledge", operation(...reads.map((read) => read(token)))));
 }
 
 const pointwiseLeq = (leq) => (frame, left, right) => {
-  const tokens = top(frame);
+  const source = admitTokenFrame(frame);
+  const tokens = top(source);
   const [l, r] = [readingsOf(tokens, left), readingsOf(tokens, right)];
   return tokens.every((token) => leq(l(token), r(token)));
 };
@@ -121,9 +123,12 @@ export const knowledgeWithin = pointwiseLeq(knowledgeLeqReading);
 export const truthWithin = pointwiseLeq(truthLeqReading);
 
 const modal = (frame, valuation, coverOf, fold) => {
-  const tokens = top(frame);
+  // Order and covers must be one admitted source cut. Consulting a mutable
+  // transported frame afresh for each token could mix incompatible revisions.
+  const source = admitTokenFrame(frame);
+  const tokens = top(source);
   const read = readingsOf(tokens, valuation);
-  return over(tokens, (token) => fold(coverOf(frame, token).map(read), "knowledge"));
+  return over(tokens, (token) => fold(coverOf(source, token).map(read), "knowledge"));
 };
 
 const modalFold = (order, knowledgeFold, truthFold) => {
@@ -183,7 +188,8 @@ function completeTruthPole(frame, declared) {
  * Obsmetrologia sigma/Delta settlement regime.
  */
 export function truthPoleClosure(frame, pole, valuation) {
-  return pointwise(frame, truthJoinReading, completeTruthPole(frame, pole), valuation);
+  const source = admitTokenFrame(frame);
+  return pointwise(source, truthJoinReading, completeTruthPole(source, pole), valuation);
 }
 
 /**
@@ -193,12 +199,15 @@ export function truthPoleClosure(frame, pole, valuation) {
  * The poles are explicit caller-qualified mathematical parameters.
  */
 export function truthNuclearQuartet(frame, firstPole, secondPole, valuation) {
-  const a = completeTruthPole(frame, firstPole);
-  const b = completeTruthPole(frame, secondPole);
-  const source = pointwise(frame, x => x, valuation);
-  const first = pointwise(frame, truthJoinReading, a, source);
-  const second = pointwise(frame, truthJoinReading, b, source);
-  const both = pointwise(frame, truthJoinReading, a, second);
+  // Both nuclei, their source and all four readings live in one source frame.
+  // The label "source" below is the original valuation, NOT a new frame.
+  const originalFrame = admitTokenFrame(frame);
+  const a = completeTruthPole(originalFrame, firstPole);
+  const b = completeTruthPole(originalFrame, secondPole);
+  const source = pointwise(originalFrame, x => x, valuation);
+  const first = pointwise(originalFrame, truthJoinReading, a, source);
+  const second = pointwise(originalFrame, truthJoinReading, b, source);
+  const both = pointwise(originalFrame, truthJoinReading, a, second);
   return Object.freeze({
     kind: "signchain.finite-truth-nuclear-quartet.v1",
     poles: Object.freeze([a, b]), source, first, second, both,

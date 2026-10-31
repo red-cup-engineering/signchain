@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { cell, address } from "@red-cup-engineering/signcell/cell";
 import { TellingLog } from "../src/log.mjs";
-import { assessOriginalSourceWithdrawal as assay } from "../src/source-withdrawal.mjs";
+import { assessOriginalSourceWithdrawal as assay, compareOriginalEvidenceSnapshots } from "../src/source-withdrawal.mjs";
 
 const proposition=()=>cell({research:"institutional-adoption"},"reported-by","documentary-evidence");
 const origin=(w,originalProducer)=>({witness:w,originalProducer});
@@ -121,6 +121,32 @@ test("results do not certify authority, source independence, source withdrawal, 
   assert.equal(r.withdrawals.length,0);
 });
 
+test("original source-withdrawal receipts preserve every nested evidence and producer reading",()=>{
+  const c=cell("s","p","o"),positive="source:affirm",negative="source:challenge";
+  const history=new TellingLog().tell(c,positive).deny(c,negative).seal();
+  const receipt=assay(history,{proposition:c,attributions:[
+    origin(positive,"producer-a"),origin(negative,"producer-b"),
+  ]});
+  assert.equal(receipt.original.knowledge,"stable");
+  assert.equal(receipt.attributedProducerCount,2);
+  assert.ok(Object.isFrozen(receipt),"outer evidence report is immutable");
+  assert.ok(Object.isFrozen(receipt.attributedProducers),"producer identities are retained as immutable evidence");
+  assert.ok(Object.isFrozen(receipt.withdrawals),"no caller may replace the independent counterfactual reports");
+  assert.ok(Object.isFrozen(receipt.withdrawals[0]),"per-producer reading is immutable");
+  assert.ok(Object.isFrozen(receipt.withdrawals[0].removedWitnessAddresses),
+    "removed source witness identities are immutable");
+  assert.ok(Object.isFrozen(receipt.withdrawals[0].remaining),"FOUR reading is immutable");
+  assert.ok(Object.isFrozen(receipt.sourceRemovalSupport),"conditional producer conclusion is immutable");
+  assert.throws(()=>receipt.attributedProducers.push("forged"),TypeError);
+  assert.throws(()=>receipt.withdrawals.splice(0,1),TypeError);
+  assert.throws(()=>receipt.withdrawals[0].removedWitnessAddresses.push("forged"),TypeError);
+  assert.throws(()=>{receipt.sourceRemovalSupport.evaluatedProducerCount=9000;},TypeError);
+  assert.equal(receipt.attributedProducerCount,2);
+  assert.deepEqual(receipt.withdrawals.map(x=>x.originalProducer),["producer-a","producer-b"]);
+  assert.equal(history.readingAt(c),"stable",
+    "defending receipt custody leaves the original sealed history untouched");
+});
+
 test("conditional all-producer removal support distinguishes independent attributions from repeated documents",()=>{
   const c=cell("s","p","o"),a="report-a",b="report-b";
   const log=new TellingLog().tell(c,a).tell(c,b).seal();
@@ -139,4 +165,348 @@ test("zero producer attributions never produce vacuous source-independence certi
   assert.equal(r.sourceRemovalSupport.evaluatedProducerCount,0);
   assert.equal(r.sourceRemovalSupport.supportSurvivesEverySingleProducerRemoval,null);
   assert.equal(r.sourceRemovalSupport.oppositionSurvivesEverySingleProducerRemoval,null);
+});
+
+
+test("original producer withdrawal uses the bounded native role index before any row materialization",()=>{
+  const c=cell("budgeted-original","has-evidence","selected-claim");
+  const unrelated=cell("other-origin","has-evidence","not-selected");
+  class GuardedLog extends TellingLog {
+    where(){throw new Error("original unbounded where called");}
+    against(){throw new Error("original unbounded against called");}
+    cells(){throw new Error("original unbounded cells called");}
+    readingAt(){throw new Error("original unbounded readingAt called");}
+  }
+  const one=new GuardedLog().tell(c,"positive").deny(c,"opposition").seal();
+  const original=assay(one,{proposition:c,attributions:[
+    origin("positive","one"),origin("opposition","two"),
+  ]});
+  assert.equal(original.original.knowledge,"stable");
+  assert.equal(original.original.truth,"both");
+  assert.equal(original.attributedProducerCount,2);
+  assert.deepEqual(original.withdrawals.map(x=>x.remaining.knowledge),
+    ["active","potential"]);
+
+  const large=new GuardedLog();
+  for(let i=0;i<5001;i++)large.tell(c,i);
+  large.seal();
+  assert.throws(()=>assay(large,{proposition:c,attributions:[]}),
+    /budget exceeded before materialization/,
+    "a real >5000 original-telling bucket refuses BEFORE any unbounded source reader");
+  assert.equal(large.size,5001);
+
+  const other=new GuardedLog();
+  for(let i=0;i<5001;i++)other.tell(unrelated,i);
+  other.tell(c,"positive").seal();
+  const selected=assay(other,{proposition:c,attributions:[
+    origin("positive","one"),
+  ]});
+  assert.equal(selected.original.knowledge,"potential",
+    "large unrelated histories need not be fully materialized for one indexed proposition");
+
+  let getterCalls=0;
+  const unsafe={attributions:[origin("positive","one")]};
+  Object.defineProperty(unsafe,"proposition",{
+    enumerable:true,get(){getterCalls++;return c;},
+  });
+  assert.throws(()=>assay(one,unsafe),/data property/);
+  const badAttributions=[origin("positive","one")];
+  Object.defineProperty(badAttributions,"entries",{
+    value(){getterCalls++;return [origin("positive","one")].entries();},
+  });
+  assert.throws(()=>assay(one,{proposition:c,attributions:badAttributions}),
+    /dense undecorated inert array/);
+  assert.equal(getterCalls,0,"source getters and executable array methods are never invoked");
+});
+
+test("snapshot comparison flags changed originals even when FOUR knowledge/truth remain unchanged", () => {
+  const c = cell("research", "supported-by", "source-evidence");
+  const first = new TellingLog().tell(c, {source:"archive-a"}).tell(c, {source:"archive-b"}).seal();
+  const second = new TellingLog().tell(c, {source:"archive-a"}).tell(c, {source:"archive-c"}).seal();
+  const r = compareOriginalEvidenceSnapshots(first, second, {propositions:[c]});
+  assert.equal(r.monitoredPropositionCount, 1);
+  assert.equal(r.readingChangedCount, 0);
+  assert.equal(r.witnessChangedReadingUnchangedCount, 1);
+  assert.deepEqual(r.changedPropositionAddresses, [address(c)]);
+  assert.equal(r.comparisons[0].requiresReverification, true);
+  assert.equal(r.comparisons[0].original.knowledge, "potential");
+  assert.equal(r.comparisons[0].revised.knowledge, "potential");
+  assert.equal(r.comparisons[0].forWitnessChanges.added.length, 1);
+  assert.equal(r.comparisons[0].forWitnessChanges.removed.length, 1);
+  assert.equal(r.comparisons[0].evidenceOrders.knowledgeNondecreasing, false);
+  assert.equal(r.comparisons[0].evidenceOrders.knowledgeNonincreasing, false);
+  assert.equal(first.size, 2);
+  assert.equal(second.size, 2);
+});
+
+test("snapshot comparison treats repeated tellings of one witness as one original identity", () => {
+  const c = cell("method", "cited", "paper"), witness={doi:"10.abc/a",page:3};
+  const first = new TellingLog().tell(c, witness).tell(c,{page:3,doi:"10.abc/a"}).seal();
+  const second = new TellingLog().tell(c, witness).seal();
+  const r = compareOriginalEvidenceSnapshots(first, second, {propositions:[c]});
+  assert.equal(r.comparisons[0].requiresReverification,false);
+  assert.equal(r.comparisons[0].original.positiveWitnesses,1);
+  assert.equal(r.comparisons[0].revised.positiveWitnesses,1);
+  assert.deepEqual(r.changedPropositionAddresses,[]);
+});
+
+test("snapshot comparison distinguishes newly received opposition from unchanged support", () => {
+  const c=cell("claim","has-status","contested"),w1="origin-support",w2="origin-opposition";
+  const before=new TellingLog().tell(c,w1).seal();
+  const after=new TellingLog().tell(c,w1).deny(c,w2).seal();
+  const r=compareOriginalEvidenceSnapshots(before,after,{propositions:[c]});
+  assert.equal(r.comparisons[0].original.truth,"true");
+  assert.equal(r.comparisons[0].revised.truth,"both");
+  assert.equal(r.comparisons[0].readingChanged,true);
+  assert.equal(r.comparisons[0].againstWitnessChanges.added.length,1);
+  assert.equal(r.comparisons[0].evidenceOrders.knowledgeNondecreasing,true);
+  assert.equal(r.comparisons[0].evidenceOrders.truthNondecreasing,false);
+});
+
+test("snapshot comparison respects explicit scope across multiple propositions", () => {
+  const one=cell("claim-one","asserted-in","paper"), two=cell("claim-two","asserted-in","paper");
+  const before=new TellingLog().tell(one,"source-1").tell(two,"source-2").seal();
+  const after=new TellingLog().tell(one,"source-1").deny(two,"source-3").seal();
+  const r=compareOriginalEvidenceSnapshots(before,after,{propositions:[one,two]});
+  assert.deepEqual(r.changedPropositionAddresses,[address(two)]);
+  assert.equal(r.comparisons[0].requiresReverification,false);
+  assert.equal(r.comparisons[1].requiresReverification,true);
+  assert.equal(r.comparisons[1].original.knowledge,"potential");
+  assert.equal(r.comparisons[1].revised.knowledge,"active");
+  assert.equal(r.readingChangedCount,1);
+});
+
+test("snapshot comparison preserves a no-evidence reading and does not invent a change", () => {
+  const c=cell("unknown","is","unknown");
+  const r=compareOriginalEvidenceSnapshots(new TellingLog().seal(),new TellingLog().seal(),{propositions:[c]});
+  assert.equal(r.comparisons[0].original.knowledge,"absurd");
+  assert.equal(r.comparisons[0].revised.truth,"neither");
+  assert.equal(r.comparisons[0].requiresReverification,false);
+  assert.equal(r.inspectedTellings,0);
+  assert.match(r.standing,/conditional/);
+});
+
+test("snapshot comparison refuses mutable histories, forged coordinates, duplicated claims and executable selectors", () => {
+  const c=cell("s","p","o"),before=new TellingLog().tell(c,"w");
+  const after=new TellingLog().tell(c,"w").seal();
+  const compare=(a,b,coordinates)=>compareOriginalEvidenceSnapshots(a,b,{propositions:coordinates});
+  assert.throws(()=>compare(before,after,[c]),/two sealed original/);
+  before.seal();
+  assert.throws(()=>compare(before,after,[c,c]),/cannot be compared twice/);
+  assert.throws(()=>compare(before,after,[{subject:"s",predicate:"p",object:"o"}]),/original unevidenced SignCell/);
+  assert.throws(()=>compare(before,after,[cell("s","p","o",{for:["w"]})]),/original unevidenced SignCell/);
+  assert.throws(()=>compare(before,after,new Array(1)),/dense undecorated inert array/);
+  let called=0;
+  const malicious={get propositions(){called++;return [c];}};
+  assert.throws(()=>compareOriginalEvidenceSnapshots(before,after,malicious),/data property/);
+  assert.equal(called,0);
+  assert.throws(()=>compare(before,after,new Array(129).fill(c)),/at most 128/);
+});
+
+test("snapshot comparison admits only a dense undecorated original proposition scope",()=>{
+  const c=cell("source","declares","proposition");
+  const before=new TellingLog().tell(c,"original").seal();
+  const after=new TellingLog().deny(c,"challenge").seal();
+  const compare=propositions=>compareOriginalEvidenceSnapshots(before,after,{propositions});
+  assert.equal(compare([c]).monitoredPropositionCount,1);
+  let called=0;
+  const hidden=[c];
+  Object.defineProperty(hidden,"unearnedAuthority",{value:"claim",enumerable:false});
+  assert.throws(()=>compare(hidden),/dense undecorated inert array/);
+  const symbol=[c];
+  Object.defineProperty(symbol,Symbol("forged-source"),{value:"claim"});
+  assert.throws(()=>compare(symbol),/dense undecorated inert array/);
+  const iterable=[c];
+  Object.defineProperty(iterable,Symbol.iterator,{
+    configurable:true,get(){called++;return [c][Symbol.iterator];},
+  });
+  assert.throws(()=>compare(iterable),/dense undecorated inert array/);
+  const accessor=[c];
+  Object.defineProperty(accessor,"0",{
+    enumerable:true,get(){called++;return c;},
+  });
+  assert.throws(()=>compare(accessor),/dense inert array entries/);
+  assert.equal(called,0,"source admission never executes an accessor or delegated iterator");
+  assert.equal(before.size,1);
+  assert.equal(after.size,1);
+});
+
+test("all 16 bounded FOUR evidence-polarity transitions preserve witness-level change and separate order directions",()=>{
+  const c=cell("FOUR","under","revision");
+  const snapshot=state=>{
+    const log=new TellingLog();
+    if(state&1)log.tell(c,"positive-original");
+    if(state&2)log.deny(c,"negative-original");
+    return log.seal();
+  };
+  for(let before=0;before<4;before++)for(let after=0;after<4;after++){
+    const r=compareOriginalEvidenceSnapshots(snapshot(before),snapshot(after),{propositions:[c]});
+    const x=r.comparisons[0];
+    assert.equal(x.requiresReverification,before!==after);
+    assert.equal(x.readingChanged,before!==after);
+    assert.equal(x.evidenceOrders.knowledgeNondecreasing,(before&after)===before);
+    assert.equal(x.evidenceOrders.knowledgeNonincreasing,(before&after)===after);
+    assert.equal(x.evidenceOrders.truthNondecreasing,
+      (!(before&1)||Boolean(after&1)) && (!(after&2)||Boolean(before&2)));
+  }
+});
+
+test("same witness and changed observation clock needs research re-verification even without verdict change",()=>{
+  const c=cell("claim","supported-by","release");
+  const first=new TellingLog().tell(c,{doi:"10.12/release"},"2026-10-27T23:00:00Z").seal();
+  const second=new TellingLog().tell(c,{doi:"10.12/release"},"2026-10-28T00:30:00Z").seal();
+  const r=compareOriginalEvidenceSnapshots(first,second,{propositions:[c]});
+  const x=r.comparisons[0];
+  assert.equal(x.witnessesChanged,false);
+  assert.equal(x.observationsChanged,true);
+  assert.equal(x.readingChanged,false);
+  assert.equal(x.requiresReverification,true);
+  assert.equal(x.forWitnessChanges.added.length,0);
+  assert.equal(x.forWitnessChanges.removed.length,0);
+  assert.equal(x.forObservationChanges.added.length,1);
+  assert.equal(x.forObservationChanges.removed.length,1);
+  assert.equal(x.forObservationChanges.added[0].observedAt,"2026-10-28T00:30:00Z");
+  assert.equal(x.forObservationChanges.removed[0].observedAt,"2026-10-27T23:00:00Z");
+  assert.deepEqual(r.changedPropositionAddresses,[address(c)]);
+  assert.equal(r.observationChangedWitnessesUnchangedCount,1);
+});
+
+test("same source-witness snapshot does not certify equal performed-event chronology",()=>{
+  // The new original mainline Temporal/Science requirement distinguishes
+  // event-occurrence order from evidence sets. This source projection is
+  // intentionally incapable of deciding return/non-return histories.
+  const c=cell("history","has-evidence","same-source-snapshot");
+  const first=new TellingLog()
+    .tell(c,"source:alpha","2026-10-29T10:00:00Z")
+    .deny(c,"source:beta","2026-10-29T10:01:00Z").seal();
+  const second=new TellingLog()
+    .deny(c,"source:beta","2026-10-29T10:01:00Z")
+    .tell(c,"source:alpha","2026-10-29T10:00:00Z").seal();
+  assert.notDeepEqual(first.rows.map(row=>row.side),
+    second.rows.map(row=>row.side),
+    "the original ordered telling histories are different");
+  const result=compareOriginalEvidenceSnapshots(first,second,{propositions:[c]});
+  assert.equal(result.comparisons[0].witnessesChanged,false);
+  assert.equal(result.comparisons[0].observationsChanged,false);
+  assert.equal(result.comparisons[0].readingChanged,false);
+  assert.equal(result.comparisons[0].requiresReverification,false);
+  assert.deepEqual(result.changedPropositionAddresses,[]);
+  assert.match(result.boundaries.join(" "),/snapshot order|not established/,
+    "the projection MUST disclose that unchanged FOUR evidence is not an event-history equivalence certificate");
+  assert.equal(result.standing.includes("conditional"),true);
+});
+
+test("replayed identical source and observation time is not fabricated independence or revision",()=>{
+  const c=cell("claim","repeated","citation");
+  const old=new TellingLog().tell(c,"one","2026-10-27T23:00:00Z").seal();
+  const same=new TellingLog().tell(c,"one","2026-10-27T23:00:00Z")
+    .tell(c,"one","2026-10-27T23:00:00Z").seal();
+  const x=compareOriginalEvidenceSnapshots(old,same,{propositions:[c]}).comparisons[0];
+  assert.equal(x.witnessesChanged,false);
+  assert.equal(x.observationsChanged,false);
+  assert.equal(x.requiresReverification,false);
+  assert.equal(x.forObservationChanges.added.length,0);
+  assert.equal(x.revised.positiveWitnesses,1);
+});
+
+test("absent clock and explicitly present null are not silently equivalent",()=>{
+  const c=cell("claim","timestamp","unverified");
+  const before=new TellingLog().tell(c,"one").seal();
+  const after=new TellingLog().tell(c,"one",null).seal();
+  const x=compareOriginalEvidenceSnapshots(before,after,{propositions:[c]}).comparisons[0];
+  assert.equal(x.witnessesChanged,false);
+  assert.equal(x.observationsChanged,true);
+  assert.equal(x.requiresReverification,true);
+  assert.deepEqual(x.forObservationChanges.added.map(y=>y.observedAtPresent),[true]);
+  assert.deepEqual(x.forObservationChanges.removed.map(y=>y.observedAtPresent),[false]);
+});
+
+test("a revised opposition observation clock remains visible without erasing contradiction",()=>{
+  const c=cell("claim","has-conflicting","research-evidence");
+  const before=new TellingLog().tell(c,"support","2026-10-27T12:00:00Z")
+    .deny(c,"oppose","2026-10-27T12:00:00Z").seal();
+  const after=new TellingLog().tell(c,"support","2026-10-27T12:00:00Z")
+    .deny(c,"oppose","2026-10-28T12:00:00Z").seal();
+  const x=compareOriginalEvidenceSnapshots(before,after,{propositions:[c]}).comparisons[0];
+  assert.equal(x.original.knowledge,"stable");
+  assert.equal(x.revised.knowledge,"stable");
+  assert.equal(x.againstWitnessChanges.added.length,0);
+  assert.equal(x.againstObservationChanges.added.length,1);
+  assert.equal(x.againstObservationChanges.removed.length,1);
+  assert.equal(x.requiresReverification,true);
+  assert.equal(x.evidenceOrders.knowledgeNondecreasing,true);
+});
+
+
+test("review control: >20k genuine source tellings refuse before unbounded projection",()=>{
+  const c=cell("budget","limits","source-materialization");
+  class GuardedLog extends TellingLog {
+    where(){throw new Error("unbounded where invoked");}
+    against(){throw new Error("unbounded against invoked");}
+    cells(){throw new Error("unbounded cells invoked");}
+    readingAt(){throw new Error("unbounded readingAt invoked");}
+  }
+  const history=new GuardedLog();
+  for(let i=0;i<20001;i++)history.tell(c,i);
+  history.seal();
+  assert.equal(history.size,20001);
+  assert.throws(()=>history.boundedAt(c,20000),/budget exceeded before materialization/);
+  assert.throws(()=>compareOriginalEvidenceSnapshots(history,new TellingLog().seal(),{
+    propositions:[c]}),/budget exceeded before materialization/);
+  assert.equal(history.size,20001);
+});
+
+test("bounded snapshot comparison is native evidence-equivalent under its admitted index budget",()=>{
+  const a=cell("trial","verified-by","first"), b=cell("trial","verified-by","second");
+  const before=new TellingLog().tell(a,"same").deny(a,"counter").tell(b,"other").seal();
+  const current=new TellingLog().tell(a,"same").deny(a,"counter").tell(b,"replacement").seal();
+  const sliced=before.boundedAt(a,2);
+  assert.equal(sliced.candidatesInspected,2);
+  assert.equal(sliced.matchedTellings,2);
+  assert.deepEqual(sliced.for,before.where(a));
+  assert.deepEqual(sliced.against,before.against(a));
+  const result=compareOriginalEvidenceSnapshots(before,current,{propositions:[a,b]});
+  assert.equal(result.inspectedCandidates,6);
+  assert.equal(result.inspectedTellings,6);
+  assert.equal(result.comparisons[0].original.knowledge,before.readingAt(a));
+  assert.equal(result.comparisons[1].revised.knowledge,current.readingAt(b));
+  assert.deepEqual(result.changedPropositionAddresses,[address(b)]);
+});
+
+test("bounded query refuses on missing coordinates, non-integer limits, and index over-budget",()=>{
+  const a=cell("x","p","y"), b=cell("z","p","y");
+  const log=new TellingLog().tell(a,"a").tell(b,"b").seal();
+  assert.throws(()=>log.boundedAt({subject:"x"},2),/complete subject/);
+  for(const limit of [-1,20001,1.5,NaN])assert.throws(()=>log.boundedAt(a,limit),/candidate limit/);
+  assert.throws(()=>log.boundedAt(a,0),/budget exceeded before materialization/);
+  assert.equal(log.boundedAt(a,1).matchedTellings,1);
+  assert.equal(log.boundedAt(cell("unknown","p","none"),0).matchedTellings,0);
+});
+
+
+test("256 dual-proposition FOUR history pairs preserve original indexed readings under the bounded projection",()=>{
+  const a=cell("source-a","asserts","claim-a"), b=cell("source-b","asserts","claim-b");
+  const build=mask=>{
+    const history=new TellingLog();
+    if(mask&1)history.tell(a,"a-for");
+    if(mask&2)history.deny(a,"a-against");
+    if(mask&4)history.tell(b,"b-for");
+    if(mask&8)history.deny(b,"b-against");
+    return history.seal();
+  };
+  const count=mask=>[1,2,4,8].filter(bit=>mask&bit).length;
+  const states=Array.from({length:16},(_,i)=>build(i));
+  for(let old=0;old<16;old++)for(let next=0;next<16;next++){
+    const before=states[old],after=states[next];
+    const result=compareOriginalEvidenceSnapshots(before,after,{propositions:[a,b]});
+    assert.equal(result.inspectedCandidates,count(old)+count(next));
+    assert.equal(result.inspectedTellings,result.inspectedCandidates);
+    for(const [index,coord,bits] of [[0,a,3],[1,b,12]]){
+      const actual=result.comparisons[index];
+      assert.equal(actual.original.knowledge,before.readingAt(coord));
+      assert.equal(actual.revised.knowledge,after.readingAt(coord));
+      assert.equal(actual.requiresReverification,(old&bits)!==(next&bits));
+      assert.equal(actual.witnessesChanged,actual.requiresReverification);
+    }
+  }
 });

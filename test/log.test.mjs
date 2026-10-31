@@ -160,3 +160,57 @@ test("readingWhere evaluates one original complete source-pattern snapshot",()=>
  assert.equal(log.where({subject:"w"}).length,1);
  assert.equal(log.against({subject:"w"}).length,1);
 });
+
+test("ordinary source-pattern reader receives null-prototype caller data without a second codec",()=>{
+  const c=cell("research","has-source","dated-report");
+  const selector=Object.create(null);
+  selector.subject="research";
+  selector.predicate="has-source";
+  selector.object="dated-report";
+  const original=new TellingLog().tell(c,"attested-for","2026-10-28T12:00:00Z")
+    .deny(c,"attested-against","2026-10-28T13:00:00Z").seal();
+  assert.equal(original.where(selector).length,1);
+  assert.equal(original.against(selector).length,1);
+  assert.equal(original.cells(selector).length,1);
+  assert.equal(original.readingAt(selector),"stable");
+  // Canonical query admission does not grant authority or mutate the source.
+  assert.equal(original.size,2);
+  assert.equal(Object.getPrototypeOf(selector),null);
+  let invoked=0;
+  const hostile={subject:"research"};
+  Object.defineProperty(hostile,"predicate",{enumerable:true,get(){invoked++;return "forged";}});
+  assert.throws(()=>original.where(hostile),/data property/);
+  assert.throws(()=>original.readingWhere(hostile),/data property/);
+  assert.equal(invoked,0);
+});
+
+
+test("indexed bounded source reading checks candidate budget before constructing row arrays",()=>{
+  const c=cell("claim","source","research");
+  const history=new TellingLog().tell(c,"support").deny(c,"opposition").seal();
+  const result=history.boundedAt(c,2);
+  assert.equal(result.candidatesInspected,2);
+  assert.deepEqual(result.for,history.where(c));
+  assert.deepEqual(result.against,history.against(c));
+  assert.equal(Object.isFrozen(result.for),true);
+  assert.throws(()=>history.boundedAt(c,1),/budget exceeded before materialization/);
+  // The original helper now returns an ordinary inert source record; the
+ // caller may still supply a null-prototype coordinate envelope.
+  const selector=Object.assign(Object.create(null),{subject:"claim",predicate:"source",object:"research"});
+  assert.equal(history.boundedAt(selector,2).matchedTellings,2);
+});
+
+
+test("oversized index intersection conservatively refuses even if exact query matches nothing",()=>{
+  const target=cell("same-subject","same-predicate","same-object");
+  const history=new TellingLog();
+  for(let i=0;i<7;i++){
+    history.tell(cell("same-subject","other-predicate-"+i,"other-object-"+i),i);
+    history.tell(cell("other-subject-"+i,"same-predicate","other-object-"+i),i);
+    history.tell(cell("other-subject-"+i,"other-predicate-"+i,"same-object"),i);
+  }
+  history.seal();
+  assert.equal(history.where(target).length,0);
+  assert.throws(()=>history.boundedAt(target,6),/budget exceeded before materialization/);
+  assert.equal(history.boundedAt(target,7).matchedTellings,0);
+});

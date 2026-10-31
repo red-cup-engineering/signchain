@@ -103,8 +103,34 @@ test("rules cannot execute untrusted source reading or Cell coordinate getters",
     }
   ];
   for(const attempt of tests)
-    assert.throws(attempt,/data property|accessor/u);
+    assert.throws(attempt,/data property|accessor|inert own data/u);
   assert.equal(calls,0);
+});
+
+test("rule coordinates cannot erase malformed source evidence before Cell admission",()=>{
+  const coordinate={subject:"from",predicate:"claims",object:"to"};
+  let calls=0;
+  const executable={...coordinate,against:[]};
+  Object.defineProperty(executable,"for",{enumerable:true,get(){calls++;return [];}});
+  for(const source of [
+    {...coordinate,for:[]},
+    {...coordinate,against:[]},
+    {...coordinate,value:"stable"},
+    {...coordinate,for:[],against:[],value:"unknown-reading"},
+    {...coordinate,for:[],against:[],extraSourceAuthority:undefined},
+    executable,
+  ]){
+    assert.throws(()=>rule("incomplete",[{cell:source,atLeast:"potential"}],
+      {cell:consequence,reading:"potential"}),TypeError);
+    assert.throws(()=>always(source,"potential"),TypeError);
+  }
+  assert.equal(calls,0,"no evidence getter can be hidden by triple projection");
+  const written=cell("from","claims","to",{value:"stable"});
+  const licensed=rule("written-only",[{cell:written,atLeast:"stable"}],
+    {cell:consequence,reading:"potential"});
+  assert.equal(antecedentHolds(licensed,[written]),true);
+  assert.deepEqual(written.for,[]);
+  assert.deepEqual(written.against,[]);
 });
 
 test("source rule antecedents refuse sparse, decorated and executable indexed arrays",()=>{
@@ -116,7 +142,7 @@ test("source rule antecedents refuse sparse, decorated and executable indexed ar
   Object.defineProperty(getters,"0",{enumerable:true,get(){calls++;return condition;}});
   for(const supplied of [sparse,decorated,getters]){
     assert.throws(()=>rule("bad-list",supplied,{cell:consequence,reading:"potential"}),
-      /sparse|decorated|inert data/u);
+      /dense|undecorated|inert own data/u);
   }
   assert.equal(calls,0);
 });
@@ -176,6 +202,6 @@ test("public rule arrays cannot execute indexed getters or erase antecedents",()
    get(){reads++;return positive;}});
  for(const read of [()=>fire(array,[forTelling]),
    ()=>firedRuleNames(array,[forTelling]),()=>step(array,[forTelling])])
-   assert.throws(read,/inert data/u);
+   assert.throws(read,/inert own data/u);
  assert.equal(reads,0);
 });

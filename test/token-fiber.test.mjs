@@ -139,6 +139,43 @@ test("both distinct modal adjoint pairs satisfy S4 laws over all finite two-toke
   }
 });
 
+test("transported source frames preserve both modal adjunctions over every two-token FOUR valuation", () => {
+  const source = tokenFrame([
+    told("specific", "general"),
+    cell("general", "reports", "claim", {for:["source"],against:["challenger"]}),
+  ]);
+  // The wire may lie about displayed tokens and identification, but its
+  // original source Cells and declared specialization law determine the math.
+  const wire = {kind:source.kind,predicate:source.predicate,cells:[...source.cells],
+    tokens:["invented"],identified:[["specific","general"]]};
+  const readings = readingFamilies.knowledge;
+  const states = readings.flatMap(a => readings.map(b => [
+    {token:"specific",reading:a},{token:"general",reading:b},
+  ]));
+  let checked = 0;
+  for(const order of ["knowledge","truth"]){
+    const within = order === "knowledge" ? knowledgeWithin : truthWithin;
+    for(const v of states){
+      const possible = possibilizeIn(wire,v,order);
+      const necessary = necessitateIn(wire,v,order);
+      assert.deepEqual(possible,possibilizeIn(source,v,order),
+        "transported frames must reproduce source-owned existential readings");
+      assert.deepEqual(necessary,necessitateIn(source,v,order),
+        "transported frames must reproduce source-owned universal readings");
+      assert.deepEqual(possibilizeIn(wire,possible,order),possible,
+        "source-indexed existential is idempotent");
+      assert.deepEqual(necessitateIn(wire,necessary,order),necessary,
+        "source-indexed universal is idempotent");
+      for(const w of states){
+        assert.equal(within(wire,possible,w),within(wire,v,necessitateIn(wire,w,order)),
+          "the original finite adjunction survives source transport");
+        checked++;
+      }
+    }
+  }
+  assert.equal(checked,512,"16 × 16 finite two-token valuations in both FOUR orders");
+});
+
 test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", () => {
   const original = { beta: [2, 1], alpha: { z: "last", a: "first" } };
   const equivalent = { alpha: { a: "first", z: "last" }, beta: [2, 1] };
@@ -156,6 +193,100 @@ test("FOUR claim fiber uses SignCell's canonical predicate/object coordinate", (
     "inheritance preserves contradictory original testimony");
   assert.equal(readingAt(valuationOf(source, "holds", "absent"), "general"), "absurd");
   assert.notEqual(claimCoordinate(original, "holds"), claimCoordinate("holds", original));
+});
+
+test("FOUR valuation uses one original SignCell-owned frame cut, never a second foreign source read", () => {
+  const original = tokenFrame([
+    told("child", "parent"),
+    cell("parent", "supports", "version", { for: ["source:first"] }),
+  ]);
+  const wire = { kind: original.kind, predicate: original.predicate, cells: [...original.cells] };
+  const first = valuationOf(wire, "supports", "version");
+  assert.equal(readingAt(first, "parent"), "potential");
+  const claimIndex = wire.cells.findIndex(at => at.predicate === "supports");
+  assert.notEqual(claimIndex, -1);
+  wire.cells[claimIndex] = cell("parent", "supports", "version", {
+    against: ["source:contrary"],
+  });
+  const second = valuationOf(wire, "supports", "version");
+  assert.equal(readingAt(second, "parent"), "active");
+  assert.equal(readingAt(first, "parent"), "potential",
+    "a prior FOUR projection cannot be changed by a later wire revision");
+
+  let invoked = 0;
+  const getter = { ...wire };
+  Object.defineProperty(getter, "cells", {
+    enumerable: true, get() { invoked++; return wire.cells; },
+  });
+  assert.throws(() => valuationOf(getter, "supports", "version"),
+    /must be source data, not a getter/);
+  const special = [...wire.cells];
+  Object.defineProperty(special, Symbol.iterator, {
+    value() { invoked++; return wire.cells[Symbol.iterator](); },
+  });
+  assert.throws(() => valuationOf({ ...wire, cells: special }, "supports", "version"),
+    /dense undecorated data array/);
+  assert.equal(invoked, 0, "no caller-supplied getter or iterator ran");
+});
+
+test("all FOUR modal operators and truth nuclei use one received frame revision", () => {
+  const specialized = told("child", "parent");
+  const original = tokenFrame([
+    specialized,
+    cell("parent", "reports", "observed", { for: ["author"] }),
+    cell("child", "reports", "observed", { against: ["counterevidence"] }),
+  ]);
+  const frame = { kind: original.kind, predicate: original.predicate, cells: [...original.cells] };
+  const poleA = [{token:"child",reading:"absurd"},{token:"parent",reading:"potential"}];
+  const poleB = [{token:"child",reading:"active"},{token:"parent",reading:"absurd"}];
+  const read = () => {
+    const valuation = valuationOf(frame, "reports", "observed");
+    return {
+      valuation,
+      possible: possibilizeIn(frame, valuation, "knowledge"),
+      necessary: necessitateIn(frame, valuation, "knowledge"),
+      truthPossible: possibilizeIn(frame, valuation, "truth"),
+      truthNecessary: necessitateIn(frame, valuation, "truth"),
+      closure: truthPoleClosure(frame, poleA, valuation),
+      quartet: truthNuclearQuartet(frame, poleA, poleB, valuation),
+    };
+  };
+  const before = read();
+  assert.equal(readingAt(before.possible,"child"),"stable");
+  assert.equal(readingAt(before.valuation,"parent"),"potential");
+  assert.equal(readingAt(before.valuation,"child"),"active");
+  assert.deepEqual(before.quartet.first,before.closure);
+  assert.deepEqual(before.quartet.both,
+    truthPoleClosure(frame,poleB,truthPoleClosure(frame,poleA,before.valuation)),
+    "two finite truth nuclei still commute over the original source cut");
+
+  // Same source locations, revised original witness sides. Do not treat the
+  // old derived FOUR result as mutable or retain a stale transported reading.
+  const at = frame.cells.findIndex(value => value.predicate==="reports" && value.subject==="parent");
+  assert.notEqual(at,-1);
+  frame.cells[at] = cell("parent","reports","observed",{ against:["new-source"] });
+  const after = read();
+  assert.equal(readingAt(after.possible,"child"),"active");
+  assert.equal(readingAt(after.valuation,"parent"),"active");
+  assert.equal(readingAt(before.possible,"child"),"stable");
+  assert.equal(readingAt(before.valuation,"parent"),"potential",
+    "source revision cannot mutate an earlier evidence valuation");
+
+  let called=0;
+  const hostile={...frame};
+  Object.defineProperty(hostile,"cells",{enumerable:true,get(){called++;return frame.cells;}});
+  const sample=before.valuation;
+  const operations=[
+    ()=>pointwise(hostile,x=>x,sample),
+    ()=>knowledgeWithin(hostile,sample,sample),
+    ()=>truthWithin(hostile,sample,sample),
+    ()=>possibilizeIn(hostile,sample,"knowledge"),
+    ()=>necessitateIn(hostile,sample,"truth"),
+    ()=>truthPoleClosure(hostile,poleA,sample),
+    ()=>truthNuclearQuartet(hostile,poleA,poleB,sample),
+  ];
+  for(const operation of operations)assert.throws(operation,/must be source data, not a getter/);
+  assert.equal(called,0,"source accessor cannot affect any mathematical FOUR fiber reader");
 });
 
 test("transported claim tellings preserve both evidence sides in either wire order", () => {

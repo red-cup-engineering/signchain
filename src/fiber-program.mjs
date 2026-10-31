@@ -16,9 +16,8 @@ import {
   residuumReading, truthImplyReading, truthJoinAll, truthJoinReading,
   truthMeetAll, truthMeetReading,
 } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { assertInertCarrierSource } from "@red-cup-engineering/semiotic-content-address";
-import { tokenFrame } from "@red-cup-engineering/signcell/token-frame";
-import { semanticId } from "@red-cup-engineering/signcell/cell";
+import { admitTokenFrame } from "@red-cup-engineering/signcell/token-frame";
+import { assertInertCarrierSource, semanticId } from "@red-cup-engineering/signcell/cell";
 import {
   knowledgeWithin, necessitateIn, pointwise, possibilizeIn, truthWithin, valuationOf,
 } from "./token-fiber.mjs";
@@ -122,7 +121,7 @@ const expression = (frame, node) => {
  * The finite frontier is not a proof that the family is exhaustive.
  */
 export function executeFiberProgram(frame, program) {
-  // Original SCA admits inert semiotic data before grammar reads. It preserves
+  // Cell's original SCA owner admits inert data before grammar reads. It preserves
   // explicit undefined fields, byte/bigint claim literals and owner snapshots.
   // This is not a sandbox for arbitrary Proxy objects or untrusted intrinsics.
   assertInertCarrierSource(program);
@@ -130,10 +129,15 @@ export function executeFiberProgram(frame, program) {
     ["kind", "version", "expression"], "program");
   if (program.kind !== "signchain.fiber-program" || program.version !== 1)
     throw new TypeError("signchain fiber program: unsupported program kind or version");
-  if (frame?.kind !== "signcell.token-frame" || !Array.isArray(frame.cells) || !Array.isArray(frame.tokens))
+  if (frame === null || typeof frame !== "object" || Array.isArray(frame))
     throw new TypeError("signchain fiber program: a native SignCell token frame is required");
-  // Reconstruct the original generated frame. A caller-authored token list is not a source witness.
-  const generated = tokenFrame(frame.cells, { predicate: frame.predicate });
+  // SignCell owns frame source admission and reconstruction. This executable
+  // contract additionally requires the advertised projection to agree with
+  // that admitted source; it never promotes a supplied token list to evidence.
+  // Inspect the whole display before comparing it, so display accessors cannot
+  // run merely because SignCell correctly ignores them as non-authoritative.
+  assertInertCarrierSource(frame);
+  const generated = admitTokenFrame(frame);
   if (semanticId(generated) !== semanticId(frame))
     throw new TypeError("signchain fiber program: declared frame differs from its source-generated token frame");
   const valuation = expression(generated, program.expression);

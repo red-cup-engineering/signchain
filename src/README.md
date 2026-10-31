@@ -27,13 +27,146 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   inference morphisms (specialization, converse, subject/object
   projection), inference rules and their composition closure,
   breadth-first derivation search, typing judgments, derivation validity
-  checking, and predicate words.
+  checking, and predicate words. Its source receiving now constructs a real
+  Token–Predicate–Token Cell rather than feeding an unqualified plain
+  SignCell into `predicationSite`. Generic `inferenceRules` also consumes
+  SignCell's original `predicationBaseNodeOf`: a source-issued node and a
+  JSON-identical unissued array Term cannot become the same object sort.
+  Generic inference now reuses the **same** dense, undecorated, ordinary
+  source-array guard already used by `theoryOfBase`. It cannot execute
+  a caller's custom iterator to create purported proof positions.
+  Converse and endpoint-projection rules derive their endpoints from
+  the **one immutable SignCell-issued base node**, not by rereading raw
+  Cell coordinates after admission; specialization retains its original
+  authored direction. Set, subclassed-array and decorated/iterable
+  inputs now refuse, so legitimate callers must materialize an ordinary
+  source-ordered data array. This is a versioned input-compatibility
+  restriction, not source authentication or a second category.
+  The original generic negative test and **non-skipping** installed
+  receiving test check executable-generator refusal and agreement of
+  original direct-versus-base source endpoints respectively. The latter
+  requires a genuinely pinned supplier; authored tests alone do not
+  establish an installed result.
+  The strict `test/receiving/typed-theory-source.check.mjs` refuses the
+  absence of that installed supplier; the broad compatibility test skips
+  its source-dependent cases with an explicit reason. SignCell owns
+  `baseObjectCoincides`, node issuance and coincidence, not SignChain.
+  A distinct immutable SignCell edition and the complete native tests
+  are still necessary before integration.
 
 - `token-fiber` — the fiber algebra over SignCell's token frame: a claim
   read at every token in FOUR (FOUR^T, each order's meet residuated by its
   implication), and possibilizing and necessitating along the order, ◇ ⊣ □.
   It sits between the frame (SignCell's Heyting algebra of tokens) and the
   token sheaf SignGraph glues from it.
+
+The `token-fiber` claim valuation, order comparisons, pointwise operations,
+possibility/necessity, truth nuclei and nuclear quartets now take one
+readmitted immutable `admitTokenFrame` source cut from SignCell per operation.
+All source tokens, covers and joined original evidence are read from that
+single cut. This removes separate raw-wire reads of mutable `frame.cells`
+without replacing FOUR, the original rule interpretation or the source index.
+Its canonical API and receiving conditions live in the original
+[SignCell contract](https://github.com/red-cup-engineering/signcell/blob/30803c6363505197a5aafffb6d3f08b13e6a9e9c/src/README.md#portable-token-frame-source-boundary);
+the proposed import needs a qualified immutable SignCell edition and
+pinned downstream native tests before integration.
+
+## Finite typed derivation admission — proof checker, not a proof oracle
+
+The original `./typed-theory#derivationValidity` checks a
+**finite derivation under one actual supplied typed theory**. The old
+implementation accepted fabricated derivation objects with a wrong
+`kind`, wrong theory, unearned ExactNumber length, or custom
+`Symbol.iterator` that suppressed the recorded steps. In particular,
+a self-identity path could be pronounced a valid certificate even
+under a theory containing malformed rule records. A successful
+breadth-first `derive` search alone is not a source-qualified proof
+check.
+
+The repaired checker first admits an ordinary inert **own-data** source
+record for the theory and its proposed proof; requires the same source
+theory object and its original finite dense arrays; checks **all**
+ambient inference rules and traces against the existing four
+source-declared morphism kinds (specialization, converse, subject and
+object projection); verifies the proof's ExactNumber `count(steps)`
+representation without coercing caller input; and requires each
+recorded step to cite an actual rule **object present in that theory**.
+It then verifies source/target incidence and the declared conclusion.
+A valid identity proof is a zero-step derivation at an **admitted**
+object, with a canonical natural-zero length; it does not license
+an ill-formed ambient theory.
+
+**Object-closed generated categories are a prerequisite, not merely a
+postcondition of proof search.** The original SignCell predication base
+already requires every generator endpoint to belong to its declared
+object carrier. The same necessary law now applies at the shared
+SignChain typed-theory boundary: for every rule `r`,
+`r.domain ∈ objects` **and** `r.codomain ∈ objects`, as determined
+solely by original SignCell `baseObjectCoincides`. A rule may not
+transport a derivation through an undeclared intermediary, even if the
+path returns to an admitted object. Previously `A → Z → B` was
+accepted in a theory declaring only `A, B`; even the apparent identity
+at `A` could be certified under those malformed rules.
+
+One private, finite `admittedTheory` source check now serves the
+existing `derive`, `typing`, `derivationValidity` and
+`derivationClosure` operations, reusing their original inert
+source-record/array admission and four original inference-morphism
+kinds. In an object-incomplete theory, search and typing return their
+original obstruction types, proof checking refuses with
+`undeclared-rule-endpoint`, and closure refuses rather than returning
+a misleading fixed point. A discrete theory with no generators still
+admits identities at its declared objects. This does not add a fifth
+generator, a new mathematical universe, a SignCell node representation
+or authorization over evidence.
+
+The original `test/typed-theory.test.mjs` includes non-skipping
+positive/negative categorical-closure tests. The existing strict
+`test/receiving/typed-theory-source.check.mjs` separately removes
+an endpoint from a real source-issued SignCell
+`predicationSite → theoryOfBase` and requires **all four** downstream
+judgments (search, typing, validity and closure) to refuse the
+incomplete original source. Neither source tests nor an internal
+finite graph calculation are evidence of a native installed producer,
+a Lean theorem, a previously qualified immutable package, or an
+independently received operational consequence.
+
+For a positive result, the checker issues its own immutable
+`typedTheory.derivationCheck:witness` containing a reconstituted
+frozen derivation and source-issued rule references. This is an
+**in-process, same-theory source check**, not a credential, a remote
+authority, a transport signature, witness testimony, an EAVT event
+history or an independent mathematical theorem. JSON-copied rules are
+not treated as the exact original rule occurrence; a legitimate
+transported proof requires independently qualified reconstruction
+through its owning source rather than implicit aliasing.
+
+The original `typedTheoryProofCarrier` now uses **that same checker**
+on every successful generated typing judgment and reports explicit
+`validations` alongside any `obstructions`. It does not convert
+unverified search results into a settled proof. Original
+`test/typed-theory.test.mjs` contains **non-skipping** finite
+positive/negative controls for path continuity, exact length, identity,
+foreign proofs, executable iterators, malformed ambient theories and
+source mutation. Its strict installed
+`test/receiving/typed-theory-source.check.mjs` separately exercises
+the actual SignCell base generator through this checker.
+
+Professional comparison: [Lean's proof-validation reference](https://lean-lang.org/doc/reference/latest/ValidatingProofs/)
+requires the kernel to check a proof term against its theorem statement
+and distinguishes this from confidence in the meaning of that
+statement. [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-validation)
+describes validation of original instance properties; this cannot
+replace preflight of executable JavaScript getters.
+[W3C PROV-O](https://www.w3.org/TR/prov-o/) separately describes
+provenance sources/activities/agents, none of which is inferred by an
+in-process syntactic derivation. The new source and public checker
+semantics need **new immutable package issuance** after the original
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html) publication
+and original locked native receiving gates. A bounded V8 assay or
+authored test does **not** certify the private native Node>=24.2
+execution, a Lean/Obsmetrologia theorem, a released artifact or an
+installed consumer effect.
 
 ## Bounded predicate-word paths: finite proof without false saturation
 

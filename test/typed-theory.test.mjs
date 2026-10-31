@@ -1,11 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as signCellPredication from "@red-cup-engineering/signcell/predication";
-const { predicationSite, specializationMorphism } = signCellPredication;
+const { predicationSite, specializationMorphism, predicateOfClaim, baseObjectCoincides } = signCellPredication;
+import {mark} from "@red-cup-engineering/signcell/mark";
+import {token,claim} from "@red-cup-engineering/signcell/utterance";
 const isAdmittedPredicationBase = signCellPredication.isAdmittedPredicationBase;
 // Do NOT call unqualified tests "passed" when the pinned source package lacks
 // its constructor-origin guard; explicitly report those receiving cases skipped.
-const hasAdmission = typeof isAdmittedPredicationBase === "function";
+const hasBaseNodes = typeof signCellPredication.predicationBaseNodeOf === "function";
+const hasAdmission = typeof isAdmittedPredicationBase === "function" && hasBaseNodes;
 const originalSourceTest = (name, fn) => test(name, {
   skip: hasAdmission ? false :
     "installed SignCell predication producer lacks original base construction admission",
@@ -18,6 +21,12 @@ import {
   inferenceMorphismIdentity,
   inferenceRules,
   theoryOfBase,
+  derive,
+  typing,
+  derivationClosure,
+  derivationValidity,
+  derivationIdentity,
+  typedTheoryProofCarrier,
 } from "../src/typed-theory.mjs";
 
 test("cellOf builds a (subject, predicate, object) cell", () => {
@@ -35,7 +44,9 @@ test("inferenceMorphismIdentity: distinct morphism kinds are not identical", () 
   assert.equal(judgment.kind, "typedTheory.inferenceMorphismIdentity-obstruction");
 });
 
-test("inferenceRules: a cell witness yields three rules (converse, subject- and object-projection)", () => {
+test("inferenceRules: a cell witness yields three rules (converse, subject- and object-projection)", {
+  skip:hasBaseNodes ? false : "pinned SignCell lacks source-owned predication-base nodes",
+}, () => {
   const rules = inferenceRules([cellOf("s", "p", "o")]);
   assert.equal(rules.length, 3);
   assert.deepEqual(new Set(rules.map((rule) => rule.trace.morphisms[0].kind)), new Set([
@@ -43,9 +54,350 @@ test("inferenceRules: a cell witness yields three rules (converse, subject- and 
     "typedTheory.inferenceMorphism.subjectProjection",
     "typedTheory.inferenceMorphism.objectProjection",
   ]));
+  const originalNode=signCellPredication.predicationBaseNodeOf(cellOf("s","p","o"));
+  assert.equal(baseObjectCoincides(rules[0].domain,originalNode),true,
+    "generic inference rules still use the original SignCell base-node role");
+  assert.equal(baseObjectCoincides(rules[0].domain,[...originalNode]),false,
+    "an unissued source array cannot impersonate a categorical node");
 });
 
-const originalBase = () => predicationSite([cell("alice","likes","bob")]).base;
+originalSourceTest("inferenceRules inherits one inert source list and SignCell-issued endpoints without executing caller source",()=>{
+  const original=cellOf("alice","knows","bob");
+  const rules=inferenceRules([original]);
+  assert.equal(rules.length,3);
+  assert.equal(rules[0].trace.morphisms[0].kind,
+    "typedTheory.inferenceMorphism.converse");
+  const produced=signCellPredication.predicationBaseNodeOf(original);
+  for(const rule of rules)assert.equal(baseObjectCoincides(rule.domain,produced),true);
+  assert.equal(baseObjectCoincides(rules[1].codomain,"alice"),true);
+  assert.equal(baseObjectCoincides(rules[2].codomain,"bob"),true);
+
+  let executed=0;
+  const iterator=[original];
+  Object.defineProperty(iterator,Symbol.iterator,{value(){
+    executed++; return [original][Symbol.iterator]();
+  }});
+  assert.throws(()=>inferenceRules(iterator),/witnesses must be dense and undecorated/);
+  const accessor=[original];
+  Object.defineProperty(accessor,"0",{enumerable:true,get(){
+    executed++;return original;
+  }});
+  assert.throws(()=>inferenceRules(accessor),/witnesses must contain inert own data/);
+  const sparse=new Array(2);
+  sparse[0]=original;
+  assert.throws(()=>inferenceRules(sparse),/witnesses must be dense and undecorated/);
+  class ForeignList extends Array {}
+  assert.throws(()=>inferenceRules(new ForeignList(original)),/witnesses must be a bounded plain source array/);
+  assert.throws(()=>inferenceRules(new Set([original])),/witnesses must be a bounded plain source array/);
+  const hostile={...original};
+  Object.defineProperty(hostile,"subject",{enumerable:true,get(){
+    executed++;return original.subject;
+  }});
+  assert.throws(()=>inferenceRules([hostile]),/inert own Cell coordinates/);
+  assert.equal(executed,0,"no caller-controlled iterator or getter may issue proof endpoints");
+
+  const mutable={subject:{id:"before"},predicate:"observes",object:{id:"target"}};
+  const derived=inferenceRules([mutable]);
+  mutable.subject.id="edited";
+  mutable.object.id="edited";
+  assert.deepEqual(derived[1].codomain,{id:"before"},
+    "proof source projections come from the immutable original SignCell base node");
+  assert.deepEqual(derived[2].codomain,{id:"target"});
+  assert.equal(Object.isFrozen(derived[1].codomain),true);
+});
+
+test("original typed derivation checker certifies real finite proof paths and identity only",()=>{
+  // SignCell owns specialization direction and equality. SignChain owns
+  // the proof path, its ExactNumber length and the certificate of validity.
+  // This test intentionally has NO SKIP: it runs even when the older pinned
+  // SignCell supplier has not shipped the new heterogeneous base-node API.
+  const rules=inferenceRules([
+    specializationMorphism("B","A"),
+    specializationMorphism("C","B"),
+  ]);
+  const theory=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(["A","B","C"]),
+    rules:Object.freeze(rules),
+  });
+  const result=derive(theory,"A","C");
+  assert.equal(result.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(result.derivation.steps.length,2);
+  const certified=derivationValidity(theory,result.derivation);
+  assert.equal(certified.kind,"typedTheory.derivationCheck:witness");
+  assert.equal(Object.isFrozen(certified.derivation),true);
+  assert.equal(Object.isFrozen(certified.derivation.steps),true);
+  assert.equal(certified.derivation.length.value,"2");
+  assert.equal(derivationIdentity(certified.derivation,result.derivation).kind,
+    "typedTheory.derivationIdentity:witness",
+    "the verified source cut is intensionally the same original rule path");
+
+  const identity=derive(theory,"B","B");
+  assert.equal(identity.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(identity.derivation.steps.length,0);
+  const checkedIdentity=derivationValidity(theory,identity.derivation);
+  assert.equal(checkedIdentity.kind,"typedTheory.derivationCheck:witness");
+  assert.equal(checkedIdentity.derivation.length.value,"0");
+  assert.equal(derive(theory,"C","A").kind,"typedTheory.derivationSearch-obstruction");
+
+  // Exercise the actual higher-level original consumer: generated typing
+  // judgments are never a completed proof carrier until the same source
+  // checker has independently validated their exact finite path records.
+  const carrier=typedTheoryProofCarrier(theory);
+  assert.equal(carrier.kind,"typedTheory.proof.carrier");
+  assert.equal(carrier.obstructions.length,0);
+  assert.equal(carrier.validations.length,carrier.judgments.length);
+  assert.ok(carrier.validations.every(item=>
+    item.kind==="typedTheory.derivationCheck:witness"));
+  assert.ok(carrier.validations.every(item=>
+    item.derivation.theory===carrier.theory));
+  assert.equal(carrier.rank.kind,"exactNumber.natural");
+});
+
+test("typed derivation validity refuses forged proof claims, executable steps and inconsistent exact lengths",()=>{
+  const rule=inferenceRules([specializationMorphism("B","A")])[0];
+  const theory=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(["A","B"]),
+    rules:Object.freeze([rule]),
+  });
+  const proved=derive(theory,"A","B").derivation;
+  const refused=(source,label)=>{
+    assert.equal(derivationValidity(theory,source).kind,
+      "typedTheory.derivation-obstruction",label);
+  };
+  for(const [name,source] of [
+    ["foreign carrier",{...proved,kind:"forged.derivation"}],
+    ["foreign theorem theory",{...proved,theory:{...theory}}],
+    ["counterfeit natural length",{...proved,length:{...proved.length,value:"999"}}],
+    ["missing length",Object.fromEntries(Object.entries(proved).filter(([k])=>k!=="length"))],
+    ["invented authority",{...proved,adminAuthority:"fabricated"}],
+    ["wrong proof conclusion",{...proved,conclusion:"A"}],
+    ["unadmitted proof object",{...proved,premise:"unknown"}],
+    ["wrong source step kind",{...proved,steps:[{...proved.steps[0],kind:"foreign.step"}]}],
+    ["added source step privilege",{...proved,steps:[{...proved.steps[0],authority:"granted"}]}],
+    ["lookalike rule outside original theory",{...proved,steps:[{...proved.steps[0],rule:{...rule}}]}],
+    ["wrong step codomain",{...proved,steps:[{...proved.steps[0],conclusion:"A"}]}],
+    ["sparse declared proof steps",{...proved,steps:new Array(1)}],
+    ["unissued extra proof step",{...proved,steps:[...proved.steps,proved.steps[0]]}],
+  ])refused(source,name);
+
+  let executed=0;
+  const externalSteps=[proved.steps[0]];
+  Object.defineProperty(externalSteps,Symbol.iterator,{value(){
+    executed++;return [][Symbol.iterator]();
+  }});
+  refused({...proved,steps:externalSteps},"caller iterator cannot hide declared steps");
+  const mutableProof={...proved};
+  Object.defineProperty(mutableProof,"steps",{enumerable:true,get(){
+    executed++;return [];
+  }});
+  refused(mutableProof,"proof fields must be inert own source data");
+  const maliciousStep={...proved.steps[0]};
+  Object.defineProperty(maliciousStep,"rule",{enumerable:true,get(){
+    executed++;return rule;
+  }});
+  refused({...proved,steps:[maliciousStep]},"step rule must be inert own source data");
+  const maliciousLength={...proved.length};
+  Object.defineProperty(maliciousLength,"value",{enumerable:true,get(){
+    executed++;return "1";
+  }});
+  refused({...proved,length:maliciousLength},"ExactNumber length must be inert data");
+  assert.equal(executed,0,"no source getter or iterator is executed by the proof checker");
+
+  // The validated result must not alias a mutable proof's source steps:
+  // receiving a later mutation may change the external record, not the proof.
+  const mutable={...proved,steps:[{...proved.steps[0]}]};
+  mutable.steps[0].rule=rule;
+  const checked=derivationValidity(theory,mutable);
+  assert.equal(checked.kind,"typedTheory.derivationCheck:witness");
+  const prior=checked.derivation.steps[0].conclusion;
+  mutable.steps[0].conclusion="forged-after-admission";
+  assert.equal(checked.derivation.steps[0].conclusion,prior);
+  assert.equal(Object.isFrozen(checked.derivation.steps[0]),true);
+});
+
+test("even a zero-step identity refuses a malformed theory's rules and traces",()=>{
+  const issued=inferenceRules([specializationMorphism("B","A")])[0];
+  const objects=Object.freeze(["A","B"]);
+  const admitted=Object.freeze({kind:"typedTheory.carrier",objects,rules:Object.freeze([issued])});
+  const identity=derive(admitted,"A","A");
+  assert.equal(identity.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(identity.derivation.steps.length,0);
+  let called=0;
+  const accessor=(source,key)=>{
+    const altered={...source};
+    Object.defineProperty(altered,key,{enumerable:true,get(){
+      called++;return source[key];
+    }});
+    return altered;
+  };
+  const brokenTrace=[...issued.trace.morphisms];
+  Object.defineProperty(brokenTrace,Symbol.iterator,{value(){
+    called++;return [][Symbol.iterator]();
+  }});
+  const cases=[
+    accessor(issued,"domain"),
+    {...issued,extraInstitutionalRight:true},
+    {...issued,kind:"foreign.rule"},
+    {...issued,trace:accessor(issued.trace,"morphisms")},
+    {...issued,trace:{...issued.trace,morphisms:brokenTrace}},
+    {...issued,trace:{...issued.trace,morphisms:[accessor(issued.trace.morphisms[0],"kind")]}},
+    {...issued,trace:{...issued.trace,morphisms:[{kind:"typedTheory.inferenceMorphism.unissued"}]}},
+    {...issued,trace:{...issued.trace,morphisms:[]}},
+  ];
+  for(const badRule of cases){
+    const badTheory=Object.freeze({
+      kind:"typedTheory.carrier",objects,rules:Object.freeze([badRule]),
+    });
+    // Search and validation share the source-category gate. Even an empty
+    // identity cannot make an invalid ambient theory admissible.
+    assert.equal(derive(badTheory,"A","A").kind,"typedTheory.derivationSearch-obstruction");
+    assert.equal(derivationValidity(badTheory,{...identity.derivation,theory:badTheory}).kind,
+      "typedTheory.derivation-obstruction");
+  }
+  assert.equal(called,0,"unadmitted theory callbacks must never run");
+});
+
+test("finite directed incidence: every and only reachable typed judgment has a checked proof",()=>{
+  // Exhaust the eight subgraphs of the original three generators A→B,
+  // B→C, A→C. The expected reachability is computed independently
+  // from the original BFS implementation (including identity arrows).
+  const edges=[["A","B"],["B","C"],["A","C"]];
+  const objects=["A","B","C"];
+  let candidates=0,checked=0;
+  for(let bits=0;bits<8;bits++){
+    const active=edges.filter((_,index)=>(bits&(1<<index))!==0);
+    const input=active.map(([domain,codomain])=>
+      specializationMorphism(codomain,domain));
+    const theory=Object.freeze({
+      kind:"typedTheory.carrier",
+      objects:Object.freeze([...objects]),
+      rules:Object.freeze(inferenceRules(input)),
+    });
+    for(const premise of objects)for(const conclusion of objects){
+      candidates++;
+      const direct=active.some(([a,b])=>a===premise&&b===conclusion);
+      const composite=premise==="A"&&conclusion==="C"&&
+        active.some(([a,b])=>a==="A"&&b==="B")&&
+        active.some(([a,b])=>a==="B"&&b==="C");
+      const expected=premise===conclusion||direct||composite;
+      const result=derive(theory,premise,conclusion);
+      assert.equal(result.kind==="typedTheory.derivationSearch:witness",
+        expected,`incorrect reachability for source graph ${bits}, ${premise}→${conclusion}`);
+      if(expected){
+        const verdict=derivationValidity(theory,result.derivation);
+        assert.equal(verdict.kind,"typedTheory.derivationCheck:witness",
+          `declared path must be a valid source proof in graph ${bits}`);
+        assert.equal(verdict.derivation.length.value,
+          String(result.derivation.steps.length));
+        checked++;
+      }
+    }
+  }
+  assert.equal(candidates,72);
+  assert.equal(checked,37);
+});
+
+test("typed theory generators cannot prove through an undeclared intermediate object",()=>{
+  // SignCell owns endpoint coincidence and directional specialization;
+  // SignChain owns the original complete object carrier and proof judgment.
+  // A -> Z -> B is NOT an arrow in the category declaring only A and B.
+  const rules=inferenceRules([
+    specializationMorphism("Z","A"),
+    specializationMorphism("B","Z"),
+  ]);
+  const invalid=Object.freeze({
+    kind:"typedTheory.carrier",objects:Object.freeze(["A","B"]),
+    rules:Object.freeze(rules),
+  });
+  assert.equal(derive(invalid,"A","B").kind,
+    "typedTheory.derivationSearch-obstruction");
+  assert.equal(typing(invalid,"A","B").kind,
+    "typedTheory.typing-obstruction");
+  assert.equal(derive(invalid,"A","A").kind,
+    "typedTheory.derivationSearch-obstruction",
+    "even identity proof requires a well-formed ambient theory");
+
+  const identity=Object.freeze({
+    kind:"typedTheory.derivation",theory:invalid,premise:"A",
+    conclusion:"A",steps:Object.freeze([]),
+    length:Object.freeze({kind:"exactNumber.natural",value:"0"}),
+  });
+  const forgedPath=Object.freeze({
+    kind:"typedTheory.derivation",theory:invalid,premise:"A",
+    conclusion:"B",steps:Object.freeze([
+      Object.freeze({kind:"typedTheory.derivationStep",
+        premise:"A",rule:rules[0],conclusion:"Z"}),
+      Object.freeze({kind:"typedTheory.derivationStep",
+        premise:"Z",rule:rules[1],conclusion:"B"}),
+    ]),length:Object.freeze({kind:"exactNumber.natural",value:"2"}),
+  });
+  for(const candidate of [identity,forgedPath]){
+    const verdict=derivationValidity(invalid,candidate);
+    assert.equal(verdict.kind,"typedTheory.derivation-obstruction");
+    assert.equal(verdict.reason,"undeclared-rule-endpoint");
+  }
+  assert.throws(()=>derivationClosure(invalid),/undeclared-rule-endpoint/);
+  assert.throws(()=>typedTheoryProofCarrier(invalid),/undeclared-rule-endpoint/);
+
+  // Declaring the actual intermediate Z repairs the SAME original graph;
+  // no edge or witness is introduced by the checker.
+  const complete=Object.freeze({
+    kind:"typedTheory.carrier",objects:Object.freeze(["A","Z","B"]),
+    rules:Object.freeze(rules),
+  });
+  const received=derive(complete,"A","B");
+  assert.equal(received.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(received.derivation.steps.length,2);
+  assert.equal(derivationValidity(complete,received.derivation).kind,
+    "typedTheory.derivationCheck:witness");
+  const carrier=typedTheoryProofCarrier(complete);
+  assert.equal(carrier.obstructions.length,0);
+  assert.ok(carrier.validations.every(item=>
+    item.kind==="typedTheory.derivationCheck:witness"));
+});
+
+test("an ill-formed theory cannot certify identity by hiding executable rule endpoints",()=>{
+  const valid=inferenceRules([specializationMorphism("B","A")])[0];
+  let executed=0;
+  const hostile={...valid};
+  Object.defineProperty(hostile,"domain",{enumerable:true,get(){
+    executed++;return "A";
+  }});
+  const source=Object.freeze({
+    kind:"typedTheory.carrier",
+    objects:Object.freeze(["A","B"]),
+    rules:Object.freeze([hostile]),
+  });
+  assert.equal(derive(source,"A","A").kind,
+    "typedTheory.derivationSearch-obstruction");
+  const identity=Object.freeze({
+    kind:"typedTheory.derivation",theory:source,premise:"A",
+    conclusion:"A",steps:Object.freeze([]),
+    length:Object.freeze({kind:"exactNumber.natural",value:"0"}),
+  });
+  assert.equal(derivationValidity(source,identity).kind,
+    "typedTheory.derivation-obstruction");
+  assert.throws(()=>derivationClosure(source),/invalid-theory-rule/);
+  assert.equal(executed,0,
+    "neither identity search nor proof checking may execute source getters");
+
+  const empty=Object.freeze({kind:"typedTheory.carrier",
+    objects:Object.freeze(["A"]),rules:Object.freeze([])});
+  const accepted=derive(empty,"A","A");
+  assert.equal(accepted.kind,"typedTheory.derivationSearch:witness");
+  assert.equal(derivationValidity(empty,accepted.derivation).kind,
+    "typedTheory.derivationCheck:witness",
+    "a genuine discrete category still has its identity");
+});
+
+// The actual source-owned predication site requires a typed Token-Predicate-Token
+// Cell. Bare string SignCells are valid for the generic cell algebra but do NOT
+// constitute a typed predication generator. Receive the real source type.
+const originalTypedCell = () => cell(token(mark("alice")),
+  predicateOfClaim(claim(mark("likes"))),token(mark("bob")));
+const originalBase = () => predicationSite([originalTypedCell()]).base;
 
 originalSourceTest("source-closed base projects all witnessed generator endpoints into one typed theory",()=>{
   const base=originalBase();
@@ -66,6 +418,28 @@ originalSourceTest("source-closed base projects all witnessed generator endpoint
     "the receiving theory retains the original closed object list");
 });
 
+originalSourceTest("typed theory preserves array-valued Mark terms without inventing a base node sort",()=>{
+  const term=token(mark(["work","w1"]));
+  const source=predicationSite([
+    originalTypedCell(),
+    specializationMorphism(["work","w2"],term),
+  ]);
+  const accepted=theoryOfBase(source.base);
+  assert.equal(baseObjectCoincides(term,["work","w1"]),true,
+    "plain array term and its Token-carried Mark have original source coincidence");
+  assert.equal(baseObjectCoincides(["work","w1"],["work","w2"]),false);
+  const originalNode=source.base.converse[0].domain;
+  assert.equal(baseObjectCoincides(["work","w1"],originalNode),false,
+    "a term array cannot impersonate the distinct Token-Predicate-Token node role");
+  assert.equal(accepted.rules.length,4);
+  assert.equal(accepted.rules[0].trace.morphisms[0].kind,
+    "typedTheory.inferenceMorphism.specialization");
+  for(const rule of accepted.rules)
+    for(const endpoint of [rule.domain,rule.codomain])
+      assert.ok(accepted.objects.some(x=>baseObjectCoincides(x,endpoint)),
+        "source-qualified typed theory must retain every original generator endpoint");
+});
+
 originalSourceTest("incomplete original categorical source refuses; cannot invent absent nodes or specialization endpoints",()=>{
   const source=originalBase();
   for(const altered of [
@@ -75,7 +449,7 @@ originalSourceTest("incomplete original categorical source refuses; cannot inven
     {...source,kind:"foreign.category"},
   ])assert.throws(()=>theoryOfBase(altered),/source|undeclared/u);
   const repaired=predicationSite([
-    cell("alice","likes","bob"),
+    originalTypedCell(),
     specializationMorphism("specific","general")
   ]).base;
   const accepted=theoryOfBase(repaired);
@@ -114,11 +488,14 @@ originalSourceTest("a syntactically closed forged base cannot enter an authentic
 
 test("unqualified installed SignCell source refuses typed base construction instead of guessing",()=>{
   if (hasAdmission) {
-    const valid=predicationSite([cell("alice","likes","bob")]).base;
+    const valid=predicationSite([originalTypedCell()]).base;
     assert.equal(isAdmittedPredicationBase(valid),true);
     assert.equal(theoryOfBase(valid).kind,"typedTheory.carrier");
-  } else {
+  } else if (typeof isAdmittedPredicationBase !== "function") {
     assert.throws(()=>theoryOfBase({kind:"predication.base"}),
       /source owner lacks predication-base construction admission/u);
+  } else {
+    assert.throws(()=>inferenceRules([cellOf("s","p","o")]),
+      /pinned SignCell lacks source-owned base-node construction/u);
   }
 });
