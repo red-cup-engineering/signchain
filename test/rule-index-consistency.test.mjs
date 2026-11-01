@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { address, cell, cellSet, merge } from "@red-cup-engineering/signcell/cell";
 import {
-  antecedentHolds, derivation, fire, fireRule, fireRuleIn, firedRuleNames, rule, always, step,
+  admitRule, admitRules, antecedentHolds, derivation, fire, fireRule, fireRuleIn, firedRuleNames, rule, always, step,
 } from "../src/rules.mjs";
 
 const premise = cell("source", "claims", "outcome");
@@ -16,6 +16,58 @@ const negative = rule("negative", [{ cell: premise, atLeast: "active" }],
 const contested = rule("contested", [{ cell: premise, atLeast: "stable" }],
   { cell: consequence, reading: "stable" });
 const rules = [positive, negative, contested];
+
+test("public rule admission retains native identity and ordered repeated occurrences", () => {
+  assert.equal(admitRule(positive), positive);
+  const source = [positive, negative, positive];
+  const received = admitRules(source);
+  assert.deepEqual(received, source);
+  assert.equal(received[0], positive);
+  assert.equal(received[2], positive);
+  assert.ok(Object.isFrozen(received));
+  source[0] = negative;
+  source.length = 0;
+  assert.equal(received[0], positive);
+  assert.equal(received[1], negative);
+  assert.equal(received.length, 3);
+});
+
+test("wire rule admission captures one immutable rule with its complete derivation identity", () => {
+  const wire = JSON.parse(JSON.stringify(positive));
+  const received = admitRule(wire);
+  assert.deepEqual(derivation(received), derivation(positive));
+  wire.antecedent[0].cell.subject = "substituted-source";
+  wire.consequent.reading = "active";
+  assert.deepEqual(derivation(received), derivation(positive));
+  assert.deepEqual(fireRule(received, [forTelling]), fireRule(positive, [forTelling]));
+  assert.equal(admitRule(received), received);
+});
+
+test("rule-family admission refuses executable and non-positional inputs without reading them", () => {
+  let reads = 0;
+  const accessor = [];
+  Object.defineProperty(accessor, 0, { enumerable: true, get() { reads++; return positive; } });
+  const iterator = [positive];
+  iterator[Symbol.iterator] = function* () { reads++; yield positive; };
+  const decorated = [positive];
+  decorated.extra = true;
+  const alteredMap = [positive];
+  alteredMap.map = () => { reads++; return []; };
+  for (const source of [accessor, iterator, decorated, alteredMap, new Array(1), { 0: positive, length: 1 }])
+    assert.throws(() => admitRules(source), TypeError);
+  const ruleGetter = { ...positive };
+  Object.defineProperty(ruleGetter, "antecedent", { enumerable: true, get() { reads++; return []; } });
+  assert.throws(() => admitRules([ruleGetter]), TypeError);
+  assert.equal(reads, 0);
+});
+
+test("admission and public consequence readers reject the same foreign rule dialect", () => {
+  const foreign = { when: premise, then: consequence };
+  for (const invoke of [
+    () => admitRule(foreign), () => admitRules([foreign]),
+    () => fire([foreign], []), () => firedRuleNames([foreign], []),
+  ]) assert.throws(invoke, /original rule positions/);
+});
 
 test("first/last occurrence order cannot change an admitted rule judgment", () => {
   const firstPositive = [forTelling, againstTelling];

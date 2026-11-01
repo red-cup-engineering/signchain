@@ -94,7 +94,7 @@ export const always = (at, reading) => {
  * shape through the same original builder. No property getter may determine
  * a premise or consequence. A non-frozen caller record is never cached.
  */
-const receivedRule = source => {
+export const admitRule = source => {
   if (source && typeof source === "object" && admittedRules.has(source)) return source;
   if (!source || typeof source !== "object" || Array.isArray(source) ||
       ![Object.prototype, null].includes(Object.getPrototypeOf(source)))
@@ -112,19 +112,28 @@ const receivedRule = source => {
     sourceField(source,"consequent"));
 };
 
+/** Capture one finite, ordered rule family through the original rule owner.
+ * Native rules retain their source identity; wire rules are readmitted once.
+ * Repeated rule occurrences remain repeated. An array getter, hole, iterator
+ * override or decorated record cannot supply an executable premise.
+ */
+export const admitRules = source => Object.freeze(
+  readSourceArray(source, "signchain rules: source family").map(admitRule),
+);
+
 /** Shared addressed rule judgment for public arrays and SignCraft Maps. */
 const antecedentHoldsIn = (r, valuation) => r.antecedent.every((condition) =>
   knowledgeLeqReading(condition.atLeast, knowledgeReading(indexedCellAtTriple(valuation, condition.cell))));
 /** Whether every antecedent holds after repeated source tellings are merged. */
 export const antecedentHolds = (r, valuation) =>
-  antecedentHoldsIn(receivedRule(r), indexValuation(valuation));
+  antecedentHoldsIn(admitRule(r), indexValuation(valuation));
 
 /** A stable witness per rule, including thresholds, conclusion and evidence lane in its identity.
  * Version 1 is retained only to replay historical settlements; it identifies labels and premise
  * addresses, not the complete license. Neither version is a signature or authenticates an issuer. */
 export function derivation(r, version = 2) {
   validateDerivationVersion(version);
-  r = receivedRule(r);
+  r = admitRule(r);
   return Object.freeze({
     rule: r.name,
     from: Object.freeze(r.antecedent.map((condition) => address(condition.cell))),
@@ -135,13 +144,13 @@ export function derivation(r, version = 2) {
 /** What one rule tells in a valuation: its consequent cell, on the sides its reading tells, witnessed by
  *  its derivation; nothing if its antecedent fails. */
 export function fireRule(r, valuation, derivationVersion = 2) {
-  return fireRuleIn(receivedRule(r), indexValuation(valuation), derivationVersion);
+  return fireRuleIn(admitRule(r), indexValuation(valuation), derivationVersion);
 }
 
 /** Fire against an addressed valuation. Settlement can reuse this index across stages. */
 export function fireRuleIn(r, valuation, derivationVersion = 2) {
   validateDerivationVersion(derivationVersion);
-  r = receivedRule(r);
+  r = admitRule(r);
   if (!antecedentHoldsIn(r, valuation)) return cellSet();
   const [forTold, againstTold] = sidesOfReading(r.consequent.reading);
   const witness = derivation(r, derivationVersion), at = r.consequent.cell;
@@ -153,8 +162,8 @@ export function fireRuleIn(r, valuation, derivationVersion = 2) {
 export function fire(rules, valuation) {
   const indexed = indexValuation(valuation);
   const tellings = [];
-  for (const r of ruleConditions(rules)) {
-    tellings.push(...fireRuleIn(receivedRule(r), indexed));
+  for (const r of admitRules(rules)) {
+    tellings.push(...fireRuleIn(r, indexed));
   }
   return cellSet(tellings);
 }
@@ -165,6 +174,6 @@ export const step = (rules, valuation) => mergeCellSets(valuation, fire(rules, v
 /** The names of the rules whose antecedents hold. */
 export const firedRuleNames = (rules, valuation) => {
   const indexed = indexValuation(valuation);
-  return Object.freeze(ruleConditions(rules).map(receivedRule)
+  return Object.freeze(admitRules(rules)
     .filter(r => antecedentHoldsIn(r, indexed)).map(r => r.name));
 };
