@@ -308,3 +308,12 @@ seventeenth transition still exposes the same disagreement. A declaration's
 catalog regime remains distinct from correspondence with an arbitrary runtime
 process. The existing negative, unsafe, coercible and uncountable-cofinality
 controls remain enrolled.
+
+## Native test enrollment
+
+`npm test` runs the native `test/**/*.test.mjs` selection. It includes
+`test/receiving/typed-theory-source.test.mjs` exactly once, with all original
+source-issued carrier and forgery-refusal assertions. The same strict receiver
+is included in `receivingTests`, the published files and
+`test:foundations:receiving`; an unavailable producer capability still fails
+without skipping.

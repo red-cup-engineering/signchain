@@ -47,7 +47,7 @@ Curry-Howard-Lambek reading says is what code is. Pure.
   original direct-versus-base source endpoints respectively. The latter
   requires a genuinely pinned supplier; authored tests alone do not
   establish an installed result.
-  The strict `test/receiving/typed-theory-source.check.mjs` refuses the
+  The strict `test/receiving/typed-theory-source.test.mjs` refuses the
   absence of that installed supplier; the broad compatibility test skips
   its source-dependent cases with an explicit reason. SignCell owns
   `baseObjectCoincides`, node issuance and coincidence, not SignChain.
@@ -122,7 +122,7 @@ or authorization over evidence.
 
 The original `test/typed-theory.test.mjs` includes non-skipping
 positive/negative categorical-closure tests. The existing strict
-`test/receiving/typed-theory-source.check.mjs` separately removes
+`test/receiving/typed-theory-source.test.mjs` separately removes
 an endpoint from a real source-issued SignCell
 `predicationSite → theoryOfBase` and requires **all four** downstream
 judgments (search, typing, validity and closure) to refuse the
@@ -149,7 +149,7 @@ unverified search results into a settled proof. Original
 positive/negative controls for path continuity, exact length, identity,
 foreign proofs, executable iterators, malformed ambient theories and
 source mutation. Its strict installed
-`test/receiving/typed-theory-source.check.mjs` separately exercises
+`test/receiving/typed-theory-source.test.mjs` separately exercises
 the actual SignCell base generator through this checker.
 
 Professional comparison: [Lean's proof-validation reference](https://lean-lang.org/doc/reference/latest/ValidatingProofs/)
@@ -410,12 +410,13 @@ skips are not evidence that the downstream mathematical contract is ready.
 Release receiving MUST run `npm run test:foundations:receiving`.
 This independently imports the **installed** original SignCell provider
 and fails (never skips) when its category producer, endpoint admission, or
-SignChain `theoryOfBase` receiving fails. The explicit source-cut file
-`test/receiving/typed-theory-source.check.mjs` is not part of the broad
-`test/**/*.test.mjs` smoke-test glob: ordinary compatibility and strict
-supplier qualification are distinct gates. Only actual installed and
-pinned packages can pass this receiving obligation; a source-only assay
-or a branch-relative test double cannot confer qualification.
+SignChain `theoryOfBase` receiving fails. The strict source-cut file
+`test/receiving/typed-theory-source.test.mjs` is included exactly once by
+ordinary `npm test` through `test/**/*.test.mjs`. The explicit foundations
+receiving command remains the installed-supplier gate and runs the same
+non-skipping receiver. Only actual installed and pinned packages can pass
+this receiving obligation; a source-only assay or a branch-relative test
+double cannot confer qualification.
 
 The check belongs to the established SignCell and SignChain owners. It
 does not add a content hash, inference engine, transaction store, agent
