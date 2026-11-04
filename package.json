@@ -46,8 +46,8 @@
     "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
   "scripts": {
-    "test": "node --test \"test/**/*.test.mjs\"",
-    "test:foundations:receiving": "node --test test/receiving/typed-theory-source.test.mjs test/typed-theory.test.mjs test/token-fiber.test.mjs test/source-withdrawal.test.mjs"
+    "test": "node --test --test-reporter=tap \"test/**/*.test.mjs\"",
+    "test:foundations:receiving": "node --test --test-reporter=tap test/receiving/typed-theory-source.test.mjs test/typed-theory.test.mjs test/token-fiber.test.mjs test/source-withdrawal.test.mjs"
   },
   "receivingTests": [
     "test/claim-event-log.test.mjs",
