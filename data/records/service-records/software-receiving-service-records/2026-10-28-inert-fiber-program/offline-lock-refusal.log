@@ -1,3 +1,0 @@
-? Verifying lockfile against supply-chain policies (47 entries)...
-✗ Lockfile failed supply-chain policy check (47 entries in 10ms)
-[ERR_PNPM_NO_OFFLINE_META] Failed to resolve @cto.af/wtf8 in package mirror /workspace/shared/signchain-fiber-admission-20261027/lock-only/cache/v12/metadata-full/https%3A+registry.561.group/@cto.af/wtf8.jsonl
