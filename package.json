@@ -1,6 +1,8 @@
 {
   "name": "@red-cup-engineering/signchain",
   "version": "0.4.6-dev.1",
+  "license": "MIT",
+  "packageManager": "pnpm@11.28.5",
   "type": "module",
   "description": "Witnessed rules, evidence ordering and executable SignCell contracts.",
   "files": [
