@@ -1,4 +1,4 @@
-import { schemaFrom } from "@red-cup-engineering/json-schema-services-section/contracts";
+import { shapeContract } from "./shape-contract.mjs";
 
 const reasonSequenceSchema = { type: "array", items: { type: "string", minLength: 1 } };
 
@@ -18,4 +18,4 @@ export const semanticJudgmentSchema = {
   additionalProperties: false,
 };
 
-export const semanticJudgmentContract = schemaFrom(semanticJudgmentSchema);
+export const semanticJudgmentContract = shapeContract(semanticJudgmentSchema);

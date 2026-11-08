@@ -14,7 +14,7 @@ import {
   instrumentContract,
   slug,
 } from "./instrument.mjs";
-import { schemaFrom } from "@red-cup-engineering/json-schema-services-section/contracts";
+import { shapeContract } from "./shape-contract.mjs";
 import {
   contractEnergeticsReport, contractEvidencePolicyReport, contractMoveReport, contractValidityReport,
   contractPhaseReport, contractLensReport, contractOutcomeReport,
@@ -63,13 +63,13 @@ export const instrumentConfigurationReportSchema = {
     certificate: { type: "string", minLength: 1 },
     evidence: { type: "array", items: { type: "string", minLength: 1 } },
     missing: { type: "array", items: { type: "string", minLength: 1 } },
-    aspects: { type: "array", items: { $ref: "semantic-judgment" } },
-    judgment: { $ref: "semantic-judgment" },
+    aspects: { type: "array", items: { $ref: "metroplat/contracts/semantic-judgment" } },
+    judgment: { $ref: "metroplat/contracts/semantic-judgment" },
   },
   additionalProperties: false,
 };
 
-export const instrumentConfigurationReportContract = schemaFrom(
+export const instrumentConfigurationReportContract = shapeContract(
   instrumentConfigurationReportSchema,
   [semanticJudgmentContract],
 );
