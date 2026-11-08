@@ -17,7 +17,7 @@
  * rules reaches its least fixed point above the seed.
  */
 import { address, admitTriple, cell, cellSet, knowledgeReading, merge, mergeCellSets, readSourceArray, semanticId } from "@red-cup-engineering/signcell/cell";
-import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/metrologic/four";
 import { sourceField } from "./telling-source.mjs";
 
 /** Index one functional valuation, joining repeated tellings of the SAME cell

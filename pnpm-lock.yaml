@@ -8,21 +8,12 @@ importers:
 
   .:
     dependencies:
-      '@red-cup-engineering/computer-data-engineering-services-section':
-        specifier: 0.3.1
-        version: 0.3.1
-      '@red-cup-engineering/exact-number-data-service':
-        specifier: 0.1.1
-        version: 0.1.1
       '@red-cup-engineering/json-schema-services-section':
         specifier: 0.5.0
         version: 0.5.0
       '@red-cup-engineering/metrologic':
-        specifier: 0.18.0
-        version: 0.18.0
-      '@red-cup-engineering/semiotic-content-address':
-        specifier: 0.1.2-dev.31
-        version: 0.1.2-dev.31
+        specifier: 0.20.0
+        version: 0.20.0
       '@red-cup-engineering/semiotic-eavt-services-section':
         specifier: 0.3.2
         version: 0.3.2
@@ -132,6 +123,10 @@ packages:
   '@red-cup-engineering/metrologic@0.18.0':
     resolution: {integrity: sha512-PPGJX3G5jk2FrBfJcFenn7i1TrArA6VlNFVlL9G1sIFt7vUjkSwdQr1qFJkDTYdgMplpoZXnUoYjJqfMg/ewHg==}
     engines: {node: '>=22'}
+
+  '@red-cup-engineering/metrologic@0.20.0':
+    resolution: {integrity: sha512-dYicZaKCLjRqXzYGD2OXZYDaZIyCeobl1RjHwAYU4h14W6xJrv7GVRg2y9CA9XlA9o8OALkNdBbMcZJWCBxSQg==}
+    engines: {node: '>=24.2.0'}
 
   '@red-cup-engineering/metrologic@0.4.0':
     resolution: {integrity: sha512-GiPwFJbSA3zsBKAHDcHQvrFlg/WXaNOpc1EMU6xl6h0Pwnz/ROSB/2sl0MfTuZCcbvuX2vCd7ectdbl1Ugi65A==}
@@ -385,6 +380,8 @@ snapshots:
       '@red-cup-engineering/computer-data-engineering-services-section': 0.2.0
       '@red-cup-engineering/exact-number-data-service': 0.1.1
       '@red-cup-engineering/json-services-section': 0.4.0
+
+  '@red-cup-engineering/metrologic@0.20.0': {}
 
   '@red-cup-engineering/metrologic@0.4.0':
     dependencies:

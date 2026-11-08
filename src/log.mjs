@@ -16,7 +16,7 @@ import { admitMessage } from "@red-cup-engineering/signcell/signal";
 import { cellEventOfMessage, cellFromCloudEvent } from "@red-cup-engineering/signcell/cloud-events";
 import { observedTimeUnixNano } from "@red-cup-engineering/signcell/observability";
 import { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
-import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { readingOfSides } from "@red-cup-engineering/metrologic/four";
 import { sourceField, sourcePattern } from "./telling-source.mjs";
 
 const ROLES = ["subject", "predicate", "object"];

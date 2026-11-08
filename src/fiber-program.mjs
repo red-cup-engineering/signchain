@@ -15,7 +15,7 @@ import {
   knowledgeMeetAll, knowledgeMeetReading, linearNegationReading, parReading,
   residuumReading, truthImplyReading, truthJoinAll, truthJoinReading,
   truthMeetAll, truthMeetReading,
-} from "@red-cup-engineering/computer-data-engineering-services-section/four";
+} from "@red-cup-engineering/metrologic/four";
 import { admitTokenFrame } from "@red-cup-engineering/signcell/token-frame";
 import { assertInertCarrierSource, semanticId } from "@red-cup-engineering/signcell/cell";
 import {

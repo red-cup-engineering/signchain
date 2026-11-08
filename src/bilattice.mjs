@@ -22,7 +22,7 @@
  * has been told, the order evidence grows in.
  */
 import { cell, cellSet, coincidenceKey, evidence, evidenced, hasTriple, isCell, admitCell, sameCell, valueOf, measured, knowledgeReading, truthReading } from "@red-cup-engineering/signcell/cell";
-import { knowledgeLeqReading, truthLeqReading, conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { knowledgeLeqReading, truthLeqReading, conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/metrologic/four";
 
 
 // — the bilattice on cells: values combined, evidence accumulated —

@@ -20,7 +20,7 @@ const nodeOfOriginalCell = (at) => {
         throw new TypeError("typed theory: pinned SignCell lacks source-owned base-node construction");
     return sourceConstructor(at);
 };
-import { count, natZero } from "@red-cup-engineering/exact-number-data-service/exact-number";
+import { count, natZero } from "@red-cup-engineering/metrologic/number/exact-number";
 /** Build a cell from subject, predicate, object. */
 export const cellOf = (subject, predicate, object) => ({ subject, predicate, object });
 const inferenceRule = (morphism, domain, codomain, trace = inferenceTrace([morphism])) => Object.freeze({ kind: "typedTheory.inferenceRule", domain, trace, codomain });

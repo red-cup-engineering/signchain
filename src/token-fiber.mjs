@@ -21,7 +21,7 @@
  */
 import { claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
 import { admitTokenFrame, extent, generalizations, top } from "@red-cup-engineering/signcell/token-frame";
-import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthJoinReading, truthLeqReading, truthMeetAll } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthJoinReading, truthLeqReading, truthMeetAll } from "@red-cup-engineering/metrologic/four";
 
 const frozen = (values) => Object.freeze([...values]);
 
