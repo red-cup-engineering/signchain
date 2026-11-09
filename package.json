@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/signchain",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "license": "MIT",
   "packageManager": "pnpm@11.28.5",
   "type": "module",
@@ -8,8 +8,7 @@
   "files": [
     "src",
     "data/schema",
-    "data/examples",
-    "docs"
+    "data/examples"
   ],
   "exports": {
     "./package.json": "./package.json",
