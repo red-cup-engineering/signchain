@@ -2,7 +2,6 @@
   "name": "@red-cup-engineering/signchain",
   "version": "0.6.3",
   "license": "MIT",
-  "packageManager": "pnpm@11.28.5",
   "type": "module",
   "description": "Orderings, tellings, rules and contracts over SignCell cells.",
   "files": [
@@ -36,8 +35,8 @@
     "./telling-source": "./src/telling-source.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/metrologic": "0.22.0",
-    "@red-cup-engineering/signcell": "0.17.3"
+    "@red-cup-engineering/metrologic": "^0.22.0",
+    "@red-cup-engineering/signcell": "^0.17.3"
   },
   "repository": {
     "type": "git",
@@ -47,6 +46,7 @@
   "engines": {
     "node": ">=24.2.0"
   },
+  "packageManager": "pnpm@11.28.5",
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "test:consumer": "node --test examples/quickstart.test.mjs"
