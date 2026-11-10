@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "basis": "Sign family rebuilding plan, SignChain holds rules and order over admitted cells. A positive rule requires its antecedent at the declared knowledge reading.",
+  "cases": [
+    {
+      "id": "SCH-RULE-GUARD",
+      "role": "source",
+      "kind": "invariant",
+      "claim": "An absent antecedent produces no consequence.",
+      "file": "test/acceptance.test.mjs"
+    },
+    {
+      "id": "SCH-RULE-READING",
+      "role": "source",
+      "kind": "refusal",
+      "claim": "Rule construction refuses an unknown knowledge reading.",
+      "file": "test/acceptance.test.mjs"
+    },
+    {
+      "id": "SCH-RULE-QUICKSTART",
+      "role": "consumer",
+      "kind": "example",
+      "claim": "An affirmed premise fires its rule and produces the expected consequence.",
+      "file": "examples/quickstart.test.mjs"
+    }
+  ]
+}

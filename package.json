@@ -8,7 +8,9 @@
   "files": [
     "src",
     "data/schema",
-    "data/examples"
+    "data/examples",
+    "docs/API.md",
+    "examples/quickstart.test.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -44,5 +46,9 @@
   "private": false,
   "engines": {
     "node": ">=24.2.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:consumer": "node --test examples/quickstart.test.mjs"
   }
 }
