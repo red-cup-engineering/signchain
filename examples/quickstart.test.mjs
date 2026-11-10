@@ -3,7 +3,7 @@ import test from "node:test";
 import { cell, knowledgeReading, sameCell } from "@red-cup-engineering/signcell/cell";
 import { fireRule, rule } from "@red-cup-engineering/signchain/rules";
 
-test("SCH-RULE-QUICKSTART", () => {
+test("An affirmed premise fires its rule and produces the expected consequence.", () => {
   const premise = cell("rain", "reaches", "garden", { for: ["sensor"] });
   const wet = cell("garden", "is", "wet");
   const watering = rule("watering", [{ cell: premise, atLeast: "potential" }], {
