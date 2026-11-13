@@ -8,7 +8,6 @@
     "src",
     "data/schema",
     "data/examples",
-    "docs/API.md",
     "examples/quickstart.test.mjs"
   ],
   "exports": {
