@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/signchain",
-  "version": "0.6.5-dev.0",
+  "version": "0.6.6-dev.0",
   "license": "MIT",
   "type": "module",
   "description": "Orderings, tellings, rules and contracts over SignCell cells.",
