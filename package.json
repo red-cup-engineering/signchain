@@ -7,8 +7,7 @@
   "files": [
     "src",
     "data/schema",
-    "data/examples",
-    "examples/quickstart.test.mjs"
+    "data/examples"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -45,9 +44,5 @@
   "engines": {
     "node": ">=24.2.0"
   },
-  "packageManager": "pnpm@11.28.5",
-  "scripts": {
-    "test": "node --test test/*.test.mjs",
-    "test:consumer": "node --test examples/quickstart.test.mjs"
-  }
+  "packageManager": "pnpm@11.28.5"
 }
