@@ -3,33 +3,15 @@
  * reports, and implementation refinement/realization for an instrument.
  */
 
+import { exactCarrier, exactIdentity, retainedCarrier } from "@red-cup-engineering/semiotic-content-address-system";
 import { contractExposure, contractExposureReport, normalizedToken, uniqueStrings } from "./contract.mjs";
 import { semanticJudgment, semanticJudgmentWitnessed, semanticJudgmentAspectWitnessed, fiberAspectWitnessed } from "./judgment.mjs";
 import { semanticJudgmentContract } from "./judgment-schema.mjs";
 import {
-
-  instrumentBoundaryAddresses,
-  instrumentMaterialReport,
-  instrumentDerivedObligations,
-  instrumentContract,
-  slug,
+  instrumentMaterialReport, instrumentDerivedObligations, instrumentContract, relationalInstrument, slug,
 } from "./instrument.mjs";
 import { shapeContract } from "./shape-contract.mjs";
-import {
-  contractEnergeticsReport, contractEvidencePolicyReport, contractMoveReport, contractValidityReport,
-  contractPhaseReport, contractLensReport, contractOutcomeReport,
-
-} from "./contract-report.mjs";
-
-/** One decidable check generated from an instrument's contract-calculus structure. */
-
-  
-
-/** A self-derived verification plan: decidable checks plus the tests/examples still owed by the instrument. */
-
-/** A carried witness that an instrument verification plan discharges the Hoare contract judgment. */
-
-/** Configuration-discipline report for the architecture order contract -> projection -> implementation -> witnessed refinement. */
+import { contractOutcomeReport, contractStaticReports } from "./contract-report.mjs";
 
 /** Executable boundary for the configuration report owned by this module. */
 export const instrumentConfigurationReportSchema = {
@@ -96,10 +78,6 @@ export const generatedInstrumentTestModuleSchema = {
   title: "GeneratedInstrumentTestModule",
   description: "A self-derived node-test module generated from an instrument's verification plan.",
 };
-
-/** Runtime realization judgment: a concrete projection refines a contract by an actual observed outcome. */
-
-/** Runtime realization judgment for an instrument: one outcome realizes its configured projection family. */
 
 export function instrumentVerificationCheck(
   spec,
@@ -221,250 +199,101 @@ export function instrumentRealizationReport(
   });
 }
 
-/** Generate the package-side verification checks and outstanding artifact obligations entailed by one instrument. */
+function contractReferences(contract) {
+  const roles = ["material", "precondition", "move", "postcondition", "phase", "lens", "evidencePolicy"];
+  return Object.fromEntries(roles.map(role => [role, contract[role].id]));
+}
 
-export function instrumentVerificationPlan(instrument) {
+function componentEvidence(contract) {
+  const { evidencePolicy, ...components } = contractReferences(contract);
+  return [...Object.entries(components).map(([role, id]) => `${role}:${id}`), `evidence-policy:${evidencePolicy}`];
+}
+
+const needsExposure = instrument => instrument.move.effects.includes("boundary") ||
+  instrument.move.effects.includes("evidence") || instrument.evidencePolicy.required;
+
+function verificationFacts(source) {
+  const instrument = relationalInstrument(retainedCarrier(source));
   const contract = instrumentContract(instrument);
-  const material = instrumentMaterialReport(instrument);
-  const move = contractMoveReport(contract);
-  const validity = contractValidityReport(contract);
-  const phase = contractPhaseReport(contract);
-  const lens = contractLensReport(contract);
-  const evidencePolicyReport = contractEvidencePolicyReport(contract);
-  const energetics = contractEnergeticsReport(contract);
-  const refinementReports = implementationRefinementReports(instrument);
-  const obligations = instrumentDerivedObligations(instrument);
+  return {
+    instrument, contract, ...contractStaticReports(contract),
+    material: instrumentMaterialReport(instrument),
+    refinements: refinementsOf(instrument, contract),
+  };
+}
+
+function planOf({ instrument, contract, material, move, validity, phase, lens, energetics, evidencePolicy, refinements }) {
+  const prefix = `${instrument.id}.verification`;
+  const check = (name, subject, verifies, evidence, report, suffix = name) =>
+    instrumentVerificationCheck({
+      id: `${prefix}.${suffix}`, instrument: instrument.id, contract: contract.id,
+      check: name, subject, verifies, evidence, missing: report.missing, judgment: report.judgment,
+    });
+  const judgmentEvidence = report => [
+    `judgment:${report.judgment.polarity}`,
+    ...report.judgment.reasons.map(reason => `missing:${reason}`),
+  ];
   const checks = [
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.material-admission`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "material-admission",
-      subject: instrument.material.id,
-      verifies: Object.freeze([
-        "admissibility-presentations",
-        "move-domain",
-        "move-codomain",
-        "admissibility",
-        "lens-permission",
-        "implementation-targets",
-      ]),
-      evidence: Object.freeze([
-        `presentation-count:${instrument.presentations.length}`,
-        `presentation-addresses:${material.boundaryAddresses.join(",")}`,
-      ]),
-      missing: material.missing,
-      judgment: material.judgment,
-    }),
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.move-admissibility`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "move-admissibility",
-      subject: instrument.move.id,
-      verifies: Object.freeze([
-        "move-domain",
-        "move-codomain",
-        "material-effect",
-        "boundary-effect",
-        "evidence-effect",
-        "phase-effect",
-        "determinism",
-      ]),
-      evidence: Object.freeze([
+    check("material-admission", instrument.material.id,
+      ["admissibility-presentations", "move-domain", "move-codomain", "admissibility", "lens-permission", "implementation-targets"],
+      [`presentation-count:${instrument.presentations.length}`, `presentation-addresses:${material.boundaryAddresses.join(",")}`],
+      material),
+    check("move-admissibility", instrument.move.id,
+      ["move-domain", "move-codomain", "material-effect", "boundary-effect", "evidence-effect", "phase-effect", "determinism"],
+      [
         `domain:${instrument.move.domain ?? "boundary-admission"}`,
         `codomain:${instrument.move.codomain ?? "boundary-output"}`,
         `effects:${instrument.move.effects.join(",")}`,
-        `partial:${instrument.move.partial}`,
-        `deterministic:${instrument.move.deterministic}`,
-      ]),
-      missing: move.missing,
-      judgment: move.judgment,
-    }),
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.contract-validity`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "contract-validity",
-      subject: contract.id,
-      verifies: Object.freeze([
-        "hoare-precondition",
-        "hoare-move",
-        "hoare-postcondition",
-        "phase-regime",
-        "observational-lens",
-        "evidence-policy",
-        "energetics",
-        "refinement-obligations",
-      ]),
-      evidence: Object.freeze([
-        `material:${validity.material}`,
-        `precondition:${validity.precondition}`,
-        `move:${validity.move}`,
-        `postcondition:${validity.postcondition}`,
-        `phase:${validity.phase}`,
-        `lens:${validity.lens}`,
-        `evidence-policy:${validity.evidencePolicy}`,
-      ]),
-      missing: validity.missing,
-      judgment: validity.judgment,
-    }),
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.phase-admissibility`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "phase-admissibility",
-      subject: instrument.phase.id,
-      verifies: Object.freeze([
-        "regime",
-        "finality",
-        "coordination-lens",
-        "evidence-policy",
-        "energetics",
-      ]),
-      evidence: Object.freeze([
-        `regime:${phase.regime}`,
-        `finality:${phase.finality}`,
-        `cost:${instrument.phase.cost}`,
-      ]),
-      missing: phase.missing,
-      judgment: phase.judgment,
-    }),
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.lens-admissibility`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "lens-admissibility",
-      subject: instrument.lens.id,
-      verifies: Object.freeze([
-        "lens-domain",
-        "lens-boundary",
-        "lens-output",
-        "lens-preserve-hide",
-        "lens-evidence",
-        "phase-coordination",
-      ]),
-      evidence: Object.freeze([
-        `domain:${lens.domain}`,
-        `boundary:${lens.boundary}`,
-        `output:${lens.output}`,
-        `preserves:${instrument.lens.preserves.length}`,
-        `hides:${instrument.lens.hides.length}`,
-      ]),
-      missing: lens.missing,
-      judgment: lens.judgment,
-    }),
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.energetics`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "energetics",
-      subject: contract.id,
-      verifies: Object.freeze([
-        "phase-energy",
-        "coordination-cost",
-        "evidenced-cost",
-        "finality-accounting",
-      ]),
-      evidence: Object.freeze([
-        `phase-energy:${energetics.phaseEnergy}`,
-        `obligations:${energetics.obligations.length}`,
-      ]),
-      missing: energetics.missing,
-      judgment: energetics.judgment,
-    }),
-    instrumentVerificationCheck({
-      id: `${instrument.id}.verification.coordinates-policy-admissibility`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "evidence-policy-admissibility",
-      subject: instrument.evidencePolicy.id,
-      verifies: Object.freeze([
-        "evidence-records",
-        "time-or-stage",
-        "caller",
-        "boundary-object",
-        "lens-requirement",
-        "phase-requirement",
-        "move-requirement",
-      ]),
-      evidence: Object.freeze([
-        `required:${evidencePolicyReport.required}`,
-        `records:${evidencePolicyReport.requiredRecords.join(",")}`,
-        `time:${instrument.evidencePolicy.time}`,
-        `caller:${instrument.evidencePolicy.caller}`,
+        `partial:${instrument.move.partial}`, `deterministic:${instrument.move.deterministic}`,
+      ], move),
+    check("contract-validity", contract.id,
+      ["hoare-precondition", "hoare-move", "hoare-postcondition", "phase-regime", "observational-lens", "evidence-policy", "energetics", "refinement-obligations"],
+      componentEvidence(contract), validity),
+    check("phase-admissibility", instrument.phase.id,
+      ["regime", "finality", "coordination-lens", "evidence-policy", "energetics"],
+      [`regime:${phase.regime}`, `finality:${phase.finality}`, `cost:${instrument.phase.cost}`], phase),
+    check("lens-admissibility", instrument.lens.id,
+      ["lens-domain", "lens-boundary", "lens-output", "lens-preserve-hide", "lens-evidence", "phase-coordination"],
+      [
+        `domain:${lens.domain}`, `boundary:${lens.boundary}`, `output:${lens.output}`,
+        `preserves:${instrument.lens.preserves.length}`, `hides:${instrument.lens.hides.length}`,
+      ], lens),
+    check("energetics", contract.id, ["phase-energy", "coordination-cost", "evidenced-cost", "finality-accounting"],
+      [`phase-energy:${energetics.phaseEnergy}`, `obligations:${energetics.obligations.length}`], energetics),
+    check("evidence-policy-admissibility", instrument.evidencePolicy.id,
+      ["evidence-records", "time-or-stage", "caller", "boundary-object", "lens-requirement", "phase-requirement", "move-requirement"],
+      [
+        `required:${evidencePolicy.required}`, `records:${evidencePolicy.requiredRecords.join(",")}`,
+        `time:${instrument.evidencePolicy.time}`, `caller:${instrument.evidencePolicy.caller}`,
         `boundary-object:${instrument.evidencePolicy.boundaryObject}`,
-      ]),
-      missing: evidencePolicyReport.missing,
-      judgment: evidencePolicyReport.judgment,
-    }),
+      ], evidencePolicy, "coordinates-policy-admissibility"),
+    ...refinements.map(report => check("implementation-refinement", report.projection,
+      [report.implementation, report.refines, report.projectionKind, ...report.obligations],
+      judgmentEvidence(report), report, `refinement.${slug(report.projection)}`)),
   ];
-
-  for (const report of refinementReports) {
-    checks.push(instrumentVerificationCheck({
-      id: `${instrument.id}.verification.refinement.${slug(report.projection)}`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "implementation-refinement",
-      subject: report.projection,
-      verifies: Object.freeze([
-        report.implementation,
-        report.refines,
-        report.projectionKind,
-        ...report.obligations,
-      ]),
-      evidence: Object.freeze([
-        `judgment:${report.judgment.polarity}`,
-        ...report.judgment.reasons.map((reason) => `missing:${reason}`),
-      ]),
-      missing: report.missing,
-      judgment: report.judgment,
-    }));
-  }
-
-  if (instrument.move.effects.includes("boundary") || instrument.move.effects.includes("evidence") || instrument.evidencePolicy.required) {
+  if (needsExposure(instrument)) {
     const exposure = contractExposure(contract, {
       caller: { generator: "instrumentVerificationPlan", instrument: instrument.id },
       boundary: { instrument: instrument.id, move: instrument.move.id, lens: instrument.lens.id },
     });
-    const exposureReport = contractExposureReport(contract, exposure);
-    checks.push(instrumentVerificationCheck({
-      id: `${instrument.id}.verification.exposure-accountability`,
-      instrument: instrument.id,
-      contract: contract.id,
-      check: "exposure-accountability",
-      subject: instrument.evidencePolicy.id,
-      verifies: Object.freeze([
-        "contract-match",
-        "witness-match",
-        "required-records",
-        "time-or-stage",
-        "caller",
-        "boundary-object",
-      ]),
-      evidence: Object.freeze([
-        `records:${exposureReport.recordsPresent.join(",")}`,
-        `judgment:${exposureReport.judgment.polarity}`,
-        ...exposureReport.judgment.reasons.map((reason) => `missing:${reason}`),
-      ]),
-      missing: exposureReport.missing,
-      judgment: exposureReport.judgment,
-    }));
+    const report = contractExposureReport(contract, exposure);
+    checks.push(check("exposure-accountability", instrument.evidencePolicy.id,
+      ["contract-match", "witness-match", "required-records", "time-or-stage", "caller", "boundary-object"],
+      [`records:${report.recordsPresent.join(",")}`, ...judgmentEvidence(report)], report));
   }
 
-  const missing = checks.flatMap((check) => check.judgment.reasons.map((entry) => `${check.id}:${entry}`));
+  const id = `${instrument.id}.verification-plan`;
+  const missing = checks.flatMap(check => check.judgment.reasons.map(reason => `${check.id}:${reason}`));
   return Object.freeze({
-    kind: "metroplat.instrument-verification-plan",
-    id: `${instrument.id}.verification-plan`,
-    instrument: instrument.id,
-    contract: contract.id,
-    checks: Object.freeze(checks),
-    obligations: Object.freeze([...obligations]),
-    missing: Object.freeze(missing),
-    aspects: Object.freeze(checks.map((check) => check.judgment)),
-    judgment: semanticJudgment(`${instrument.id}.verification-plan`, missing),
+    kind: "metroplat.instrument-verification-plan", id, instrument: instrument.id, contract: contract.id,
+    checks: Object.freeze(checks), obligations: instrumentDerivedObligations(instrument),
+    missing: Object.freeze(missing), aspects: Object.freeze(checks.map(check => check.judgment)),
+    judgment: semanticJudgment(id, missing),
   });
 }
+
+/** Derive ordered static checks and outstanding obligations from an inert instrument declaration. */
+export const instrumentVerificationPlan = instrument => planOf(verificationFacts(instrument));
 
 const baseVerificationCheckClasses = Object.freeze([
   "material-admission",
@@ -480,92 +309,68 @@ function requiredVerificationCheckClasses(instrument) {
   return Object.freeze([
     ...baseVerificationCheckClasses,
     ...(instrument.projections.length === 0 ? [] : ["implementation-refinement"]),
-    ...(instrument.move.effects.includes("boundary") || instrument.move.effects.includes("evidence") || instrument.evidencePolicy.required
-      ? ["exposure-accountability"]
-      : []),
+    ...(needsExposure(instrument) ? ["exposure-accountability"] : []),
   ]);
 }
 
-function checkClassDischarged(plan, checkClass) {
-  const checks = plan.checks.filter((check) => check.check === checkClass);
-  return checks.length > 0 && checks.every((check) => semanticJudgmentWitnessed(check.judgment));
+function sameReport(source, derived) {
+  if (source === undefined) return true;
+  try { return exactIdentity(exactCarrier(source)) === exactIdentity(derived); }
+  catch { return false; }
 }
 
-/**
- * Certify that one generated verification plan is an accountable witness for
- * the static Hoare judgment carried by an instrument.
- */
-
-export function instrumentVerificationCertificateFor(
-  instrument,
-  plan = instrumentVerificationPlan(instrument),
-) {
-  const contract = instrumentContract(instrument);
+function certificateOf({ instrument, contract }, plan, planMatches = true) {
   const requiredChecks = requiredVerificationCheckClasses(instrument);
-  const dischargedChecks = requiredChecks.filter((checkClass) => checkClassDischarged(plan, checkClass));
-  const missingChecks = requiredChecks.filter((checkClass) => plan.checks.every((check) => check.check !== checkClass));
-  const failedChecks = plan.checks.filter((check) => !semanticJudgmentWitnessed(check.judgment)).map((check) => check.id);
-  const validityEvidence = plan.checks
-    .filter((check) => check.check === "contract-validity")
-    .flatMap((check) => check.evidence);
-  const contractComponentEvidence = [
-    `material:${contract.material.id}`,
-    `precondition:${contract.precondition.id}`,
-    `move:${contract.move.id}`,
-    `postcondition:${contract.postcondition.id}`,
-    `phase:${contract.phase.id}`,
-    `lens:${contract.lens.id}`,
-    `evidence-policy:${contract.evidencePolicy.id}`,
-  ];
-  const contractComponentsAccounted = contractComponentEvidence.every((entry) => validityEvidence.includes(entry));
+  const failedChecks = [], checkEvidence = [];
+  const verdicts = new Map();
+  for (const check of plan.checks) {
+    const witnessed = semanticJudgmentWitnessed(check.judgment);
+    verdicts.set(check.check, (verdicts.get(check.check) ?? true) && witnessed);
+    if (witnessed) checkEvidence.push(`check:${check.id}`);
+    else failedChecks.push(check.id);
+  }
+  const dischargedChecks = requiredChecks.filter(check => verdicts.get(check) === true);
+  const missingChecks = requiredChecks.filter(check => !verdicts.has(check));
+  const validityEvidence = plan.checks.find(check => check.check === "contract-validity").evidence;
+  const contractComponentsAccounted = componentEvidence(contract).every(entry => validityEvidence.includes(entry));
   const obligationsProjected = plan.obligations.length > 0 &&
-    plan.obligations.every((obligation) => obligation.verifies.length > 0 && obligation.evidence.length > 0);
-  const planMatchesInstrument = plan.instrument === instrument.id && plan.contract === contract.id;
+    plan.obligations.every(obligation => obligation.verifies.length > 0 && obligation.evidence.length > 0);
   const evidence = [
-    `plan:${plan.id}`,
-    `contract:${contract.id}`,
-    ...plan.checks.filter((check) => semanticJudgmentWitnessed(check.judgment)).map((check) => `check:${check.id}`),
-    ...plan.obligations.map((obligation) => `obligation:${obligation.id}`),
+    `plan:${plan.id}`, `contract:${contract.id}`, ...checkEvidence,
+    ...plan.obligations.map(obligation => `obligation:${obligation.id}`),
   ];
+  const sourceObstructions = planMatches ? [] : ["plan-source-mismatch"];
+  const checkObstructions = [
+    ...missingChecks.map(check => `check:${check}`),
+    ...failedChecks.map(check => `failed:${check}`),
+  ];
+  const componentObstructions = contractComponentsAccounted ? [] : ["contract-components"];
+  const obligationObstructions = obligationsProjected ? [] : ["derived-obligations"];
   const missing = [
-    ...(planMatchesInstrument ? [] : ["plan-instrument-contract-match"]),
-    ...(semanticJudgmentWitnessed(plan.judgment) ? [] : plan.missing.map((entry) => `plan:${entry}`)),
-    ...missingChecks.map((checkClass) => `check:${checkClass}`),
-    ...failedChecks.map((check) => `failed:${check}`),
-    ...(contractComponentsAccounted ? [] : ["contract-components"]),
-    ...(obligationsProjected ? [] : ["derived-obligations"]),
+    ...sourceObstructions, ...plan.missing.map(reason => `plan:${reason}`),
+    ...checkObstructions, ...componentObstructions, ...obligationObstructions,
   ];
+  const id = `${plan.id}.certificate`;
   return instrumentVerificationCertificate({
-    id: `${plan.id}.certificate`,
-    instrument: instrument.id,
-    contract: contract.id,
-    plan: plan.id,
-    material: contract.material.id,
-    precondition: contract.precondition.id,
-    move: contract.move.id,
-    postcondition: contract.postcondition.id,
-    phase: contract.phase.id,
-    lens: contract.lens.id,
-    evidencePolicy: contract.evidencePolicy.id,
-    requiredChecks,
-    dischargedChecks,
-    missingChecks,
-    failedChecks,
-    obligations: plan.obligations.map((obligation) => obligation.id),
-    evidence,
-    missing,
-    aspects: Object.freeze([
+    id, instrument: instrument.id, contract: contract.id, plan: plan.id, ...contractReferences(contract),
+    requiredChecks, dischargedChecks, missingChecks, failedChecks,
+    obligations: plan.obligations.map(obligation => obligation.id), evidence, missing,
+    aspects: [
       plan.judgment,
-      semanticJudgment("plan-instrument-contract-match", planMatchesInstrument ? [] : ["plan-instrument-contract-match"]),
-      semanticJudgment("required-checks", [
-        ...missingChecks.map((checkClass) => `check:${checkClass}`),
-        ...failedChecks.map((check) => `failed:${check}`),
-      ]),
-      semanticJudgment("contract-components", contractComponentsAccounted ? [] : ["contract-components"]),
-      semanticJudgment("derived-obligations", obligationsProjected ? [] : ["derived-obligations"]),
-    ]),
-    judgment: semanticJudgment(`${plan.id}.certificate`, missing),
+      semanticJudgment("plan-instrument-contract-match", sourceObstructions),
+      semanticJudgment("required-checks", checkObstructions),
+      semanticJudgment("contract-components", componentObstructions),
+      semanticJudgment("derived-obligations", obligationObstructions),
+    ],
+    judgment: semanticJudgment(id, missing),
   });
+}
+
+/** Certify the original instrument plan. A supplied copy must carry the same exact report. */
+export function instrumentVerificationCertificateFor(instrument, suppliedPlan) {
+  const facts = verificationFacts(instrument);
+  const plan = planOf(facts);
+  return certificateOf(facts, plan, sameReport(suppliedPlan, plan));
 }
 
 const configurationStages = Object.freeze([
@@ -579,26 +384,12 @@ function uniqueImplementationProjectionKinds(projections) {
   return Object.freeze([...new Set(projections.map((projection) => projection.projection))]);
 }
 
-/**
- * Judge whether an instrument obeys the configuration discipline from the
- * relational-instrument note: contract first, then projections, then concrete
- * implementation refinements, then witnessed/certified refinement.
- */
-
-export function instrumentConfigurationReportFor(
-  instrument,
-  certificate = instrumentVerificationCertificateFor(instrument),
-) {
-  const contract = instrumentContract(instrument);
-  const material = instrumentMaterialReport(instrument);
-  const validity = contractValidityReport(contract);
-  const evidencePolicy = contractEvidencePolicyReport(contract);
-  const refinements = implementationRefinementReports(instrument);
+function configurationOf({ instrument, contract, material, validity, evidencePolicy, refinements }, certificate, certificateMatches = true) {
   const contractStage = semanticJudgmentWitnessed(validity.judgment) && semanticJudgmentWitnessed(material.judgment);
   const projectionStage = instrument.projections.length > 0 &&
     instrument.projections.every((projection) => projection.refines.length > 0 && projection.implementation.length > 0);
   const implementationStage = refinements.length > 0 && refinements.every((report) => semanticJudgmentWitnessed(report.judgment));
-  const evidencedStage = semanticJudgmentWitnessed(evidencePolicy.judgment) &&
+  const evidencedStage = certificateMatches && semanticJudgmentWitnessed(evidencePolicy.judgment) &&
     semanticJudgmentWitnessed(certificate.judgment) &&
     certificate.requiredChecks.includes("exposure-accountability") &&
     certificate.dischargedChecks.includes("exposure-accountability");
@@ -619,6 +410,7 @@ export function instrumentConfigurationReportFor(
     ...refinements.map((report) => `refinement:${report.projection}`),
   ];
   const missing = [
+    ...(certificateMatches ? [] : ["certificate-source-mismatch"]),
     ...missingStages.map((stage) => `stage:${stage}`),
     ...validity.judgment.reasons.map((entry) => `contract:${entry}`),
     ...material.judgment.reasons.map((entry) => `material:${entry}`),
@@ -630,13 +422,7 @@ export function instrumentConfigurationReportFor(
     id: `${instrument.id}.configuration`,
     instrument: instrument.id,
     contract: contract.id,
-    material: contract.material.id,
-    precondition: contract.precondition.id,
-    move: contract.move.id,
-    postcondition: contract.postcondition.id,
-    phase: contract.phase.id,
-    lens: contract.lens.id,
-    evidencePolicy: contract.evidencePolicy.id,
+    ...contractReferences(contract),
     stages: configurationStages,
     configuredStages,
     missingStages,
@@ -657,6 +443,13 @@ export function instrumentConfigurationReportFor(
     ]),
     judgment: semanticJudgment(`${instrument.id}.configuration`, missing),
   });
+}
+
+/** Read configuration from the original facts and a freshly derived certificate. */
+export function instrumentConfigurationReportFor(instrument, suppliedCertificate) {
+  const facts = verificationFacts(instrument);
+  const certificate = certificateOf(facts, planOf(facts));
+  return configurationOf(facts, certificate, sameReport(suppliedCertificate, certificate));
 }
 
 function projectionTokens(projection) {
@@ -777,11 +570,11 @@ function projectionSatisfies(
  * that projection kind.
  */
 
-export function implementationRefinementReport(
-  instrument,
-  projection,
-) {
-  const contract = instrumentContract(instrument);
+export function implementationRefinementReport(instrument, projection) {
+  return refinementOf(instrument, instrumentContract(instrument), projection);
+}
+
+function refinementOf(instrument, contract, projection) {
   const targets = projectionTargets(instrument, contract);
   const targetCompatible = targets.includes(projection.refines);
   const lensCompatible = projection.lens === undefined ||
@@ -838,7 +631,11 @@ export function implementationRefinementReport(
 /** Report all implementation refinements claimed by an instrument. */
 
 export function implementationRefinementReports(instrument) {
-  return Object.freeze(instrument.projections.map((projection) => implementationRefinementReport(instrument, projection)));
+  return instrument.projections.length === 0 ? Object.freeze([]) : refinementsOf(instrument, instrumentContract(instrument));
+}
+
+function refinementsOf(instrument, contract) {
+  return Object.freeze(instrument.projections.map(projection => refinementOf(instrument, contract, projection)));
 }
 
 function implementationRealizationObligations(projection) {
@@ -939,14 +736,13 @@ function realizationSatisfies(
  * contract material; this report also checks the observed behavior.
  */
 
-export function implementationRealizationReport(
-  instrument,
-  projection,
-  outcome,
-) {
+export function implementationRealizationReport(instrument, projection, outcome) {
   const contract = instrumentContract(instrument);
-  const refinement = implementationRefinementReport(instrument, projection);
-  const outcomeReport = contractOutcomeReport(contract, outcome);
+  return realizationOf(instrument, contract, projection, outcome,
+    refinementOf(instrument, contract, projection), contractOutcomeReport(contract, outcome));
+}
+
+function realizationOf(instrument, contract, projection, outcome, refinement, outcomeReport) {
   const obligations = implementationRealizationObligations(projection);
   const satisfied = obligations.filter((obligation) => realizationSatisfies(obligation, refinement, outcomeReport));
   const failed = obligations.filter((obligation) => !satisfied.includes(obligation));
@@ -986,11 +782,15 @@ export function implementationRealizationReport(
 
 /** Judge every implementation projection of an instrument against one realized outcome. */
 
-export function implementationRealizationReports(
-  instrument,
-  outcome,
-) {
-  return Object.freeze(instrument.projections.map((projection) => implementationRealizationReport(instrument, projection, outcome)));
+export function implementationRealizationReports(instrument, outcome) {
+  if (instrument.projections.length === 0) return Object.freeze([]);
+  const contract = instrumentContract(instrument);
+  return realizationsOf(instrument, contract, outcome, refinementsOf(instrument, contract), contractOutcomeReport(contract, outcome));
+}
+
+function realizationsOf(instrument, contract, outcome, refinements, outcomeReport) {
+  return Object.freeze(instrument.projections.map((projection, index) =>
+    realizationOf(instrument, contract, projection, outcome, refinements[index], outcomeReport)));
 }
 
 /**
@@ -1000,19 +800,16 @@ export function implementationRealizationReports(
  * observed through the outcome, and every declared projection must be realized.
  */
 
-export function instrumentRealizationReportFor(
-  instrument,
-  outcome,
-  configuration = instrumentConfigurationReportFor(instrument),
-) {
-  const contract = instrumentContract(instrument);
+export function instrumentRealizationReportFor(source, outcome, suppliedConfiguration) {
+  const facts = verificationFacts(source);
+  const { instrument, contract, refinements } = facts;
+  const configuration = configurationOf(facts, certificateOf(facts, planOf(facts)));
+  const configurationMatches = sameReport(suppliedConfiguration, configuration);
   const outcomeReport = contractOutcomeReport(contract, outcome);
-  const realizationReports = implementationRealizationReports(instrument, outcome);
+  const realizationReports = realizationsOf(instrument, contract, outcome, refinements, outcomeReport);
   const realizedProjections = realizationReports.filter((report) => semanticJudgmentWitnessed(report.judgment)).map((report) => report.projection);
   const unrealizedProjections = realizationReports.filter((report) => !semanticJudgmentWitnessed(report.judgment)).map((report) => report.projection);
-  const configurationAccounted = semanticJudgmentWitnessed(configuration.judgment) &&
-    configuration.instrument === instrument.id &&
-    configuration.contract === contract.id;
+  const configurationAccounted = configurationMatches && semanticJudgmentWitnessed(configuration.judgment);
   const outcomeAccounted = semanticJudgmentWitnessed(outcomeReport.judgment) &&
     outcome.contract === contract.id &&
     outcome.material === contract.material.id &&
@@ -1033,6 +830,7 @@ export function instrumentRealizationReportFor(
   ];
   const missing = [
     ...(configurationAccounted ? [] : ["configuration"]),
+    ...(configurationMatches ? [] : ["configuration-source-mismatch"]),
     ...configuration.missing.map((entry) => `configuration:${entry}`),
     ...(outcomeAccounted ? [] : ["outcome"]),
     ...outcomeReport.missing.map((entry) => `outcome:${entry}`),
@@ -1044,13 +842,7 @@ export function instrumentRealizationReportFor(
     contract: contract.id,
     outcome: `${outcome.contract}:${outcome.fingerprint}`,
     outcomeContract: outcome.contract,
-    material: contract.material.id,
-    precondition: contract.precondition.id,
-    move: contract.move.id,
-    postcondition: contract.postcondition.id,
-    phase: contract.phase.id,
-    lens: contract.lens.id,
-    evidencePolicy: contract.evidencePolicy.id,
+    ...contractReferences(contract),
     configuration: configuration.id,
     projectionKinds: uniqueImplementationProjectionKinds(instrument.projections),
     implementationReports,

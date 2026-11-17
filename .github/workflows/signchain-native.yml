@@ -13,6 +13,8 @@ jobs:
   native:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      npm_config_registry: https://registry.561.group/
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -22,7 +24,7 @@ jobs:
         with:
           node-version: '24'
       - name: Install suppliers from the Group registry
-        run: pnpm install --ignore-scripts --registry=https://registry.561.group/
+        run: pnpm install --ignore-scripts
       - name: Check source syntax
         run: find src -name '*.mjs' -print0 | xargs -0 -n1 node --check
       - run: pnpm test
@@ -32,5 +34,5 @@ jobs:
           trap 'rm -rf "$consumer"' EXIT
           archive=$(npm pack --silent --ignore-scripts --pack-destination "$consumer")
           cd "$consumer"
-          npm install --ignore-scripts --no-audit --no-fund --registry=https://registry.561.group/ "./$archive"
+          npm install --ignore-scripts --no-audit --no-fund "./$archive"
           node --test "$consumer/node_modules/@red-cup-engineering/signchain/test/receiving.test.mjs"

@@ -7,6 +7,14 @@ import { appendCellWitnesses, telling, TellingLog } from "@red-cup-engineering/s
 import { replayTellingEvents, repairTellingEvent, tellingEvent } from "@red-cup-engineering/signchain/replicated-log";
 import { antecedentHolds, derivation, fireRule, fireRuleIn, rule, step } from "@red-cup-engineering/signchain/rules";
 import { assessOriginalSourceWithdrawal, compareOriginalEvidenceSnapshots } from "@red-cup-engineering/signchain/source-withdrawal";
+import { contractOutcome } from "@red-cup-engineering/signchain/contracts/contract-report";
+import { phaseEnergeticObligation } from "@red-cup-engineering/signchain/contracts/energetics";
+import { instrumentContract, relationalInstrument } from "@red-cup-engineering/signchain/contracts/instrument";
+import { strictFinitePhase as phase } from "@red-cup-engineering/signchain/contracts/phase";
+import {
+  instrumentConfigurationReportFor, instrumentRealizationReportFor,
+  instrumentVerificationCertificateFor, instrumentVerificationPlan,
+} from "@red-cup-engineering/signchain/contracts/verification";
 
 const composed = "é";
 const decomposed = "e\u0301";
@@ -111,4 +119,73 @@ test("a rule joins exact premises and refuses a foreign value at a consulted add
   const next = step([r], valuation);
   assert.equal(next.find(value => address(value) === address(at)).against[0], decomposed);
   assert.deepEqual(step([r], next), next);
+});
+
+const rankInstrument = relationalInstrument({
+  id: "rank-instrument",
+  material: {
+    id: "rank", loci: [], incidence: [], fibers: [], valueAlgebra: "rank",
+    constraints: [], closure: ["observe"], boundary: ["observation"],
+    phaseEvidence: [{ id: "rank-closure", phase: phase.id, stages: [0], settledAt: 0 }],
+  },
+  precondition: { id: "pre", entails: ["observation"] },
+  postcondition: { id: "post", entails: ["observation"] },
+  move: { id: "observe", domain: "observation", codomain: "observation", partial: false, deterministic: true, effects: ["boundary"] },
+  phase,
+  lens: { id: "rank-lens", domain: "observation", boundary: "observation", output: "observation", preserves: ["rank"], hides: [], evidenceRequired: false },
+  evidencePolicy: { id: "rank-policy", required: false, records: ["boundary"], time: "none", caller: "none", boundaryObject: "required" },
+  energetics: [phaseEnergeticObligation({
+    id: "rank-energy", phase, source: "pre", target: "post", invariant: "rank decreases", measure: "rank", evidenceRequired: false,
+  })],
+  presentations: [{
+    id: "rank-presentation", material: "rank", address: "observation", admissibility: { id: "present" },
+    invariants: ["rank"], permittedLenses: ["rank-lens"], projections: ["function"],
+  }],
+  projections: [{ id: "rank-projection", projection: "function", implementation: "observe", refines: "observe", preserves: ["rank"] }],
+});
+
+const restored = value => JSON.parse(JSON.stringify(value));
+
+test("an instrument receives its genuine plan, certificate and configuration after restoration", () => {
+  const plan = instrumentVerificationPlan(rankInstrument);
+  const certificate = instrumentVerificationCertificateFor(rankInstrument, restored(plan));
+  const configuration = instrumentConfigurationReportFor(rankInstrument, restored(certificate));
+  const outcome = contractOutcome(instrumentContract(rankInstrument), {
+    materialBefore: { rank: 1 }, materialAfter: { rank: 0 }, boundary: { rank: 0 },
+  });
+  const realization = instrumentRealizationReportFor(rankInstrument, outcome, restored(configuration));
+
+  for (const report of [plan, certificate, configuration, realization]) {
+    assert.equal(report.judgment.polarity, "witness", JSON.stringify(report.missing));
+  }
+  assert.deepEqual(certificate, instrumentVerificationCertificateFor(rankInstrument));
+  assert.deepEqual(configuration, instrumentConfigurationReportFor(rankInstrument));
+  assert.deepEqual(realization, instrumentRealizationReportFor(rankInstrument, outcome));
+  const forged = { ...configuration, implementations: ["unrelated"] };
+  assert.ok(instrumentRealizationReportFor(rankInstrument, outcome, forged).missing.includes("configuration-source-mismatch"));
+});
+
+test("edited or foreign instrument reports cannot supply positive verification evidence", () => {
+  const incomplete = { ...rankInstrument, presentations: [] };
+  const plan = instrumentVerificationPlan(incomplete);
+  const certificate = instrumentVerificationCertificateFor(incomplete, restored(plan));
+  assert.equal(certificate.judgment.polarity, "obstruction");
+  assert.ok(certificate.failedChecks.some(id => id.endsWith(".material-admission")));
+
+  const witness = { polarity: "witness", reasons: [] };
+  const forgedPlan = { ...plan, judgment: witness, checks: plan.checks.map(check => ({ ...check, judgment: witness })) };
+  const refusal = instrumentVerificationCertificateFor(incomplete, forgedPlan);
+  assert.ok(refusal.missing.includes("plan-source-mismatch"));
+  assert.deepEqual(refusal.failedChecks, certificate.failedChecks);
+
+  const foreignCertificate = instrumentVerificationCertificateFor(rankInstrument);
+  const configuration = instrumentConfigurationReportFor(incomplete, foreignCertificate);
+  assert.ok(configuration.missing.includes("certificate-source-mismatch"));
+  assert.ok(configuration.missingStages.includes("evidenced-refinement"));
+
+  let reads = 0;
+  const accessor = { ...plan, get judgment() { reads++; return plan.judgment; } };
+  assert.ok(instrumentVerificationCertificateFor(incomplete, accessor).missing.includes("plan-source-mismatch"));
+  assert.throws(() => instrumentVerificationPlan({ ...incomplete, get id() { reads++; return incomplete.id; } }), /inert/);
+  assert.equal(reads, 0);
 });

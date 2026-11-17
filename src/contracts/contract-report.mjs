@@ -412,7 +412,9 @@ function moveEndpointAccounted(contract, endpoint, role) {
 
 /** Judge whether the relational move m is admissible for Γ/Φ/Λ/Ω before executing it. */
 
-export function contractMoveReport(contract) {
+export const contractMoveReport = contract => moveReportFor(contract);
+
+function moveReportFor(contract, { lens, evidencePolicy, phase } = {}) {
   const domainAccounted = moveEndpointAccounted(contract, contract.move.domain, "domain");
   const codomainAccounted = moveEndpointAccounted(contract, contract.move.codomain, "codomain");
   const materialEffectAccounted = !contract.move.effects.includes("material") ||
@@ -420,11 +422,11 @@ export function contractMoveReport(contract) {
     codomainAccounted ||
     contract.material.closure.length > 0;
   const boundaryEffectAccounted = !contract.move.effects.includes("boundary") ||
-    semanticJudgmentWitnessed(contractLensReport(contract).judgment);
+    semanticJudgmentWitnessed((lens ?? contractLensReport(contract)).judgment);
   const evidenceEffectAccounted = !contract.move.effects.includes("evidence") ||
-    semanticJudgmentWitnessed(contractEvidencePolicyReport(contract).judgment);
+    semanticJudgmentWitnessed((evidencePolicy ?? contractEvidencePolicyReport(contract)).judgment);
   const phaseEffectAccounted = !contract.move.effects.includes("phase") ||
-    semanticJudgmentWitnessed(contractPhaseReport(contract).judgment);
+    semanticJudgmentWitnessed((phase ?? contractPhaseReport(contract)).judgment);
   const deterministicAccounted = !contract.move.deterministic || contract.phase.regime !== "aperiodic";
   const missing = [
     ...(domainAccounted ? [] : ["move-domain"]),
@@ -566,17 +568,13 @@ function evidencePostconditionAccounted(contract) {
     contract.evidencePolicy.records.some((record) => record === "postcondition" || record === "postcondition observation");
 }
 
-/**
- * Judge whether `Γ ⊨ {P} m {Q}` is statically admissible under its phase regime,
- * observation lens, evidence policy, energetics, and implementation refinements.
- */
-
-export function contractValidityReport(contract) {
-  const move = contractMoveReport(contract);
-  const phase = contractPhaseReport(contract);
+/** Derive the static component and whole-contract judgments from one contract. */
+export function contractStaticReports(contract) {
+  const energetics = contractEnergeticsReport(contract);
+  const phase = phaseReportFor(contract, energetics);
   const lens = contractLensReport(contract);
   const evidencePolicyReport = contractEvidencePolicyReport(contract);
-  const energetics = contractEnergeticsReport(contract);
+  const move = moveReportFor(contract, { phase, lens, evidencePolicy: evidencePolicyReport });
   const preconditionAccounted = predicateRoleAccounted(contract, contract.precondition, "precondition");
   const postconditionAccounted = predicateRoleAccounted(contract, contract.postcondition, "postcondition");
   const evidencePostcondition = evidencePostconditionAccounted(contract);
@@ -592,7 +590,7 @@ export function contractValidityReport(contract) {
     ...(evidencePostcondition ? [] : ["postcondition-evidence-accounting"]),
     ...(refinementsDeclared ? [] : ["refinement-obligations"]),
   ];
-  return Object.freeze({
+  const validity = Object.freeze({
     kind: "metroplat.contract-validity",
     contract: contract.id,
     material: contract.material.id,
@@ -616,10 +614,17 @@ export function contractValidityReport(contract) {
     ]),
     judgment: semanticJudgment(`${contract.id}.validity`, missing),
   });
+  return Object.freeze({ move, phase, lens, evidencePolicy: evidencePolicyReport, energetics, validity });
 }
 
+/** Judge `Γ ⊨ {P} m {Q}` with its phase, lens, evidence, energy and refinements. */
+export const contractValidityReport = contract => contractStaticReports(contract).validity;
+
 export function contractPhaseReport(contract) {
-  const energetics = contractEnergeticsReport(contract);
+  return phaseReportFor(contract, contractEnergeticsReport(contract));
+}
+
+function phaseReportFor(contract, energetics) {
   const closure = closureMatchesPhase(contract);
   const finality = finalityMatchesPhase(contract);
   const lens = lensMatchesPhase(contract);
