@@ -8,7 +8,7 @@ import { observationalLens } from "./observation-lens.mjs";
 import { evidencePolicy } from "./evidence-policy.mjs";
 import { energeticObligation, energeticLawForPhase } from "./energetics.mjs";
 import { admissibilityPresentation } from "./admissibility-presentation.mjs";
-import { retainedCarrier } from "@red-cup-engineering/signcell/cell";
+import { retainedCarrier } from "@red-cup-engineering/semiotic-content-address-system";
 import {
   semanticJudgment, fiberAspectWitnessed,
 } from "./judgment.mjs";

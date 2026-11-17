@@ -19,8 +19,9 @@
  *
  * Gluing fibers into sections over covers is the layer above this one: SignGraph's token sheaf.
  */
-import { claimCoordinate, coincidenceKey, sidesOf } from "@red-cup-engineering/signcell/cell";
-import { admitTokenFrame, extent, generalizations, top } from "@red-cup-engineering/signcell/token-frame";
+import { claimCoordinate, sidesOf } from "@red-cup-engineering/signcell";
+import { coincidenceKey } from "@red-cup-engineering/semiotic-content-address-system";
+import { admitTokenFrame, extent, generalizations, top } from "./token-frame.mjs";
 import { isReading, knowledgeJoinAll, knowledgeLeqReading, knowledgeMeetAll, readingAs, readingOfSides, truthJoinAll, truthJoinReading, truthLeqReading, truthMeetAll } from "@red-cup-engineering/metrologic/four";
 
 const frozen = (values) => Object.freeze([...values]);

@@ -21,13 +21,19 @@
  * The witness sets are ordered too (knowledgeLeq, truthLeq): inclusion of what
  * has been told, the order evidence grows in.
  */
-import { cell, cellSet, coincidenceKey, evidence, evidenced, hasTriple, isCell, admitCell, sameCell, valueOf, measured, knowledgeReading, truthReading } from "@red-cup-engineering/signcell/cell";
+import {
+  cell, cellSet, evidence, evidenced, hasTriple, isCell, admitCell, merge, sameCell,
+  knowledgeReading as valueOf, measured, knowledgeReading, truthReading,
+} from "@red-cup-engineering/signcell";
+import { exactCarrier, exactIdentity } from "@red-cup-engineering/semiotic-content-address-system";
 import { knowledgeLeqReading, truthLeqReading, conflateReading, knowledgeJoinAll, readingSchema, knowledgeJoinReading, knowledgeMeetReading, knowledgeTop, negateReading, readingOfSides, samePoint, sidesOfReading, truthJoinReading, truthMeetReading } from "@red-cup-engineering/metrologic/four";
 
 
-// — the bilattice on cells: values combined, evidence accumulated —
-
-const includes = (small, large) => { const has = new Set(large.map(coincidenceKey)); return small.every((w) => has.has(coincidenceKey(w))); };
+function includes(small, large) {
+  const key = witness => exactIdentity(exactCarrier(witness));
+  const witnesses = new Set(large.map(key));
+  return small.every(witness => witnesses.has(key(witness)));
+}
 
 const sameShape = (left, right) => {
   if (hasTriple(left) !== hasTriple(right)) throw new TypeError("signchain: a cell combines only with a cell, a bare evidence pair only with a pair");
@@ -44,7 +50,10 @@ const combined = (operation) => (left, right) => {
 };
 
 /** Knowledge join (Valued.joinK): everything either telling told (on cells, SignCell's merge). */
-export const knowledgeJoin = combined(knowledgeJoinReading);
+export function knowledgeJoin(left, right) {
+  return hasTriple(left) && hasTriple(right) ? merge(left, right) : joinEvidence(left, right);
+}
+const joinEvidence = combined(knowledgeJoinReading);
 /** Knowledge meet (Valued.meetK): the value both tellings share, every witness of either kept. */
 export const knowledgeMeet = combined(knowledgeMeetReading);
 /** Truth join (Valued.joinT): the value leaning truer, every witness kept. */

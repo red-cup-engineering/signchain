@@ -11,7 +11,7 @@
  * - boundary-only -> neither        (no side) — interior evidence is not
  *   admissible through the phase's observability, so no evidence enters
  */
-import { evidence, knowledgeReading } from "@red-cup-engineering/signcell/cell";
+import { evidence, knowledgeReading } from "@red-cup-engineering/signcell";
 import { truthMeetReading, truthTop } from "@red-cup-engineering/metrologic/four";
 
 /** The structural face of a computing-stratum semantic judgment. */

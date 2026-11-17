@@ -7,42 +7,23 @@
 [![Tips welcome](https://img.shields.io/badge/tips-welcome-d4a017)](https://github.com/561-group/.github/blob/main/TIPS.md)
 <!-- 561-group-standards:badges:end -->
 
-Orderings, tellings, rules and contracts over SignCell cells.
+SignChain composes ordered tellings, predication sites, rules, and contract cuts over SignCell evidence. Metrologic supplies the mathematics. The Group's data libraries supply exact and semantic addressing and typed source admission.
 
-## Quickstart
+## Evidence and rules
 
-Create a rule over SignCell cells and apply it to a valuation that meets its precondition. The [runnable example](examples/quickstart.test.mjs)
-uses the same public imports as an installed application.
+Use [the receiving example](test/receiving.test.mjs) to construct an ordered telling history, read both witness lanes, and fire an admitted rule. When a physical or organizational observation supplies an occurrence, pass its `{source, id}` to `tellingEvent` separately from its witness.
 
-```sh
-npm run test:consumer
-```
+Keep the `events` returned by `replayTellingEvents` as the mergeable state. The `original` log retains the verified original tellings in event-address order. The `effective` log reads the evidence that survives causally scoped repairs. An ordered `TellingLog` retains the sequence supplied by its caller. External producer order, source authority, and effects belong to the host.
 
-Run the source suite with `npm test`.
+A repair supersedes the live opposed evidence it cites. Previously unseen evidence survives. Competing concurrent repairs remain contested until a later repair sees both. Replay reports an address mismatch, conflicting source occurrence, missing basis or invalid basis.
 
-## Place in the family
+## Install and test
 
-Metrologic → SignCell → SignChain → SignGraph → SignCraft. Each library may import
-only those before it. SignChain imports: Metrologic and SignCell.
-
-Metrologic holds pure mathematics; the Sign libraries hold the semiotic
-implementation (cells, ports, channels, messages); specific formats and protocols
-are codecs downstream of the family.
-
-## Install
-
-Packages are published to the 561 Group registry, which serves them without
-authentication. Node.js 24.2 or later is required.
+Use Node.js 24.2 or later. Install the candidate archive in a consumer directory.
 
 ```sh
-npm install @red-cup-engineering/signchain --registry=https://registry.561.group/
+npm install ./red-cup-engineering-signchain-0.7.0-dev.0.tgz --registry=https://registry.561.group/
+node --test "$PWD/node_modules/@red-cup-engineering/signchain/test/receiving.test.mjs"
 ```
 
-## Status
-
-The family is being rebuilt to that order. See
-[the plan](https://github.com/red-cup-engineering/computer-engineering-services-section/blob/main/content/text/documents/specifications/2026-11-07-rebuilding-the-sign-family-from-its-theory.md).
-
-## Requirements
-
-The peers this library must meet, then beat, are recorded in [requirements/](requirements/).
+Run `pnpm test` from a source checkout after installing the selected suppliers. Refer to [implementation and receiving](content/implementation.md) for the selected obligations and [requirements](requirements/) for peer comparison.

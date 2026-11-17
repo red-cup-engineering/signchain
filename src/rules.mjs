@@ -1,179 +1,125 @@
-/**
- * SignChain — rules and the immediate-consequence step over cell sets.
- *
- * A rule has positive threshold antecedents — "this cell reads at least this
- * point in the knowledge order" — and one consequent: a cell and the point it
- * tells it (Fitting 1991: logic programs over bilattices, valued in the
- * knowledge order). Firing a rule tells its consequent with a derivation as the
- * witness: the rule's content identity, name and the addresses of its premises. So every
- * derived telling is content-addressed back to what licensed it — the chain.
- * The rule language has no negation: an antecedent reading told against is a
- * threshold on the cell's against side, and a consequent told against tells
- * that side.
- *
- * `step` is Fitting's immediate-consequence operator T(v) = v ⊔ fire(v): monotone
- * and inflationary in the knowledge order. Repeating a derivation tells the same
- * witness again, which the evidence sets absorb, so iterating T on finitely many
- * rules reaches its least fixed point above the seed.
- */
-import { address, admitTriple, cell, cellSet, knowledgeReading, merge, mergeCellSets, readSourceArray, semanticId } from "@red-cup-engineering/signcell/cell";
-import { isReading, sidesOfReading, knowledgeLeqReading } from "@red-cup-engineering/metrologic/four";
-import { sourceField } from "./telling-source.mjs";
+import {
+  address, admitCell, admitTriple, cell, cellSet, knowledgeReading, merge, mergeCellSets,
+} from "@red-cup-engineering/signcell";
+import {
+  hasFields, readSourceArray, readSourceRecord, semanticId,
+} from "@red-cup-engineering/semiotic-content-address-system";
+import {
+  isReading, knowledgeBottom, knowledgeLeqReading, sidesOfReading,
+} from "@red-cup-engineering/metrologic/four";
 
-/** Index one functional valuation, joining repeated tellings of the SAME cell
- * through SignCell rather than letting first/last insertion order choose which
- * evidence can license a derivation. Public readers accept either cell arrays
- * or Maps of addressed cells; Map keys are untrusted here, so derive addresses
- * from their values. SignCraft's already-admitted index goes directly to
- * fireRuleIn without rebuilding this index. */
-function indexValuation(valuation) {
-  const indexed = new Map();
-  for (const at of valuation instanceof Map ? valuation.values() : valuation) {
-    const key = address(at), prior = indexed.get(key);
-    indexed.set(key, prior === undefined ? at : merge(prior, at));
-  }
-  return indexed;
-}
-const indexedCellAtTriple = (valuation, at) => valuation.get(address(at)) ?? cell(at.subject, at.predicate, at.object);
-const validateDerivationVersion = (version) => {
-  if (version !== 1 && version !== 2) throw new TypeError("signchain derivation: unsupported version");
-};
-
-// Only the original constructor qualifies a rule for fast repeated firing.
-// JSON wire records must be re-admitted instead of being treated as already
-// proven just because they carry "kind": "signchain.rule". This is local
-// construction custody, not a signed source certificate or permission grant.
 const admittedRules = new WeakSet();
+const kind = "signchain.rule";
 
-/** Receive a coordinate through its SignCell owner. Any supplied witness
- * lanes must be complete and valid before a rule projects them away.
- */
-const ruleTriple = source => admitTriple(source);
+function conditionOf(input, position) {
+  const record = readSourceRecord(input, "rule clause");
+  if (!isReading(record[position])) throw new TypeError("a rule clause requires a valid FOUR reading");
+  return Object.freeze({ cell: admitTriple(record.cell), [position]: record[position] });
+}
 
-/** A finite rule antecedent is an inert, dense data array. The outer
- * positional admission belongs to SignCell, preserving repeated occurrences.
- */
-const ruleConditions = value => readSourceArray(value, "signchain rule: antecedent");
-
-/** One original source-qualified positive rule. Each condition's cell and
- * reading is captured once, then the immutable SignCell triple is admitted.
- * This does NOT authenticate the provenance or issuer of a rule.
- */
+/** Admit a finite family of threshold clauses and one consequence. */
 export function rule(name, antecedent, consequent) {
-  if (typeof name !== "string" || name === "")
-    throw new TypeError("signchain rule: name must be a non-empty string");
-  const conditions = ruleConditions(antecedent).map(condition => {
-    const atLeast = sourceField(condition, "atLeast");
-    const originalCell = sourceField(condition, "cell");
-    if (!isReading(atLeast))
-      throw new TypeError("signchain rule: condition must have a valid knowledge reading");
-    return Object.freeze({cell: ruleTriple(originalCell), atLeast});
+  if (typeof name !== "string" || name === "") throw new TypeError("a SignChain rule needs a nonempty name");
+  const at = Object.freeze({
+    kind, name,
+    antecedent: Object.freeze(readSourceArray(antecedent, "rule antecedent").map(at => conditionOf(at, "atLeast"))),
+    consequent: conditionOf(consequent, "reading"),
   });
-  const originalConsequence = sourceField(consequent, "cell");
-  const reading = sourceField(consequent, "reading");
-  if (!isReading(reading))
-    throw new TypeError("signchain rule: consequent must have a valid knowledge reading");
-  const admitted = Object.freeze({
-    kind: "signchain.rule",
-    name,
-    antecedent: Object.freeze(conditions),
-    consequent: Object.freeze({ cell: ruleTriple(originalConsequence), reading }),
-  });
-  admittedRules.add(admitted);
-  return admitted;
+  admittedRules.add(at);
+  return at;
 }
 
-/** A rule with no antecedent: it always tells its consequent. */
-export const always = (at, reading) => {
-  const origin = ruleTriple(at);
-  return rule(`always:${address(origin)}:${reading}`, [], { cell: origin, reading });
-};
+export const always = (at, reading) => rule(`always:${address(at)}:${reading}`, [], { cell: at, reading });
 
-/**
- * Receive an in-process qualified original rule or re-admit the exact wire
- * shape through the same original builder. No property getter may determine
- * a premise or consequence. A non-frozen caller record is never cached.
- */
-export const admitRule = source => {
-  if (source && typeof source === "object" && admittedRules.has(source)) return source;
-  if (!source || typeof source !== "object" || Array.isArray(source) ||
-      ![Object.prototype, null].includes(Object.getPrototypeOf(source)))
-    throw new TypeError("signchain rule: requires original source rule record");
-  const descriptors = Object.getOwnPropertyDescriptors(source);
-  const names = Reflect.ownKeys(descriptors);
-  if (names.length !== 4 ||
-      !["kind","name","antecedent","consequent"].every(name =>
-        Object.hasOwn(descriptors,name) && descriptors[name].enumerable &&
-        Object.hasOwn(descriptors[name],"value")))
-    throw new TypeError("signchain rule: requires exact inert original rule positions");
-  if (sourceField(source,"kind") !== "signchain.rule")
-    throw new TypeError("signchain rule: unknown source kind");
-  return rule(sourceField(source,"name"),sourceField(source,"antecedent"),
-    sourceField(source,"consequent"));
-};
-
-/** Capture one finite, ordered rule family through the original rule owner.
- * Native rules retain their source identity; wire rules are readmitted once.
- * Repeated rule occurrences remain repeated. An array getter, hole, iterator
- * override or decorated record cannot supply an executable premise.
- */
-export const admitRules = source => Object.freeze(
-  readSourceArray(source, "signchain rules: source family").map(admitRule),
-);
-
-/** Shared addressed rule judgment for public arrays and SignCraft Maps. */
-const antecedentHoldsIn = (r, valuation) => r.antecedent.every((condition) =>
-  knowledgeLeqReading(condition.atLeast, knowledgeReading(indexedCellAtTriple(valuation, condition.cell))));
-/** Whether every antecedent holds after repeated source tellings are merged. */
-export const antecedentHolds = (r, valuation) =>
-  antecedentHoldsIn(admitRule(r), indexValuation(valuation));
-
-/** A stable witness per rule, including thresholds, conclusion and evidence lane in its identity.
- * Version 1 is retained only to replay historical settlements; it identifies labels and premise
- * addresses, not the complete license. Neither version is a signature or authenticates an issuer. */
-export function derivation(r, version = 2) {
-  validateDerivationVersion(version);
-  r = admitRule(r);
-  return Object.freeze({
-    rule: r.name,
-    from: Object.freeze(r.antecedent.map((condition) => address(condition.cell))),
-    ...(version === 2 ? { ruleId: semanticId(r) } : {}),
-  });
-}
-
-/** What one rule tells in a valuation: its consequent cell, on the sides its reading tells, witnessed by
- *  its derivation; nothing if its antecedent fails. */
-export function fireRule(r, valuation, derivationVersion = 2) {
-  return fireRuleIn(admitRule(r), indexValuation(valuation), derivationVersion);
-}
-
-/** Fire against an addressed valuation. Settlement can reuse this index across stages. */
-export function fireRuleIn(r, valuation, derivationVersion = 2) {
-  validateDerivationVersion(derivationVersion);
-  r = admitRule(r);
-  if (!antecedentHoldsIn(r, valuation)) return cellSet();
-  const [forTold, againstTold] = sidesOfReading(r.consequent.reading);
-  const witness = derivation(r, derivationVersion), at = r.consequent.cell;
-  if (!forTold && !againstTold) return cellSet();
-  return cellSet([cell(at.subject, at.predicate, at.object, { for: forTold ? [witness] : [], against: againstTold ? [witness] : [] })]);
-}
-
-/** Everything the rules tell in a valuation. */
-export function fire(rules, valuation) {
-  const indexed = indexValuation(valuation);
-  const tellings = [];
-  for (const r of admitRules(rules)) {
-    tellings.push(...fireRuleIn(r, indexed));
+/** Receive a stored rule through the same admission used by its constructor. */
+export function admitRule(input) {
+  if (admittedRules.has(input)) return input;
+  const source = readSourceRecord(input, "stored SignChain rule");
+  if (!hasFields(source, ["kind", "name", "antecedent", "consequent"]) || source.kind !== kind) {
+    throw new TypeError("a SignChain rule requires the exact original rule fields");
   }
-  return cellSet(tellings);
+  return rule(source.name, source.antecedent, source.consequent);
 }
 
-/** The immediate-consequence step: the valuation joined with what its rules tell. */
-export const step = (rules, valuation) => mergeCellSets(valuation, fire(rules, valuation));
+export const admitRules = input => Object.freeze(readSourceArray(input, "rule family").map(admitRule));
 
-/** The names of the rules whose antecedents hold. */
-export const firedRuleNames = (rules, valuation) => {
-  const indexed = indexValuation(valuation);
-  return Object.freeze(admitRules(rules)
-    .filter(r => antecedentHoldsIn(r, indexed)).map(r => r.name));
-};
+function indexValuation(input) {
+  const index = new Map();
+  const source = input instanceof Map ? Map.prototype.values.call(input) : readSourceArray(input, "rule valuation");
+  for (const raw of source) {
+    const value = admitCell(raw);
+    const key = address(value), previous = index.get(key);
+    index.set(key, previous === undefined ? value : merge(previous, value));
+  }
+  return index;
+}
+
+function readingAt(valuation, at) {
+  const key = address(at);
+  if (!Map.prototype.has.call(valuation, key)) return knowledgeBottom();
+  const value = admitCell(Map.prototype.get.call(valuation, key));
+  if (address(value) !== key) throw new TypeError("a rule premise differs from its valuation coordinate");
+  return knowledgeReading(value);
+}
+
+const holds = (rule, valuation) => rule.antecedent.every(({ cell, atLeast }) =>
+  knowledgeLeqReading(atLeast, readingAt(valuation, cell)));
+
+export const antecedentHolds = (rule, valuation) => holds(admitRule(rule), indexValuation(valuation));
+
+function requireDerivationVersion(version) {
+  if (version !== 1 && version !== 2) throw new TypeError("unsupported SignChain derivation version");
+}
+
+function witnessOf(rule, version) {
+  return Object.freeze({
+    rule: rule.name,
+    from: Object.freeze(rule.antecedent.map(condition => address(condition.cell))),
+    ...(version === 2 ? { ruleId: semanticId(rule) } : {}),
+  });
+}
+
+/** Project the original v1 premise trace or v2 full rule commitment. */
+export function derivation(input, version = 2) {
+  requireDerivationVersion(version);
+  return witnessOf(admitRule(input), version);
+}
+
+function applyRule(rule, valuation, version) {
+  if (!holds(rule, valuation)) return Object.freeze([]);
+  const [support, opposition] = sidesOfReading(rule.consequent.reading);
+  if (!support && !opposition) return Object.freeze([]);
+  const witness = witnessOf(rule, version);
+  const { subject, predicate, object } = rule.consequent.cell;
+  return Object.freeze([cell(subject, predicate, object, {
+    for: support ? [witness] : [], against: opposition ? [witness] : [],
+  })]);
+}
+
+/** Apply a rule against an addressed valuation, validating each consulted premise. */
+export function fireRuleIn(input, valuation, version = 2) {
+  requireDerivationVersion(version);
+  if (!(valuation instanceof Map)) throw new TypeError("an indexed rule valuation requires a Map");
+  return applyRule(admitRule(input), valuation, version);
+}
+
+export function fireRule(input, valuation, version = 2) {
+  return fireRuleIn(input, indexValuation(valuation), version);
+}
+
+const consequences = (rules, index) => cellSet(admitRules(rules).flatMap(rule => applyRule(rule, index, 2)));
+
+export function fire(rules, valuation) {
+  return consequences(rules, indexValuation(valuation));
+}
+
+/** Join the current valuation with the immediate consequences of all admitted rules. */
+export function step(rules, valuation) {
+  const index = indexValuation(valuation);
+  return mergeCellSets([...index.values()], consequences(rules, index));
+}
+
+export function firedRuleNames(rules, valuation) {
+  const index = indexValuation(valuation);
+  return Object.freeze(admitRules(rules).filter(rule => holds(rule, index)).map(rule => rule.name));
+}

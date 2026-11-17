@@ -9,7 +9,8 @@
  * Obsmetrologia's separately ordered knowledge/truth FOUR fiber. It is not
  * a retraction, proven source independence, truth adjudication or quotient.
  */
-import { cell, address, coincidenceKey, isCell, measured, semanticId } from "@red-cup-engineering/signcell/cell";
+import { cell, address, isCell, measured } from "@red-cup-engineering/signcell";
+import { exactCarrier, exactIdentity, readSourceArray } from "@red-cup-engineering/semiotic-content-address-system";
 import { TellingLog } from "./log.mjs";
 import { adjudicateCellEvidence, knowledgeLeq, truthLeq } from "./bilattice.mjs";
 import { sourceField } from "./telling-source.mjs";
@@ -43,47 +44,20 @@ function reading(state) {
 export function assessOriginalSourceWithdrawal(history, input={}) {
   requireEvidence(history instanceof TellingLog && history.sealed,
     "requires one sealed original SignChain TellingLog");
-  // Original outer source-field guards must run before a getter-backed
-  // options envelope can fabricate coordinates or a source partition.
   const proposition=sourceField(input,"proposition");
-  const attributions=sourceField(input,"attributions");
+  const attributions=readSourceArray(sourceField(input,"attributions"), "original-producer attributions", LIMIT);
   requireEvidence(isCell(proposition) && measured(proposition) &&
     proposition.for.length===0 && proposition.against.length===0,
     "requires an original unevidenced SignCell proposition coordinate");
-  requireEvidence(Array.isArray(attributions) &&
-    Object.getPrototypeOf(attributions)===Array.prototype &&
-    attributions.length<=LIMIT,
-    "requires bounded explicit original-producer attributions");
-  const attributionSlots=Object.getOwnPropertyDescriptors(attributions);
-  requireEvidence(Reflect.ownKeys(attributionSlots).length===attributions.length+1 &&
-    Array.from({length:attributions.length},(_,i)=>attributionSlots[String(i)])
-      .every(slot=>slot && slot.enumerable && Object.hasOwn(slot,"value")),
-    "original-producer attributions must be a dense undecorated inert array");
-
-  // The existing smallest-bucket source index enforces the FULL budget
-  // BEFORE materializing rows. The former where/against/cells/readingAt
-  // path checked its 5,000 limit only AFTER unbounded row projection.
-  // This is a conservative candidate-row cap: many irrelevant rows in a
-  // narrow bucket can cause a valid refusal rather than a time/byte bound.
   const selected=TellingLog.prototype.boundedAt.call(history,proposition,LIMIT);
   const positive=selected.for.map(row=>row.witness);
   const negative=selected.against.map(row=>row.witness);
-  // Build the exact ORIGINAL SignCell/FOUR reading from those original
-  // indexed rows; no second verdict algebra or unbounded log reader.
   const originalCell=cell(proposition.subject,proposition.predicate,proposition.object,{
     for:positive,against:negative,
   });
   const original=reading(originalCell);
 
-  const observed=new Map();
-  for(const [side,values] of [["for",positive],["against",negative]]) {
-    for(const witness of values) {
-      const key=coincidenceKey(witness);
-      const record=observed.get(key) ?? {witness, sides:new Set()};
-      record.sides.add(side);
-      observed.set(key,record);
-    }
-  }
+  const observed=new Set([...positive,...negative].map(exactIdentity));
   const claimed=new Map();
   for(const entry of attributions) {
     const witness=sourceField(entry,"witness");
@@ -91,7 +65,7 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
     requireEvidence(typeof producer==="string" &&
       producer.trim()!=="" && producer.length<=256,
       "original producer is a bounded, nonempty supplied identifier");
-    const key=coincidenceKey(witness);
+    const key=exactIdentity(exactCarrier(witness));
     requireEvidence(observed.has(key),
       "attribution claims a witness not found in the original selected cell");
     requireEvidence(!claimed.has(key),
@@ -103,7 +77,7 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
   const origins=Object.freeze([...new Set(claimed.values())].sort(cmp));
   requireEvidence(origins.length<=LIMIT,
     "too many original-producer assignments");
-  const remove=(xs,origin)=>xs.filter(w=>claimed.get(coincidenceKey(w))!==origin);
+  const remove=(xs,origin)=>xs.filter(w=>claimed.get(exactIdentity(w))!==origin);
   const withdrawals=Object.freeze(origins.map(originalProducer=>{
     const retained=cell(proposition.subject,proposition.predicate,proposition.object,{
       for:remove(positive,originalProducer), against:remove(negative,originalProducer),
@@ -111,8 +85,8 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
     const after=reading(retained);
     return Object.freeze({
       originalProducer,
-      removedWitnessAddresses:Object.freeze([...observed].filter(([k])=>claimed.get(k)===originalProducer)
-        .map(([,v])=>semanticId(v.witness)).sort(cmp)),
+      removedWitnessAddresses:Object.freeze([...observed]
+        .filter(id=>claimed.get(id)===originalProducer).sort(cmp)),
       remaining:after,
       originalKnowledgeAboveRestricted:knowledgeLeq(retained,originalCell),
       restrictedTruthBelowOriginal:truthLeq(retained,originalCell),
@@ -128,9 +102,7 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
     attributedProducerCount:origins.length,
     attributedProducers:origins,
     withdrawals,
-    // Universal quantification is over the supplied COMPLETE attribution partition,
-    // not a certificate of independent, authentic or independently located sources.
-    // Zero-producer cases are explicitly unknown, not vacuous corroboration.
+    /** Quantify over the supplied attribution partition. Zero producers give an unknown result. */
     sourceRemovalSupport:Object.freeze({
       evaluatedProducerCount:origins.length,
       supportSurvivesEverySingleProducerRemoval:origins.length===0 ? null :
@@ -158,47 +130,25 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
  *
  * A change of original source witnesses OR the associated observedAt clock
  * testimony requires downstream research review even when the FOUR reading
- * remains exactly the same. Repeated tellings of
- * one witnessed identity are not independent corroboration. The ordinary
- * SignCell coincidence/semantic identities, not JSON serialization, own the
- * witness relation. No permission or task transition is made here.
+ * remains exactly the same. An exact evidence address identifies a witness
+ * across repeated tellings. A separate address binds any reception clock.
  */
 export function compareOriginalEvidenceSnapshots(previous, current, input = {}) {
   requireEvidence(previous instanceof TellingLog && previous.sealed &&
     current instanceof TellingLog && current.sealed,
     "requires two sealed original SignChain TellingLogs");
-  const propositions = sourceField(input, "propositions");
-  requireEvidence(Array.isArray(propositions) &&
-    Object.getPrototypeOf(propositions) === Array.prototype &&
-    propositions.length <= 128,
-    "requires at most 128 explicitly nominated proposition coordinates");
-  // A coordinate family is finite source DATA, not an arbitrary iterator or
-  // a carrier for concealed authorities. Reject decorated/sparse/accessor
-  // arrays BEFORE the original indexed histories are touched.
-  const propositionSlots = Object.getOwnPropertyDescriptors(propositions);
-  requireEvidence(Reflect.ownKeys(propositionSlots).length === propositions.length + 1,
-    "proposition coordinates must be a dense undecorated inert array");
-  for (let index = 0; index < propositions.length; index++) {
-    const slot = propositionSlots[String(index)];
-    requireEvidence(slot && slot.enumerable && Object.hasOwn(slot, "value"),
-      "proposition coordinates must be dense inert array entries");
-  }
+  const propositions = readSourceArray(sourceField(input,"propositions"), "propositions", 128);
   const seen = new Set();
   let inspectedTellings = 0, inspectedCandidates = 0;
   const changes = [];
-  // These are already bounded ORIGINAL rows returned by TellingLog.boundedAt,
-  // not a second interpretation of raw SEAVT records or an unbounded log query.
+  /** Index exact witnesses and reception clocks from the bounded original rows. */
   const evidenceMap = (rows) => {
     const witnesses = new Map(), observations = new Map();
     for (const row of rows) {
-      const witnessKey = coincidenceKey(row.witness);
-      const witnessAddress = semanticId(row.witness);
-      if (!witnesses.has(witnessKey)) witnesses.set(witnessKey, witnessAddress);
-      // An original witness and its observed reception are different
-      // coordinates. A timestamp correction need not change the FOUR value.
-      // The typed tag separates absent clocks from explicitly present null.
+      const witnessAddress = exactIdentity(row.witness);
+      witnesses.set(witnessAddress, witnessAddress);
       const clockPresent = Object.hasOwn(row, "observedAt");
-      const observationKey = coincidenceKey([
+      const observationKey = exactIdentity([
         row.witness, clockPresent ? ["present", row.observedAt] : ["absent"],
       ]);
       if (!observations.has(observationKey)) observations.set(
@@ -222,8 +172,7 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     removed: Object.freeze([...before].filter(([key]) => !after.has(key))
       .sort(([a], [b]) => cmp(a, b)).map(([, value]) => value)),
   });
-  for (let index = 0; index < propositions.length; index++) {
-    const proposition = propositionSlots[String(index)].value;
+  for (const proposition of propositions) {
     requireEvidence(isCell(proposition) && measured(proposition) &&
       proposition.for.length === 0 && proposition.against.length === 0,
       "requires original unevidenced SignCell proposition coordinates");
@@ -231,9 +180,7 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     requireEvidence(!seen.has(propositionAddress),
       "the same original proposition cannot be compared twice");
     seen.add(propositionAddress);
-    // Original role-index bucket sizes are checked BEFORE a matched-row
-    // array is constructed. Both snapshots share the same 20k candidate
-    // visit/row-allocation budget, even across 128 nominated propositions.
+    /** Both snapshots share one 20,000-row candidate budget across all nominated propositions. */
     const priorRows = TellingLog.prototype.boundedAt.call(
       previous, proposition, 20000 - inspectedCandidates);
     inspectedCandidates += priorRows.candidatesInspected;
@@ -243,9 +190,7 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
     inspectedTellings += priorRows.matchedTellings + laterRows.matchedTellings;
     const priorFor = evidenceMap(priorRows.for), laterFor = evidenceMap(laterRows.for);
     const priorAgainst = evidenceMap(priorRows.against), laterAgainst = evidenceMap(laterRows.against);
-    // Rebuild the measured proposition from the original bounded testimony.
-    // Native SignCell still owns witness coincidence, canonicalization and
-    // the FOUR evidence reading. Never call unbounded cells/readingAt here.
+    /** SignCell computes the measured reading from the bounded original rows. */
     const fromRows = rows => cell(proposition.subject, proposition.predicate, proposition.object, {
       for: rows.for.map(row => row.witness),
       against: rows.against.map(row => row.witness),
