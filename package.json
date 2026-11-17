@@ -1,13 +1,19 @@
 {
   "name": "@red-cup-engineering/signchain",
-  "version": "0.6.7-dev.0",
+  "version": "0.7.0-dev.0",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
   "description": "Orderings, tellings, rules and contracts over SignCell cells.",
   "files": [
     "src",
     "data/schema",
-    "data/examples"
+    "data/examples",
+    "content/implementation.md",
+    "requirements",
+    "test/receiving.test.mjs"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -28,13 +34,20 @@
     "./token-fiber": "./src/token-fiber.mjs",
     "./rules": "./src/rules.mjs",
     "./log": "./src/log.mjs",
+    "./replicated-log": "./src/replicated-log.mjs",
     "./fiber-program": "./src/fiber-program.mjs",
     "./source-withdrawal": "./src/source-withdrawal.mjs",
-    "./telling-source": "./src/telling-source.mjs"
+    "./telling-source": "./src/telling-source.mjs",
+    "./predication": "./src/predication.mjs",
+    "./token-frame": "./src/token-frame.mjs",
+    "./document-spine": "./src/document-spine.mjs",
+    "./charge-spin": "./src/charge-spin.mjs"
   },
   "dependencies": {
     "@red-cup-engineering/metrologic": "^0.22.0",
-    "@red-cup-engineering/signcell": "^0.17.3"
+    "@red-cup-engineering/signcell": "0.18.0-dev.0",
+    "@red-cup-engineering/semiotic-content-address-system": "0.1.7-dev.1",
+    "@red-cup-engineering/typed-content": "0.1.0-dev.0"
   },
   "repository": {
     "type": "git",

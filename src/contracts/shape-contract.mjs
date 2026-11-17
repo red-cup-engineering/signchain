@@ -3,7 +3,7 @@
  * by SignCell's carrier shapes.
  */
 
-import { compileShape } from "@red-cup-engineering/signcell/shape";
+import { compileShape } from "@red-cup-engineering/typed-content";
 
 const shapesOf = (contracts) => contracts.flatMap((contract) => [contract.schema, ...shapesOf(contract.references)]);
 

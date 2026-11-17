@@ -8,7 +8,11 @@ import { observationalLens } from "./observation-lens.mjs";
 import { evidencePolicy } from "./evidence-policy.mjs";
 import { energeticObligation } from "./energetics.mjs";
 import { schemaOperationsCompose } from "./contract-operation.mjs";
-import { address, bytesToHex, cell, cellSchema, tripleSchema, cellSet, coincides, retainedCarrier, semanticId } from "@red-cup-engineering/signcell/cell";
+import { address, cell, cellSet } from "@red-cup-engineering/signcell";
+import { cellSchema, tripleSchema } from "@red-cup-engineering/typed-content";
+import {
+  bytesToHex, coincides, retainedCarrier, semanticId,
+} from "@red-cup-engineering/semiotic-content-address-system";
 import { rule, fireRule } from "../rules.mjs";
 import {
   semanticJudgment, semanticJudgmentWitnessed, fiberAspectWitnessed,

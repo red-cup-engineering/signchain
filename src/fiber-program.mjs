@@ -16,8 +16,8 @@ import {
   residuumReading, truthImplyReading, truthJoinAll, truthJoinReading,
   truthMeetAll, truthMeetReading,
 } from "@red-cup-engineering/metrologic/four";
-import { admitTokenFrame } from "@red-cup-engineering/signcell/token-frame";
-import { assertInertCarrierSource, semanticId } from "@red-cup-engineering/signcell/cell";
+import { admitTokenFrame } from "./token-frame.mjs";
+import { assertInertCarrierSource, semanticId } from "@red-cup-engineering/semiotic-content-address-system";
 import {
   knowledgeWithin, necessitateIn, pointwise, possibilizeIn, truthWithin, valuationOf,
 } from "./token-fiber.mjs";

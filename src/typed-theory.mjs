@@ -8,8 +8,8 @@
  * and predicate words (composition of predicates along a path). Self-contained
  * over predication coincidence and the exact `count`/`natZero`.
  */
-import * as signCellPredication from "@red-cup-engineering/signcell/predication";
-import { readSourceArray, readSourceRecord } from "@red-cup-engineering/signcell/cell";
+import * as signCellPredication from "./predication.mjs";
+import { readSourceArray, readSourceRecord } from "@red-cup-engineering/semiotic-content-address-system";
 const { baseObjectCoincides, predicateCoincides, termCoincides, isSpecializationMorphism } = signCellPredication;
 // The heterogeneous categorical source-node sort belongs to SignCell. A
 // 3-element array can itself be the value of a Mark, so this consumer must
