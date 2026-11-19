@@ -1,0 +1,29 @@
+{
+  "kind": "signchain.fiber-program",
+  "version": 1,
+  "expression": {
+    "op": "family",
+    "quantifier": "all",
+    "order": "truth",
+    "terms": [
+      {
+        "op": "indexed",
+        "quantifier": "some",
+        "order": "knowledge",
+        "of": {
+          "op": "read",
+          "predicate": "scenario-a",
+          "object": "outcome"
+        }
+      },
+      {
+        "op": "linear-not",
+        "of": {
+          "op": "read",
+          "predicate": "scenario-b",
+          "object": "outcome"
+        }
+      }
+    ]
+  }
+}

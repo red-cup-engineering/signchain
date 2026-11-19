@@ -1,0 +1,57 @@
+{
+  "name": "@red-cup-engineering/signchain",
+  "version": "0.7.1-dev.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Orderings, tellings, rules and contracts over SignCell cells.",
+  "files": [
+    "src",
+    "data/schema",
+    "data/examples",
+    "content/implementation.md",
+    "requirements"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./typed-theory": "./src/typed-theory.mjs",
+    "./contracts/admissibility-presentation": "./src/contracts/admissibility-presentation.mjs",
+    "./contracts/contract-operation": "./src/contracts/contract-operation.mjs",
+    "./contracts/contract-report": "./src/contracts/contract-report.mjs",
+    "./contracts/contract": "./src/contracts/contract.mjs",
+    "./contracts/energetics": "./src/contracts/energetics.mjs",
+    "./contracts/evidence-policy": "./src/contracts/evidence-policy.mjs",
+    "./contracts/instrument": "./src/contracts/instrument.mjs",
+    "./contracts/observation-lens": "./src/contracts/observation-lens.mjs",
+    "./contracts/phase": "./src/contracts/phase.mjs",
+    "./contracts/verification": "./src/contracts/verification.mjs",
+    "./contracts/judgment": "./src/contracts/judgment.mjs",
+    "./contracts/judgment-schema": "./src/contracts/judgment-schema.mjs",
+    "./bilattice": "./src/bilattice.mjs",
+    "./token-fiber": "./src/token-fiber.mjs",
+    "./rules": "./src/rules.mjs",
+    "./log": "./src/log.mjs",
+    "./replicated-log": "./src/replicated-log.mjs",
+    "./fiber-program": "./src/fiber-program.mjs",
+    "./source-withdrawal": "./src/source-withdrawal.mjs",
+    "./telling-source": "./src/telling-source.mjs",
+    "./predication": "./src/predication.mjs",
+    "./token-frame": "./src/token-frame.mjs",
+    "./document-spine": "./src/document-spine.mjs",
+    "./charge-spin": "./src/charge-spin.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/metrologic": "^0.22.0",
+    "@red-cup-engineering/signcell": "^0.18.0",
+    "@red-cup-engineering/semiotic-content-address-system": "^0.1.7",
+    "@red-cup-engineering/typed-content": "^0.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/signchain.git"
+  },
+  "private": false,
+  "engines": {
+    "node": ">=24.2.0"
+  },
+  "packageManager": "pnpm@11.28.5"
+}

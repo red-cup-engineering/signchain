@@ -1,0 +1,112 @@
+{
+  "id": "signchain-meets-then-beats-application-peers",
+  "name": "SignChain meets then beats its application peers",
+  "kind": "requirement",
+  "raised-by": "emsenn",
+  "asks": "signchain: langchain",
+  "comparison": {
+    "required-of": "561-group",
+    "subject": {
+      "kind": "package",
+      "name": "@red-cup-engineering/signchain"
+    },
+    "relation": "meet-then-beat",
+    "against": [
+      {
+        "name": "LangChain",
+        "domain": "Composed agent/model/tool operations: typed inputs and outputs, tool choice and middleware behavior, structured outputs, bounded retries, and observable execution through LangGraph-backed agents"
+      },
+      {
+        "name": "Temporal",
+        "domain": "Durable workflow execution: persisted event-history replay, task retries and external-activity idempotency, signals, timeouts, and recovery across worker failure"
+      }
+    ]
+  },
+  "met-when": [
+    {
+      "cell": "signchain-meets-then-beats-application-peers:meet",
+      "target": "held",
+      "says": "SignChain demonstrates parity with each named target on its relevant user workflows against identified baselines and workloads, with independent receiving evidence."
+    },
+    {
+      "cell": "signchain-meets-then-beats-application-peers:beat",
+      "target": "held",
+      "says": "After parity is established for each target, SignChain demonstrates a material user-relevant improvement under comparable conditions while retaining parity capabilities."
+    }
+  ],
+  "x-provenance": {
+    "recorded-by": "codex",
+    "recorded-on": "2026-10-15",
+    "leader-source": "lib/emsenn/services/561-group/services/561-group-services-section/data/records/leader-source-records/2026-10-15-application-meet-then-beat-expansion.json",
+    "target-selection-authority": "You should use your own best thinking and ambitions to say what each should meet-then-beat",
+    "leader-named-targets": [
+      "LangChain"
+    ],
+    "agent-selected-targets": [
+      "Temporal"
+    ],
+    "intended-capability": "Composable programs with typed contracts, durable continuation and witnessed effects; fewer opaque agent steps and safer resumption.",
+    "derivation": "The subject is grounded in the observed owner or explicitly desired application. Target selections extend the Leader's named comparisons under the quoted delegation. Existing requirements remain additive. Manifest descriptions describe current source and do not determine the intended design.",
+    "qualification-gaps": [
+      "Peer identities and existing R11-SCH cases are selected; exact benchmark revisions, complete paired workloads, measures, installed packages and independent receiver decisions remain unqualified.",
+      "No comparative receiving command or evidence is attached; satisfaction remains unsettled. Native schema admission remains unreceived after the previously recorded semantic-content-identity export failure."
+    ],
+    "admission": "Authored requirement data; not an assertion of signed live-enterprise admission or achieved parity.",
+    "peer-workload-qualification": {
+      "status": "Existing R11 workloads selected; pinned versions, complete paired runtime tests, and independently received installed effects are unqualified",
+      "originalSpecification": "red-cup-engineering/computer-engineering-services-section/content/text/documents/specifications/2026-10-15-technology-peer-acceptance.md#56-signchain-langchain-with-opa-as-a-policy-facet",
+      "LangChain": {
+        "primarySources": [
+          "https://docs.langchain.com/oss/python/langchain/overview",
+          "https://docs.langchain.com/oss/python/learn"
+        ],
+        "selectedCases": [
+          "R11-SCH-M1 typed inspect -> transform -> validate, two tool choices, invalid tool output, tool exception, bounded retry and trace",
+          "R11-SCH-B1 rule identity, premise witnesses, failed and contested paths"
+        ],
+        "ownerBoundary": "SignChain owns pure schema/rule/evidence composition. Model/tool calls, organizational authority, effect custody and durable runtime belong to the original composed consumers."
+      },
+      "Temporal": {
+        "primarySources": [
+          "https://docs.temporal.io/workflows",
+          "https://docs.temporal.io/encyclopedia/event-history"
+        ],
+        "selectedCases": [
+          "Compare acknowledged vs in-flight external activities against an original durable event history: exact source/occurrence identity, replay order, idempotent duplicate delivery, conflicting same source+id refusal, and actual effect/recipient readback. The SignChain telling projection is NOT the original event history.",
+          "Measure recovered user outcomes and interventions through existing FeltOS/System owners",
+          "SR-MER-14/15 acceptance: given three distinct admitted source occurrences, compare ordered 000→111→000 (weak departure-and-return) with 000→000→111 (no return). Both share W000=2,W111=1 and the complete AB, AC, BC pair count tables [[2,0],[0,1]]; neither their unique histogram nor a deduplicated telling projection may determine the return decision. An authorized downstream history consumer must retain original source+id, authenticated producer/performed causal stage order distinguished from receiver `message.observedAt` cut and any merely asserted CloudEvents `time`, a valid observation clock cut and no-return refusal, and must report unknown if only unordered counts or deduplicated evidence are available.",
+          "Evidence projection vs history control: same source+id CloudEvent retries or cross-channel forwarding preserve one original event identity and do not duplicate witnesses; two different source+id event occurrences carrying the same witnessed SignCell do not become one event, even though SignChain's TellingLog may deduplicate their evidence witness. Refuse a reused source+id with changed content, invalid/missing original source, contested order, incomplete cuts and unqualified physical port/return claims. An arriving sequence ordered by receipt-time alone MUST NOT be treated as an authenticated producer-causal sequence; refuse stronger return claims when those orders are missing, inconsistent, or unverified."
+        ],
+        "ownerBoundary": "Temporal is an additional, different workflow engine competitor; do not misclassify its worker/history requirements as LangChain's model/tool middleware.",
+        "sourceHistoryQualification": {
+          "status": "required original peer-receiving oracle; no source-native dependent test or installed consumer qualified",
+          "originalScienceWork": "https://github.com/lenticule-science/science-services-section/issues/215",
+          "existingScienceDraft": "https://github.com/lenticule-science/science-services-section/pull/216",
+          "positiveNegativeSource": "Science §7.58 three-stage equal-histogram return/non-return counterexample; §7.59 three native Holofoam branches differing in source histories despite some equal numeric projections",
+          "existingSuppliers": [
+            "red-cup-engineering/signchain/src/log.mjs blob 79904de8d0148e4aae5cbcad2743462b2f0f5175; appendWitnesses deduplicates cell/side/witness while complete history stays in original source messages",
+            "red-cup-engineering/signchain/test/claim-event-log.test.mjs blob 8493e6c10e0c588165d9457043062b1575c82ef8; reused event identity/changed content refusal and forwarding witness dedup",
+            "red-cup-engineering/signgraph/src/temporal-flow-aliasing.mjs blob 94e483206ccee3a902e2daee88c07c9b2836106d; conditional incidence dimension, NOT observed ordered triple stage sequence",
+            "red-cup-engineering/signgraph/test/meridian-temporal-aliasing.test.mjs blob f27a69c1da5c401c2bcfeeff46a7dd590fff9eae; original standalone 7/7/224 tests passed, independent consumer receiving remains open"
+          ],
+          "peerEvidence": [
+            "CloudEvents v1.0.2 source+id uniqueness and duplicate identity: https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md (current stable release observed 2026-10-29)",
+            "Temporal Event History maintains complete durable ordered workflow event log: https://docs.temporal.io/encyclopedia/event-history (documentation observed 2026-10-29, page publication undated)"
+          ],
+          "classEvidence": "Comuzzi, Ko & Maggi, A Language to Model and Simulate Data Quality Issues in Process Mining, ACM JDIQ 17(2), published 2025-06-28, https://doi.org/10.1145/3743144; source/ground-truth quality challenges are comparison only",
+          "currentBoundary": "Pure SignChain owns source-retained, deduplicated witness projection; an actual durable event/source history, Actor/port effects and replay mechanism belong to their existing original host and consumer owners.",
+          "nextOriginalStage": "Use existing accepted requirement->generated BCP14 specification->architecture->HLD/LLD->normative fabrication method, then exact-source dependency-closed native positive/negative suite; immutable pinned package, operating consumer, independently accepted effect are separate gates.",
+          "receiverOrderNonreflection": {
+            "result": "Receipt order can invert the §7.58 weak departure-and-return verdict even with three distinct source+id occurrences and identical 2×2 marginals; actual original stage order must be independently sourced.",
+            "exactCountercontrol": "For source-labelled e0,e1,e2 with values (000,111,000), causal return=true; a permitted delivery order (e0,e2,e1) with monotonically assigned receipt times reads (000,000,111) and returns false. For causal values (000,000,111), source return=false but delivery (e0,e2,e1) yields (000,111,000) and a false-positive return.",
+            "boundedIndependentAssay": "Python 3 permutations of three distinct event IDs: for true-return source (000,111,000), a naive receipt-order predicate misclassifies 4/6 orderings; for no-return source (000,000,111), it falsely claims return on 2/6. These are finite constructed negative controls, not a delivery frequency or operational risk probability.",
+            "originalCode": "SignChain src/log.mjs blob 79904de8d0148e4aae5cbcad2743462b2f0f5175: `logOfCellEventMessages` orders by `message.observedAt` and explicitly says event asserted occurrence time is not permission to make a later-received witness available earlier; its telling log is a deduplicated evidence projection, not source-authenticated event causality.",
+            "externalBasis": "CloudEvents v1.0.2 https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md: optional time is producer-supplied, source+id is event identity but neither independently authenticates actual causal ordering; compared 2026-10-29.",
+            "receiver": "Existing original source event-history owner establishes original producer/causal ordering and authorization, SignChain keeps testimony, SignGraph keeps structural incidence. Missing original order => return unknown, not a new fabricated stage."
+          }
+        }
+      },
+      "actualStatus": "Requirements oracle clarified for exact source-event versus deduplicated testimony; no native generated specification, code, pinned package, selected installed consumer, peer parity or beneficiary receiving established."
+    }
+  }
+}
