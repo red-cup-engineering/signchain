@@ -235,7 +235,7 @@ export function contractCompositionEvidence(left, right) {
 
 /** Replay against the supplied original sources, never trust a declared id,
  * schema pass or apparent positive reading in the transported result. */
-export function admitContractCompositionEvidence(left, right, received) {
+export function validateContractCompositionEvidence(left, right, received) {
   try {
     const value = contractCompositionEvidence(left, right);
     if (!coincides(received, value))

@@ -8,7 +8,7 @@ import {
   isReading, knowledgeBottom, knowledgeLeqReading, sidesOfReading,
 } from "@red-cup-engineering/metrologic/four";
 
-const admittedRules = new WeakSet();
+const validatedRules = new WeakSet();
 const kind = "signchain.rule";
 
 function conditionOf(input, position) {
@@ -25,7 +25,7 @@ export function rule(name, antecedent, consequent) {
     antecedent: Object.freeze(readSourceArray(antecedent, "rule antecedent").map(at => conditionOf(at, "atLeast"))),
     consequent: conditionOf(consequent, "reading"),
   });
-  admittedRules.add(at);
+  validatedRules.add(at);
   return at;
 }
 
@@ -33,7 +33,7 @@ export const always = (at, reading) => rule(`always:${address(at)}:${reading}`, 
 
 /** Receive a stored rule through the same admission used by its constructor. */
 export function admitRule(input) {
-  if (admittedRules.has(input)) return input;
+  if (validatedRules.has(input)) return input;
   const source = readSourceRecord(input, "stored SignChain rule");
   if (!hasFields(source, ["kind", "name", "antecedent", "consequent"]) || source.kind !== kind) {
     throw new TypeError("a SignChain rule requires the exact original rule fields");

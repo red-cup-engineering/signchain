@@ -33,17 +33,17 @@ const edges = (input, keys, endpoints, addresses, role) => {
 /** Construct a document spine with an explicit navigation order. */
 function documentSpine({ cells, order = [], references = [] } = {}) {
   if (!Array.isArray(cells)) fail("cells must be an array");
-  const admitted = cellSet(cells);
-  const addresses = admitted.map((cell) => ({ key: address(cell), cell }));
+  const validated = cellSet(cells);
+  const addresses = validated.map((cell) => ({ key: address(cell), cell }));
   const keys = new Set(addresses.map(({ key }) => key));
   const body = retainedCarrier({
     kind: DOCUMENT_SPINE_KIND,
     version: 1,
-    cells: admitted,
+    cells: validated,
     addresses,
     order: edges(order, ["before", "after"], ["before", "after"], keys, "order"),
     references: edges(references, ["from", "to", "predicate"], ["from", "to"], keys, "reference"),
-    valuationSites: admitted.map((cell) => ({
+    valuationSites: validated.map((cell) => ({
       address: address(cell), value: knowledgeReading(cell), evidence: evidence(cell),
     })),
   });
@@ -51,7 +51,7 @@ function documentSpine({ cells, order = [], references = [] } = {}) {
 }
 
 /** Reconstruct the spine and verify its advertised identity. */
-function admitDocumentSpine(input) {
+function validateDocumentSpine(input) {
   try {
     spineRecord(input, ["kind", "version", "identity", "cells", "addresses", "order", "references", "valuationSites"], "spine");
     if (input.kind !== DOCUMENT_SPINE_KIND || input.version !== 1) fail("unsupported spine kind or version");
@@ -98,5 +98,5 @@ const documentSpineSchema = retainedCarrier({
 });
 
 export {
-  DOCUMENT_SPINE_KIND, admitDocumentSpine, documentSpine, documentSpineSchema,
+  DOCUMENT_SPINE_KIND, validateDocumentSpine, documentSpine, documentSpineSchema,
 };

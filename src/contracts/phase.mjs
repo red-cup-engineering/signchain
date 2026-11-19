@@ -85,17 +85,17 @@ export const phaseEvidenceSchema = {
   description: "An observed closure ordinal (the approximant stages observed, and the finite stage at which one equalled its successor, if any did), or a certificate naming the declaration that proves the completion a gap rung's orbit never reaches.",
 };
 
-function admittedClosure(closure) {
-  const admitted = closureRegimeData(closure?.scottContinuous === true, closure?.finiteBase === true, closure?.countableCofinality === true);
-  if (admitted.kind !== "settling.closureRegimeData:witness") throw new TypeError(`phase closure violates ${admitted.constraint}`);
-  return admitted.data;
+function validatedClosure(closure) {
+  const validated = closureRegimeData(closure?.scottContinuous === true, closure?.finiteBase === true, closure?.countableCofinality === true);
+  if (validated.kind !== "settling.closureRegimeData:witness") throw new TypeError(`phase closure violates ${validated.constraint}`);
+  return validated.data;
 }
 
 /** A phase: its closure data, and the regime and coordinates read off it. */
 export function phaseSignature(spec) {
-  const data = admittedClosure(spec.closure);
-  const regime = classifyRegime(data);
-  const name = closureRegimeName(regime);
+  const data = validatedClosure(spec.closure);
+  const mode = classifyRegime(data);
+  const name = closureRegimeName(mode);
   return Object.freeze({
     kind: "metroplat.phase",
     id: spec.id,
@@ -103,7 +103,7 @@ export function phaseSignature(spec) {
     regime: name,
     finality: finalities[name],
     cost: costs[name],
-    coordinationCost: cohomologyVanishesInRegime(regime) ? "none" : "evidenced",
+    coordinationCost: cohomologyVanishesInRegime(mode) ? "none" : "evidenced",
     energy: energies[name],
   });
 }
@@ -137,7 +137,7 @@ const zeroSeed = () => record(0, 0);
  * An observation reads its closure ordinal under the phase's continuity and cofinality
  * (`regimeOfOrd`) and witnesses that regime only below the gap: a finite settling stage
  * is strict, and an unsettled orbit is Scott when the phase is Scott-continuous. */
-export function phaseEvidenceRegime(phase, evidence) {
+export function phaseEvidenceMode(phase, evidence) {
   if (evidence.certificate !== undefined) {
     // Receive only the parameters this source actually declares. The upstream
     // catalog owns the family and its exact parameter admission; missing or
@@ -158,14 +158,14 @@ export function phaseEvidenceRegime(phase, evidence) {
   // reports its documented absence of a regime without attempting the claim.
   if (phase.closure.countableCofinality === false) return null;
   const ordinal = evidence.settledAt === undefined ? omegaOrdinal() : ofNat(evidence.settledAt);
-  const regime = regimeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality);
-  return regimeRank(regime) < 2 ? closureRegimeName(regime) : null;
+  const mode = regimeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality);
+  return regimeRank(mode) < 2 ? closureRegimeName(mode) : null;
 }
 
 /** Whether some piece of evidence for this phase witnesses the phase's own regime. */
 export function phaseEvidenced(phase, evidence) {
   return (evidence ?? []).some((entry) =>
-    entry.phase === phase.id && entry.stages.length > 0 && phaseEvidenceRegime(phase, entry) === phase.regime);
+    entry.phase === phase.id && entry.stages.length > 0 && phaseEvidenceMode(phase, entry) === phase.regime);
 }
 
 /** A finite settling: finite base, so Scott-continuous and countably cofinal. */

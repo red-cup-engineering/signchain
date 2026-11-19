@@ -189,7 +189,7 @@ const proofSourceRecord = (value, names) => {
  * valid morphism even when its path eventually returns to a known object.
  * SignCell alone owns actual base object equality and issued-node roles.
  */
-function admittedTheory(theory) {
+function validatedTheory(theory) {
     const rejected = reason => Object.freeze({ ok: false, reason });
     const source = proofSourceRecord(theory, ["kind", "objects", "rules"]);
     if (!source || source.kind !== "typedTheory.carrier")
@@ -230,7 +230,7 @@ function admittedTheory(theory) {
 
 /** The composition closure of a theory's rules (to a fixed point). */
 export function derivationClosure(theory) {
-    const source = admittedTheory(theory);
+    const source = validatedTheory(theory);
     if (!source.ok) throw new TypeError("typed theory: cannot close " + source.reason);
     let rules = source.rules;
     for (;;) {
@@ -255,14 +255,14 @@ const derivationSearchObstruction = (theory, premise, conclusion, explored) => O
 /** Objects must be admitted to this exact theory before its identity
  * morphisms or proofs can exist. An arbitrary matching pair of JSON values
  * is not an object of an otherwise unrelated finite category. */
-const admittedObject = (objects, object) =>
+const validatedObject = (objects, object) =>
     objects.some(known => baseObjectCoincides(known, object));
 
 /** Breadth-first search for a derivation from premise to conclusion. */
 export function derive(theory, premise, conclusion) {
-    const source = admittedTheory(theory);
-    if (!source.ok || !admittedObject(source.objects, premise) ||
-        !admittedObject(source.objects, conclusion))
+    const source = validatedTheory(theory);
+    if (!source.ok || !validatedObject(source.objects, premise) ||
+        !validatedObject(source.objects, conclusion))
         return derivationSearchObstruction(theory, premise, conclusion, []);
     if (baseObjectCoincides(premise, conclusion)) {
         const derivation = Object.freeze({ kind: "typedTheory.derivation", theory, premise, conclusion, steps: Object.freeze([]), length: natZero });
@@ -306,23 +306,23 @@ export function typing(theory, premise, conclusion) {
  * or an independent scientific theorem.
  */
 export function derivationValidity(theory, derivation) {
-    const refusal = (reason, evidence = {}) => Object.freeze({
+    const rejection = (reason, evidence = {}) => Object.freeze({
         kind: "typedTheory.derivation-obstruction", theory, reason, derivation,
         ...evidence,
     });
     // Use the SAME category-source gate as derivation search and closure.
     // A zero-step identity cannot conceal a rule with undeclared endpoints.
-    const source = admittedTheory(theory);
-    if (!source.ok) return refusal(source.reason);
+    const source = validatedTheory(theory);
+    if (!source.ok) return rejection(source.reason);
     const original = proofSourceRecord(derivation,
         ["kind", "theory", "premise", "conclusion", "steps", "length"]);
     if (!original || original.kind !== "typedTheory.derivation" ||
         original.theory !== theory)
-        return refusal("invalid-proof-source");
+        return rejection("invalid-proof-source");
     const objects = source.objects, rules = source.rules;
     let steps;
     try { steps = finiteSourceArray(original.steps, "derivation steps"); }
-    catch { return refusal("invalid-proof-sequence"); }
+    catch { return rejection("invalid-proof-sequence"); }
     // ExactNumber owns natural-number meaning. Compare the actual issued
     // count's two canonical data coordinates, rather than coercing a
     // caller-provided claimed length to a number.
@@ -330,25 +330,25 @@ export function derivationValidity(theory, derivation) {
     const length = proofSourceRecord(original.length, ["kind", "value"]);
     if (!length || length.kind !== issuedLength.kind ||
         length.value !== issuedLength.value)
-        return refusal("incorrect-proof-length");
-    const isObject = (object) => admittedObject(objects, object);
+        return rejection("incorrect-proof-length");
+    const isObject = (object) => validatedObject(objects, object);
     if (!isObject(original.premise) || !isObject(original.conclusion))
-        return refusal("unadmitted-object");
+        return rejection("unadmitted-object");
     let current = original.premise;
     const verifiedSteps = [];
     for (const step of steps) {
         const at = proofSourceRecord(step, ["kind", "premise", "rule", "conclusion"]);
         if (!at || at.kind !== "typedTheory.derivationStep")
-            return refusal("invalid-proof-step");
+            return rejection("invalid-proof-step");
         // A lookalike rule with matching words has not been issued by this
         // theory. A step can only cite one of its ACTUAL inference rules.
         const rule = rules.find(candidate => candidate === at.rule);
         if (!rule)
-            return refusal("unissued-proof-rule");
+            return rejection("unissued-proof-rule");
         if (!baseObjectCoincides(at.premise, current) ||
             !baseObjectCoincides(rule.domain, current) ||
             !baseObjectCoincides(rule.codomain, at.conclusion))
-            return refusal("broken-proof-path", { at: current, step });
+            return rejection("broken-proof-path", { at: current, step });
         verifiedSteps.push(Object.freeze({
             kind: "typedTheory.derivationStep",
             premise: current, rule, conclusion: rule.codomain,
@@ -356,7 +356,7 @@ export function derivationValidity(theory, derivation) {
         current = rule.codomain;
     }
     if (!baseObjectCoincides(current, original.conclusion))
-        return refusal("wrong-proof-conclusion", { at: current, conclusion: original.conclusion });
+        return rejection("wrong-proof-conclusion", { at: current, conclusion: original.conclusion });
     // Return a new immutable verified carrier. In particular, a mutable
     // foreign source cannot rewrite the steps of an already issued check.
     const certified = Object.freeze({
