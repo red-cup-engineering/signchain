@@ -22,10 +22,10 @@
  * cell holds both sides witnessed in every regime. Observability is the lens's,
  * not the phase's.
  */
-import { classifyMode, closureModeData, cohomologyVanishesInMode } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/value-category";
-import { ofNat, modeOfOrdinal } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/ordinal-closure";
-import { closureModeName, omegaOrdinal } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/closure";
-import { certificateOf, modeRank } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/certificate";
+import { classifyRegime, closureRegimeData, cohomologyVanishesInRegime } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/value-category";
+import { ofNat, regimeOfOrdinal } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/ordinal-closure";
+import { closureRegimeName, omegaOrdinal } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/closure";
+import { certificateOf, regimeRank } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/certificate";
 import { record } from "@red-cup-engineering/metrologic/four";
 
 /** When a settled value is attained, by regime (`unattained_settling_gate`): at a finite
@@ -86,7 +86,7 @@ export const phaseEvidenceSchema = {
 };
 
 function validatedClosure(closure) {
-  const validated = closureModeData(closure?.scottContinuous === true, closure?.finiteBase === true, closure?.countableCofinality === true);
+  const validated = closureRegimeData(closure?.scottContinuous === true, closure?.finiteBase === true, closure?.countableCofinality === true);
   if (validated.kind !== "settling.closureRegimeData:witness") throw new TypeError(`phase closure violates ${validated.constraint}`);
   return validated.data;
 }
@@ -94,8 +94,8 @@ function validatedClosure(closure) {
 /** A phase: its closure data, and the regime and coordinates read off it. */
 export function phaseSignature(spec) {
   const data = validatedClosure(spec.closure);
-  const mode = classifyMode(data);
-  const name = closureModeName(mode);
+  const mode = classifyRegime(data);
+  const name = closureRegimeName(mode);
   return Object.freeze({
     kind: "metroplat.phase",
     id: spec.id,
@@ -103,7 +103,7 @@ export function phaseSignature(spec) {
     regime: name,
     finality: finalities[name],
     cost: costs[name],
-    coordinationCost: cohomologyVanishesInMode(mode) ? "none" : "evidenced",
+    coordinationCost: cohomologyVanishesInRegime(mode) ? "none" : "evidenced",
     energy: energies[name],
   });
 }
@@ -151,15 +151,15 @@ export function phaseEvidenceMode(phase, evidence) {
       if (error instanceof TypeError || error instanceof RangeError) return null;
       throw error;
     }
-    return certificate.kind.endsWith("-obstruction") ? null : closureModeName(certificate.regime);
+    return certificate.kind.endsWith("-obstruction") ? null : closureRegimeName(certificate.regime);
   }
   // An observed finite/countable orbit cannot evidence uncountable cofinality.
   // The shared ordinal reader refuses that claim; this evidence projection
   // reports its documented absence of a regime without attempting the claim.
   if (phase.closure.countableCofinality === false) return null;
   const ordinal = evidence.settledAt === undefined ? omegaOrdinal() : ofNat(evidence.settledAt);
-  const mode = modeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality);
-  return modeRank(mode) < 2 ? closureModeName(mode) : null;
+  const mode = regimeOfOrdinal(ordinal, phase.closure.scottContinuous, phase.closure.countableCofinality);
+  return regimeRank(mode) < 2 ? closureRegimeName(mode) : null;
 }
 
 /** Whether some piece of evidence for this phase witnesses the phase's own regime. */
