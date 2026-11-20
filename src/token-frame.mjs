@@ -5,7 +5,7 @@ import {
   createGraph, shortestPathWithSourceEdges,
 } from "@red-cup-engineering/metrologic/models/graphs/directed-multigraph";
 import {
-  finitePreorder, relates, topDownset, admitDownset, upward, principalDownset, joinDownsets,
+  finitePreorder, relates, topDownset, validateDownset, upward, principalDownset, joinDownsets,
   bottomDownset, downsetWithin, meetDownsets, impliesDownsets,
 } from "@red-cup-engineering/metrologic/models/order/finite-preorder";
 import {
@@ -131,7 +131,7 @@ function position(frame, token) {
   if (index === undefined) throw new TypeError("Token does not occur in this frame");
   return index;
 }
-const downset = (frame, open) => admitDownset(frame.order, open.map(token => position(frame, token)));
+const downset = (frame, open) => validateDownset(frame.order, open.map(token => position(frame, token)));
 
 function specializes(frame, special, general) {
   const current = state(frame);
