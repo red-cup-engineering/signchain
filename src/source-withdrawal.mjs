@@ -1,3 +1,4 @@
+import { compareText } from "@red-cup-engineering/semiotic-content-address-system";
 /**
  * Source/producer withdrawal over an actual, fixed SignChain telling history.
  *
@@ -16,7 +17,7 @@ import { adjudicateCellEvidence, knowledgeLeq, truthLeq } from "./bilattice.mjs"
 import { sourceField } from "./telling-source.mjs";
 
 const LIMIT = 5000;
-const cmp = (a,b) => a < b ? -1 : a > b ? 1 : 0;
+
 function requireEvidence(condition, message) {
   if (!condition) throw new TypeError("signchain original-source withdrawal: " + message);
 }
@@ -74,7 +75,7 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
   }
   requireEvidence(claimed.size===observed.size,
     "missing original-producer attribution for a witnessed source");
-  const origins=Object.freeze([...new Set(claimed.values())].sort(cmp));
+  const origins=Object.freeze([...new Set(claimed.values())].sort(compareText));
   requireEvidence(origins.length<=LIMIT,
     "too many original-producer assignments");
   const remove=(xs,origin)=>xs.filter(w=>claimed.get(exactIdentity(w))!==origin);
@@ -86,7 +87,7 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
     return Object.freeze({
       originalProducer,
       removedWitnessAddresses:Object.freeze([...observed]
-        .filter(id=>claimed.get(id)===originalProducer).sort(cmp)),
+        .filter(id=>claimed.get(id)===originalProducer).sort(compareText)),
       remaining:after,
       originalKnowledgeAboveRestricted:knowledgeLeq(retained,originalCell),
       restrictedTruthBelowOriginal:truthLeq(retained,originalCell),
@@ -162,15 +163,15 @@ export function compareOriginalEvidenceSnapshots(previous, current, input = {}) 
   };
   const delta = (before, after) => Object.freeze({
     added: Object.freeze([...after].filter(([key]) => !before.has(key))
-      .map(([, id]) => id).sort(cmp)),
+      .map(([, id]) => id).sort(compareText)),
     removed: Object.freeze([...before].filter(([key]) => !after.has(key))
-      .map(([, id]) => id).sort(cmp)),
+      .map(([, id]) => id).sort(compareText)),
   });
   const observationDelta = (before, after) => Object.freeze({
     added: Object.freeze([...after].filter(([key]) => !before.has(key))
-      .sort(([a], [b]) => cmp(a, b)).map(([, value]) => value)),
+      .sort(([a], [b]) => compareText(a, b)).map(([, value]) => value)),
     removed: Object.freeze([...before].filter(([key]) => !after.has(key))
-      .sort(([a], [b]) => cmp(a, b)).map(([, value]) => value)),
+      .sort(([a], [b]) => compareText(a, b)).map(([, value]) => value)),
   });
   for (const proposition of propositions) {
     requireEvidence(isCell(proposition) && measured(proposition) &&
