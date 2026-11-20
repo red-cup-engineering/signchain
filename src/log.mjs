@@ -24,7 +24,7 @@ export function telling(at, witness, side = "for", observedAt) {
 }
 
 /** Persisted rows supply their own explicit polarity. */
-export function validateTelling(input) {
+export function admitTelling(input) {
   const row = readSourceRecord(input, "persisted telling");
   return rowOf(row, row.witness, row.side, row.observedAt);
 }
@@ -35,7 +35,7 @@ function cellOfRow(row) {
 
 /** Project ordered testimony into a SignCell set. */
 export function cellsOfRows(rows) {
-  return cellSet(readSourceArray(rows, "telling rows").map(row => cellOfRow(validateTelling(row))));
+  return cellSet(readSourceArray(rows, "telling rows").map(row => cellOfRow(admitTelling(row))));
 }
 
 /** An ordered append-only history, optionally sealed for repeatable reads. */
@@ -45,7 +45,7 @@ export class TellingLog {
   #sealed = false;
 
   constructor(rows = []) {
-    for (const row of readSourceArray(rows, "telling history")) this.#append(validateTelling(row));
+    for (const row of readSourceArray(rows, "telling history")) this.#append(admitTelling(row));
   }
 
   #assertAppendable() {

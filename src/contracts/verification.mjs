@@ -322,15 +322,15 @@ function sameReport(source, derived) {
 function certificateOf({ instrument, contract }, plan, planMatches = true) {
   const requiredChecks = requiredVerificationCheckClasses(instrument);
   const failedChecks = [], checkEvidence = [];
-  const results = new Map();
+  const verdicts = new Map();
   for (const check of plan.checks) {
     const witnessed = semanticJudgmentWitnessed(check.judgment);
-    results.set(check.check, (results.get(check.check) ?? true) && witnessed);
+    verdicts.set(check.check, (verdicts.get(check.check) ?? true) && witnessed);
     if (witnessed) checkEvidence.push(`check:${check.id}`);
     else failedChecks.push(check.id);
   }
-  const dischargedChecks = requiredChecks.filter(check => results.get(check) === true);
-  const missingChecks = requiredChecks.filter(check => !results.has(check));
+  const dischargedChecks = requiredChecks.filter(check => verdicts.get(check) === true);
+  const missingChecks = requiredChecks.filter(check => !verdicts.has(check));
   const validityEvidence = plan.checks.find(check => check.check === "contract-validity").evidence;
   const contractComponentsAccounted = componentEvidence(contract).every(entry => validityEvidence.includes(entry));
   const obligationsProjected = plan.obligations.length > 0 &&

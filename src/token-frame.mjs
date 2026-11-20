@@ -61,15 +61,15 @@ function cacheableTokenFrame(frame) {
   } catch { return false; }
 }
 
-function validateTokenFrame(frame) {
+function admitTokenFrame(frame) {
   if (frames.has(frame)) return frame;
   const previous = reconstructions.get(frame);
   if (previous) return previous;
   const cells = field(frame, "cells");
   if (field(frame, "kind") !== FRAME || cells === undefined) throw new TypeError("Invalid token frame");
-  const validated = tokenFrame(cells, { predicate: field(frame, "predicate", true) });
-  if (cacheableTokenFrame(frame)) reconstructions.set(frame, validated);
-  return validated;
+  const admitted = tokenFrame(cells, { predicate: field(frame, "predicate", true) });
+  if (cacheableTokenFrame(frame)) reconstructions.set(frame, admitted);
+  return admitted;
 }
 
 /** Derive the order from supporting witnesses and retain direct denials separately. */
@@ -125,7 +125,7 @@ function tokenFrame(cells = [], options = {}) {
   return frame;
 }
 
-const state = frame => frames.get(validateTokenFrame(frame));
+const state = frame => frames.get(admitTokenFrame(frame));
 function position(frame, token) {
   const index = frame.positions.get(coincidenceKey(token));
   if (index === undefined) throw new TypeError("Token does not occur in this frame");
@@ -172,6 +172,6 @@ const implies = (frame, antecedent, consequent) => combine(frame, impliesDownset
 const negation = (frame, open) => implies(frame, open, bottom());
 
 export {
-  SPECIALIZES, validateTokenFrame, bottom, cacheableTokenFrame, extent, generalizations, implies, join,
+  SPECIALIZES, admitTokenFrame, bottom, cacheableTokenFrame, extent, generalizations, implies, join,
   meet, negation, specialization, specializes, tokenFrame, top, within,
 };

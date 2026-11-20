@@ -79,18 +79,18 @@ export function assessOriginalSourceWithdrawal(history, input={}) {
     "too many original-producer assignments");
   const remove=(xs,origin)=>xs.filter(w=>claimed.get(exactIdentity(w))!==origin);
   const withdrawals=Object.freeze(origins.map(originalProducer=>{
-    const kept=cell(proposition.subject,proposition.predicate,proposition.object,{
+    const retained=cell(proposition.subject,proposition.predicate,proposition.object,{
       for:remove(positive,originalProducer), against:remove(negative,originalProducer),
     });
-    const after=reading(kept);
+    const after=reading(retained);
     return Object.freeze({
       originalProducer,
       removedWitnessAddresses:Object.freeze([...observed]
         .filter(id=>claimed.get(id)===originalProducer).sort(cmp)),
       remaining:after,
-      originalKnowledgeAboveRestricted:knowledgeLeq(kept,originalCell),
-      restrictedTruthBelowOriginal:truthLeq(kept,originalCell),
-      originalTruthBelowRestricted:truthLeq(originalCell,kept),
+      originalKnowledgeAboveRestricted:knowledgeLeq(retained,originalCell),
+      restrictedTruthBelowOriginal:truthLeq(retained,originalCell),
+      originalTruthBelowRestricted:truthLeq(originalCell,retained),
       intervention:"counterfactual-withholding-not-an-observed-source-retraction",
     });
   }));

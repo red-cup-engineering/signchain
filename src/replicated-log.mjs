@@ -1,6 +1,6 @@
 import { hasFields, exactIdentity, isNiUri, readSourceArray, readSourceRecord, retainedCarrier } from "@red-cup-engineering/semiotic-content-address-system";
 import { tripleKey } from "@red-cup-engineering/signcell";
-import { validateTelling, telling, TellingLog } from "./log.mjs";
+import { admitTelling, telling, TellingLog } from "./log.mjs";
 
 const originalKind = "signchain.telling.v1";
 const repairKind = "signchain.repair.v1";
@@ -19,7 +19,7 @@ function occurrenceOf(input) {
 
 /** Identify a retained exact telling and any independently supplied occurrence. */
 export function tellingEvent(row, occurrence) {
-  return eventOf({ kind: originalKind, row: validateTelling(row), ...occurrenceOf(occurrence) });
+  return eventOf({ kind: originalKind, row: admitTelling(row), ...occurrenceOf(occurrence) });
 }
 
 function checkEvent(source) {
@@ -27,7 +27,7 @@ function checkEvent(source) {
   if (!isNiUri(id) || exactIdentity(body) !== id) return { id, code: "identity-mismatch" };
   let event;
   try {
-    const row = validateTelling(body.row);
+    const row = admitTelling(body.row);
     const occurrence = occurrenceOf(body.occurrence);
     if (body.kind === originalKind) event = eventOf({ kind: originalKind, row, ...occurrence });
     if (body.kind === repairKind && Array.isArray(body.over) &&
@@ -99,16 +99,16 @@ export function replayTellingEvents(...histories) {
     }
   }
 
-  const validated = new Set(), superseded = new Set();
+  const admitted = new Set(), superseded = new Set();
   for (let index = 0; index < ready.length; index++) {
     const event = ready[index];
     if (conflicts.has(event.id)) {
       report(event.id, "occurrence-conflict");
-    } else if (event.over && (!event.over.every(id => validated.has(id)) ||
+    } else if (event.over && (!event.over.every(id => admitted.has(id)) ||
         !validBasis(event.over.map(id => byId.get(id)), byId, tripleKey(event.row)))) {
       report(event.id, "invalid-repair-basis");
     } else {
-      validated.add(event.id);
+      admitted.add(event.id);
       for (const id of event.over ?? []) superseded.add(id);
     }
     for (const child of dependents.get(event.id) ?? []) {
@@ -122,7 +122,7 @@ export function replayTellingEvents(...histories) {
       conflicts.has(event.id) ? "occurrence-conflict" : "unresolved-repair-basis");
   }
 
-  const active = events.filter(event => validated.has(event.id) && !superseded.has(event.id));
+  const active = events.filter(event => admitted.has(event.id) && !superseded.has(event.id));
   const originals = events.filter(event => event.kind === originalKind);
   return Object.freeze({
     events: Object.freeze(events),

@@ -256,13 +256,13 @@ function materialMentions(material, value) {
     .some((entry) => entry === needle || entry.includes(needle) || needle.includes(entry));
 }
 
-function lensDomainValidated(contract) {
+function lensDomainAdmitted(contract) {
   return materialMentions(contract.material, contract.lens.domain) ||
     contract.lens.domain === contract.move.domain ||
     contract.lens.domain === contract.move.codomain;
 }
 
-function lensBoundaryValidated(contract) {
+function lensBoundaryAdmitted(contract) {
   const boundaryNeedle = normalizedToken(contract.lens.boundary);
   return materialMentions(contract.material, contract.lens.boundary) ||
     contract.lens.boundary === contract.move.domain ||
@@ -661,16 +661,16 @@ function phaseReportFor(contract, energetics) {
 /** Judge whether a contract's observational lens Λ is admissible for Γ/m/Φ/Ω before any boundary value is observed. */
 
 export function contractLensReport(contract) {
-  const domainValidated = lensDomainValidated(contract);
-  const boundaryValidated = lensBoundaryValidated(contract);
+  const domainAdmitted = lensDomainAdmitted(contract);
+  const boundaryAdmitted = lensBoundaryAdmitted(contract);
   const outputAccounted = lensOutputAccounted(contract);
   const preservesDeclared = contract.lens.preserves.length > 0;
   const hidesDeclared = contract.phase.finality === "normal-form" || contract.lens.hides.length > 0;
   const evidenceRequirementAccounted = !contract.lens.evidenceRequired || contract.evidencePolicy.required;
   const phaseCompatible = lensMatchesPhase(contract);
   const missing = [
-    ...(domainValidated ? [] : ["lens-domain"]),
-    ...(boundaryValidated ? [] : ["lens-boundary"]),
+    ...(domainAdmitted ? [] : ["lens-domain"]),
+    ...(boundaryAdmitted ? [] : ["lens-boundary"]),
     ...(outputAccounted ? [] : ["lens-output"]),
     ...(preservesDeclared ? [] : ["lens-preserves"]),
     ...(hidesDeclared ? [] : ["lens-hides"]),
@@ -689,8 +689,8 @@ export function contractLensReport(contract) {
     output: contract.lens.output,
     missing: Object.freeze(missing),
     aspects: Object.freeze([
-      semanticJudgment("lens-domain", domainValidated ? [] : ["lens-domain"]),
-      semanticJudgment("lens-boundary", boundaryValidated ? [] : ["lens-boundary"]),
+      semanticJudgment("lens-domain", domainAdmitted ? [] : ["lens-domain"]),
+      semanticJudgment("lens-boundary", boundaryAdmitted ? [] : ["lens-boundary"]),
       semanticJudgment("lens-output", outputAccounted ? [] : ["lens-output"]),
       semanticJudgment("lens-preserves", preservesDeclared ? [] : ["lens-preserves"]),
       semanticJudgment("lens-hides", hidesDeclared ? [] : ["lens-hides"]),

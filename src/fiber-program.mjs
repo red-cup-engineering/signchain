@@ -16,7 +16,7 @@ import {
   residuumReading, truthImplyReading, truthJoinAll, truthJoinReading,
   truthMeetAll, truthMeetReading,
 } from "@red-cup-engineering/metrologic/four";
-import { validateTokenFrame } from "./token-frame.mjs";
+import { admitTokenFrame } from "./token-frame.mjs";
 import { assertInertCarrierSource, semanticId } from "@red-cup-engineering/semiotic-content-address-system";
 import {
   knowledgeWithin, necessitateIn, pointwise, possibilizeIn, truthWithin, valuationOf,
@@ -137,7 +137,7 @@ export function executeFiberProgram(frame, program) {
   // Inspect the whole display before comparing it, so display accessors cannot
   // run merely because SignCell correctly ignores them as non-authoritative.
   assertInertCarrierSource(frame);
-  const generated = validateTokenFrame(frame);
+  const generated = admitTokenFrame(frame);
   if (semanticId(generated) !== semanticId(frame))
     throw new TypeError("signchain fiber program: declared frame differs from its source-generated token frame");
   const valuation = expression(generated, program.expression);
