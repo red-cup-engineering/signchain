@@ -124,5 +124,61 @@ export function firedRuleNames(rules, valuation) {
   return Object.freeze(parseRules(rules).filter(rule => holds(rule, index)).map(rule => rule.name));
 }
 
+/**
+ * Abduction: the rules whose consequence would satisfy a goal, with what each one still needs.
+ * The goal is `{ cell, atLeast }`: the cell and the least reading wanted of it. A rule is a
+ * candidate when its consequent is that cell at a reading covering `atLeast`; each of its clauses is
+ * reported `present` (the valuation already reads at least the clause's threshold) or `missing`.
+ */
+export function abduce(rules, valuation, goal) {
+  return abduceIn(parseRules(rules), indexValuation(valuation), conditionOf(goal, "atLeast"));
+}
+
+function abduceIn(rules, index, goal) {
+  const wanted = address(goal.cell);
+  return Object.freeze(rules
+    .filter(rule => address(rule.consequent.cell) === wanted
+      && knowledgeLeqReading(goal.atLeast, rule.consequent.reading))
+    .map(rule => {
+      const needed = Object.freeze(rule.antecedent.map(({ cell, atLeast }) => Object.freeze({
+        cell, atLeast, status: knowledgeLeqReading(atLeast, readingAt(index, cell)) ? "present" : "missing",
+      })));
+      return Object.freeze({
+        rule: rule.name, needed, satisfied: needed.every(clause => clause.status === "present"),
+      });
+    }));
+}
+
+/**
+ * Backward chaining: a proof tree for a goal `{ cell, atLeast }` by recursive abduction. The
+ * root's `source` is `fact` (the valuation already reads it), `derived` (some candidate rule has
+ * every clause proved; its `children` list each candidate with its clause proofs), `cycle`,
+ * `depth-limit`, or `failed`.
+ */
+export function prove(rules, valuation, goal, { maxDepth = 16 } = {}) {
+  return proveIn(parseRules(rules), indexValuation(valuation), conditionOf(goal, "atLeast"), new Set(), 0, maxDepth);
+}
+
+function proveIn(rules, index, goal, path, depth, maxDepth) {
+  const claim = Object.freeze({ cell: goal.cell, atLeast: goal.atLeast });
+  const key = `${address(goal.cell)}\u0000${goal.atLeast}`;
+  if (knowledgeLeqReading(goal.atLeast, readingAt(index, goal.cell))) return Object.freeze({ source: "fact", claim });
+  if (path.has(key)) return Object.freeze({ source: "cycle", claim });
+  if (depth >= maxDepth) return Object.freeze({ source: "depth-limit", claim });
+  const candidates = abduceIn(rules, index, goal);
+  if (candidates.length === 0) return Object.freeze({ source: "failed", claim });
+  const inside = new Set(path).add(key);
+  const children = candidates.map(candidate => {
+    const clauses = candidate.needed.map(clause => proveIn(rules, index, clause, inside, depth + 1, maxDepth));
+    return Object.freeze({
+      rule: candidate.rule, clauses: Object.freeze(clauses),
+      satisfied: clauses.every(clause => clause.source === "fact" || clause.source === "derived"),
+    });
+  });
+  return Object.freeze({
+    source: children.some(child => child.satisfied) ? "derived" : "failed", claim, children: Object.freeze(children),
+  });
+}
+
 // Names exported by previous package releases.
 export { parseRule as admitRule, parseRules as admitRules };
